@@ -93,15 +93,6 @@ Slide contents.
 == Annotation for equation using `pint`
 #slide[
   #v(50pt)
-  $
-    // pdv(vb(u), t) + (vb(u) dprod grad) vb(u) = - 1 / rho grad p + nu laplacian vb(u) + vb(f)
-    #pin(1);(partial vb(u)) / (partial t)#pin(2)
-    + #pin(3);(vb(u) dprod grad) vb(u)#pin(4)
-    = - #pin(5);1/rho grad p#pin(6)
-    + #pin(7)nu laplacian vb(u)#pin(8)
-    + #pin(9)vb(f)#pin(10)
-  $
-
   #pinit-highlight-equation-from(1, 2, height: 60pt, dx: -4pt, dy: 19pt, pos: bottom, fill: red, arrow-length: 20pt)[
     Time derivative
   ]
@@ -117,6 +108,14 @@ Slide contents.
   #pinit-highlight-equation-from(9, 10, height: 30pt, dx: 0pt, dy: 4pt, pos: right, fill: aqua, arrow-length: 20pt)[
     Force
   ]
+  $
+    // pdv(vb(u), t) + (vb(u) dprod grad) vb(u) = - 1 / rho grad p + nu laplacian vb(u) + vb(f)
+    #pin(1);(partial vb(u)) / (partial t)#pin(2)
+    + #pin(3);(vb(u) dprod grad) vb(u)#pin(4)
+    = - #pin(5);1/rho grad p#pin(6)
+    + #pin(7)nu laplacian vb(u)#pin(8)
+    + #pin(9)vb(f)#pin(10)
+  $
 ]
 
 == Two-column slide

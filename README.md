@@ -23,15 +23,6 @@ touch sample.typ
 #import "@preview/physica:0.9.4": *
 #import "typst-templates/annotated-equation.typ": *
 
-$
-// pdv(vb(u), t) + (vb(u) dprod grad) vb(u) = - 1 / rho grad p + nu laplacian vb(u) + vb(f)
-#pin(1);(partial vb(u)) / (partial t)#pin(2)
-+ #pin(3);(vb(u) dprod grad) vb(u)#pin(4)
-= - #pin(5);1/rho grad p#pin(6)
-+ #pin(7)nu laplacian vb(u)#pin(8)
-+ #pin(9)vb(f)#pin(10)
-$
-
 #pinit-highlight-equation-from(1, 2, height: 30pt, dx: -12pt, dy: 0pt, pos: bottom, fill: red, arrow-length: 0pt)[
   Time derivative
 ]
@@ -47,6 +38,14 @@ $
 #pinit-highlight-equation-from(9, 10, height: 15pt, dx: 0pt, dy: -8pt, pos: right, fill: aqua, arrow-length: 10pt)[
   Force
 ]
+$
+// pdv(vb(u), t) + (vb(u) dprod grad) vb(u) = - 1 / rho grad p + nu laplacian vb(u) + vb(f)
+#pin(1);(partial vb(u)) / (partial t)#pin(2)
++ #pin(3);(vb(u) dprod grad) vb(u)#pin(4)
+= - #pin(5);1/rho grad p#pin(6)
++ #pin(7)nu laplacian vb(u)#pin(8)
++ #pin(9)vb(f)#pin(10)
+$
 ```
 
 ※よりきれいな出力を得るためには`pinit-highlight-equation-from`関数中の`dy-line`パラメータを調整する必要がある．

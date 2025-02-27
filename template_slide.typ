@@ -1,0 +1,190 @@
+#import "@preview/touying:0.6.1": *
+#import themes.university: *
+#import "@preview/showybox:2.0.4": showybox // Colorful and customizable boxes
+#import "@preview/physica:0.9.4": * // Math constructs for science and engineering
+#import "@preview/pinit:0.2.2": * // Annotation
+#import "@preview/cetz:0.3.2" // Draw figures
+#import "annotate-equation.typ": pinit-highlight-equation-from
+
+// ===========================================
+// Set font family
+// ===========================================
+// Serif fonts: Amiri, Noto Music
+// Sans serif fonts: Inter Display, Nimbus Sans, TeX Gyre Heros
+#set text(font: "Cabin")
+#show math.equation: set text(font: "Latin Modern Math")
+#show regex("[\p{scx:Han}\p{scx:Hira}\p{scx:Kana}]"): set text(font: "Noto Sans CJK JP") // For Japanese
+
+// ===========================================
+// Set up slide design
+// ===========================================
+#show: university-theme.with(
+  header-right: "", // Remove section
+  footer-columns: (45%, 45%, 10%), // Decompose footer into three columns
+  // left footer: current section
+  footer-a: self => {
+    sym.section + " " + utils.display-current-heading(level: 1)
+  },
+  // centre footer: summary & presentation date
+  footer-b: self => {
+    h(1fr)
+    self.info.summary
+    h(1fr)
+    self.info.date.display(self.datetime-format)
+    h(1fr)
+  },
+  // right footer: slide number
+  footer-c: context utils.slide-counter.display() + " / " + utils.last-slide-number,
+  // Set up title slide information
+  config-info(
+    title: [Presentation title\ ...continued to the second line],
+    subtitle: [Subtitle],
+    author: [
+      *Presenter name*: Institution\
+      Co-author name: Institution
+    ],
+    date: datetime.today(),
+    institution: [], // Now written in `author` field
+    logo: "", // emoji.school,
+    summary: [presenter$at$subtitle],
+  ),
+  // Date format
+  config-common(datetime-format: "[month repr:short]. [day], [year]"),
+  // config-common(datetime-format: "[year]年[month]月[day]日"), // 日本語
+  // Do not show 'new section' slide
+  config-common(new-section-slide-fn: none),
+  // Semi-transparent animation ***does not work for some cases***
+  // config-methods(cover: utils.semi-transparent-cover.with(alpha: 80%)),
+  // Handout slide
+  config-common(handout: false),
+)
+
+// ===========================================
+// Other settings
+// ===========================================
+// Add animation to CeTZ
+#let cetz-canvas = touying-reducer.with(reduce: cetz.canvas, cover: cetz.draw.hide.with(bounds: true))
+// tcolorbox equivalent
+#let showybox_focus = (
+  border-color: white,
+  body-color: red.lighten(50%),
+)
+
+
+#title-slide()
+
+// ==================================================
+= Chapter title
+// ==================================================
+
+==  // without this, subsection will not be printed. Related with `config-common(new-section-slide-fn: none)`?
+== Simple slide
+
+Slide contents.
+
+== Slide with `#slide` block and animation
+#slide[
+  $
+    f &= m a \
+    pause &= m dv(v, t)
+  $
+]
+
+== Annotation for equation using `pint`
+#slide[
+  #v(50pt)
+  $
+    // pdv(vb(u), t) + (vb(u) dprod grad) vb(u) = - 1 / rho grad p + nu laplacian vb(u) + vb(f)
+    #pin(1);(partial vb(u)) / (partial t)#pin(2)
+    + #pin(3);(vb(u) dprod grad) vb(u)#pin(4)
+    = - #pin(5);1/rho grad p#pin(6)
+    + #pin(7)nu laplacian vb(u)#pin(8)
+    + #pin(9)vb(f)#pin(10)
+  $
+
+  #pinit-highlight-equation-from(1, 2, height: 60pt, dx: -4pt, dy: 19pt, pos: bottom, fill: red, arrow-length: 20pt)[
+    Time derivative
+  ]
+  #pinit-highlight-equation-from(3, 4, height: 30pt, dx: 27pt, dy: 4pt, pos: top, fill: blue, arrow-length: 30pt)[
+    Advect
+  ]
+  #pinit-highlight-equation-from(5, 6, height: 60pt, dx: 7pt, dy: 17pt, pos: bottom, fill: green, arrow-length: 20pt)[
+    Pressure gradient
+  ]
+  #pinit-highlight-equation-from(7, 8, height: 30pt, dx: 13pt, dy: 4pt, pos: top, fill: orange, arrow-length: 30pt)[
+    Viscous
+  ]
+  #pinit-highlight-equation-from(9, 10, height: 30pt, dx: 0pt, dy: 4pt, pos: right, fill: aqua, arrow-length: 20pt)[
+    Force
+  ]
+]
+
+== Two-column slide
+
+#slide[
+  First column
+][
+  Second column
+]
+
+== Partially two-column slide
+#slide[
+  #box(
+    columns(2, gutter: 10pt)[
+      === Description
+      - test test test
+      - test test test
+      - test test test
+      #colbreak()
+      #align(center)[
+        #cetz.canvas({
+          import cetz.draw: *
+          // figure
+          // content((0, 0), image("fig/figure.png", width: 10cm))
+          // Overwrite x label
+          rect(fill: gray, stroke: white, (-2.0, -4.7), (2.0, -5.3))
+          content(
+            (0, -5),
+            [#text(16pt)[x label]],
+          )
+          // Overwrite y label
+          rect(fill: gray, stroke: white, (-5.3, -2.0), (-4.7, 2.0))
+          content(
+            (-5, 0),
+            angle: 90deg,
+            [#text(16pt)[y label]],
+          )
+        })
+      ]
+    ],
+  )
+  #v(1fr)
+  #showybox(
+    frame: showybox_focus,
+    [Important text],
+  )
+]
+
+// Freeze last-slide-number
+#show: appendix
+
+/*
+#slide[
+  #bibliography(
+    title: "References",
+    style: "annual-reviews-author-date",
+    "biblio.bib",
+  )
+]
+*/
+
+// ==================================================
+= Appendix
+// ==================================================
+
+== To Do list
+#slide[
+  ==
+  - Add template contents
+  - Add animation example
+]

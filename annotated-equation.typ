@@ -18,7 +18,13 @@
   pin2, //highlightの終点
   body, //テキスト
 ) = {
-  pinit-highlight(pin1, pin2, dy: -dy - 18pt, extended-height: height, fill: rgb(..fill.components().slice(0, -1), 40))
+  pinit-highlight(
+    pin1,
+    pin2,
+    dy: -dy - 18pt,
+    extended-height: height,
+    fill: rgb(..fill.components().slice(0, -1), 153),
+  ) // 153=255*6/10
 
   let out-contents = box(stroke: (bottom: fill + 0.12em), inset: (x: inset, y: 5pt), text(fill: fill)[#body])
 

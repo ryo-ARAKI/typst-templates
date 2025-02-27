@@ -23,7 +23,7 @@
     pin2,
     dy: -dy - 18pt,
     extended-height: height,
-    fill: rgb(..fill.components().slice(0, -1), 153),
+    fill: rgb(..fill.components().slice(0, -1), 100),
   ) // 153=255*6/10
 
   let out-contents = box(stroke: (bottom: fill + 0.12em), inset: (x: inset, y: 5pt), text(fill: fill)[#body])

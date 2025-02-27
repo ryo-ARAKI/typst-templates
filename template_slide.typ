@@ -80,6 +80,11 @@ Slide contents.
   $
 ]
 
+== 日本語と数式
+#slide[
+  運動方程式$f=m a$は質量$m$の物体に力$f$が作用したとき物体に働く加速度$a$を記述する．
+]
+
 == Annotation for equation using `pint`
 #slide[
   #v(50pt)

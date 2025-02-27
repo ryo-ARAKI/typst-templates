@@ -4,7 +4,7 @@
 #import "@preview/physica:0.9.4": * // Math constructs for science and engineering
 #import "@preview/pinit:0.2.2": * // Annotation
 #import "@preview/cetz:0.3.2" // Draw figures
-#import "annotate-equation.typ": pinit-highlight-equation-from
+#import "annotated-equation.typ": pinit-highlight-equation-from
 
 // ===========================================
 // Set font family

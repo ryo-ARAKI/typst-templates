@@ -10,6 +10,7 @@
   arrow-length: 20pt, //矢印の長さ
   dx: 0pt, //矢印全体のx座標
   dy: 0pt, //全体のy座標
+  dy-line: -1.5pt, // 矢印と枠線の位置調整
   pos: bottom, //矢印の位置（bottom, top, right）
   fill: rgb(0, 0, 0), //矢印の色
   inset: 0.25em, //テキストのinset
@@ -20,8 +21,6 @@
   pinit-highlight(pin1, pin2, dy: -dy - 18pt, extended-height: height, fill: rgb(..fill.components().slice(0, -1), 40))
 
   let out-contents = box(stroke: (bottom: fill + 0.12em), inset: (x: inset, y: 5pt), text(fill: fill)[#body])
-
-  let dy-line = -1.5pt //ここで線の位置を微調整する
 
   if pos == bottom {
     let text-dy = 0.85em

@@ -14,6 +14,14 @@
 #set text(font: "Cabin")
 #show math.equation: set text(font: "Latin Modern Math")
 #show regex("[\p{scx:Han}\p{scx:Hira}\p{scx:Kana}]"): set text(font: "Noto Sans CJK JP") // For Japanese
+// 和欧文間空白
+// https://qiita.com/zr_tex8r/items/a9d82669881d8442b574
+#show math.equation.where(block: false): it => {
+  let ghost = text(font: "Adobe Blank", "\u{375}") // 欧文ゴースト
+  ghost
+  it
+  ghost
+}
 
 // ===========================================
 // Set up slide design

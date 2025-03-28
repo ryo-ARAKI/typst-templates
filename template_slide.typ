@@ -65,7 +65,7 @@
 // Other settings
 // ===========================================
 // Vertical gap between text and equation
-#show math.equation.where(block: true): set block(spacing: 0.5em)
+#show math.equation.where(block: true): set block(spacing: 0.7em)
 // add new theorion environment
 #show: show-question
 #show: show-summary

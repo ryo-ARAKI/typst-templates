@@ -27,8 +27,6 @@
   radius: 5pt,
   text,
 )
-// Vertical gap between text and equation
-#show math.equation.where(block: true): set block(spacing: 0.5em)
 
 // ===========================================
 // Configuration of theorion (theorem environment)

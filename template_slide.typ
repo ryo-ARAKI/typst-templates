@@ -61,6 +61,15 @@
   config-common(handout: false),
 )
 
+// ===========================================
+// Other settings
+// ===========================================
+// Vertical gap between text and equation
+#show math.equation.where(block: true): set block(spacing: 0.5em)
+// add new theorion environment
+#show: show-question
+#show: show-summary
+
 #title-slide()
 
 // ==================================================

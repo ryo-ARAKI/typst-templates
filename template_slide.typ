@@ -174,7 +174,6 @@ Slide contents.
 // Freeze last-slide-number
 #show: appendix
 
-/*
 #slide[
   #bibliography(
     title: "References",
@@ -182,7 +181,6 @@ Slide contents.
     "biblio.bib",
   )
 ]
-*/
 
 // ==================================================
 = Appendix

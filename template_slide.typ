@@ -130,6 +130,22 @@ Slide contents.
   Second column
 ]
 
+== Two-column slide with uneven columns
+#slide(composer: (60%, auto))[
+  First column
+][
+  #cetz.canvas({
+    import cetz.draw: *
+    // for reference
+    grid((-5, -7), (5, 7), stroke: gray)
+    circle((0, 0), radius: .1, fill: black, stroke: none)
+    content(
+      (0, 0),
+      text[tmp],
+    )
+  })
+]
+
 == Partially two-column slide
 #slide[
   #box(

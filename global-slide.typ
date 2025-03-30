@@ -40,6 +40,6 @@
 )
 #let (summary-counter, summary-box, summary, show-summary) = make-frame(
   "summary",
-  "まとめ",
+  "Summary",
   render: render-fn.with(fill: rgb("#f93d6e").lighten(70%)),
 )

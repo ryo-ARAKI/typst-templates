@@ -21,10 +21,11 @@
   body-color: red.lighten(50%),
 )
 // textbox
-#let textbox(text, color) = box(
+#let textbox(text, color, baseline: 0%) = box(
   fill: color.lighten(50%),
   outset: (x: 4pt, y: 10pt),
   radius: 5pt,
+  baseline: baseline,
   text,
 )
 

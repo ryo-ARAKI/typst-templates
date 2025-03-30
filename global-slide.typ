@@ -20,6 +20,10 @@
   border-color: white,
   body-color: red.lighten(50%),
 )
+#let showybox_advanced = (
+  border-color: white,
+  body-color: orange.lighten(80%),
+)
 // textbox
 #let textbox(text, color, baseline: 0%) = box(
   fill: color.lighten(50%),
@@ -28,6 +32,8 @@
   baseline: baseline,
   text,
 )
+// Math expression with colored text
+#let colormath(math, color) = text(fill: color, math)
 
 // ===========================================
 // Configuration of theorion (theorem environment)

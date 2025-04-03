@@ -20,13 +20,20 @@
   border-color: white,
   body-color: red.lighten(50%),
 )
+#let showybox_advanced = (
+  border-color: white,
+  body-color: orange.lighten(80%),
+)
 // textbox
-#let textbox(text, color) = box(
+#let textbox(text, color, baseline: 0%) = box(
   fill: color.lighten(50%),
   outset: (x: 4pt, y: 10pt),
   radius: 5pt,
+  baseline: baseline,
   text,
 )
+// Math expression with colored text
+#let colormath(math, color) = text(fill: color, math)
 
 // ===========================================
 // Configuration of theorion (theorem environment)
@@ -40,6 +47,6 @@
 )
 #let (summary-counter, summary-box, summary, show-summary) = make-frame(
   "summary",
-  "まとめ",
+  "Summary",
   render: render-fn.with(fill: rgb("#f93d6e").lighten(70%)),
 )

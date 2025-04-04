@@ -165,17 +165,10 @@ Slide contents.
           // content((0, 0), image("fig/figure.png", width: 10cm))
           // Overwrite x label
           rect(fill: gray, stroke: white, (-2.0, -2.5), (2.0, -3.5))
-          content(
-            (0, -3),
-            [#text(16pt)[x label]],
-          )
+          content((0, -3), [#text(16pt)[x label]])
           // Overwrite y label
           rect(fill: gray, stroke: white, (-2.5, -2.0), (-3.5, 2.0))
-          content(
-            (-3, 0),
-            angle: 90deg,
-            [#text(16pt)[y label]],
-          )
+          content((-3, 0), angle: 90deg, [#text(16pt)[y label]])
         })
       ]
     ],

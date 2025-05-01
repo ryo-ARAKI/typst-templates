@@ -18,7 +18,7 @@
 // tcolorbox equivalent
 #let showybox_focus = (
   border-color: white,
-  body-color: red.lighten(50%),
+  body-color: rgb("#f93d6e").lighten(50%),
 )
 #let showybox_advanced = (
   border-color: white,

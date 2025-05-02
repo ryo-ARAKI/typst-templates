@@ -102,7 +102,7 @@
   block(
     width: 100%,
     fill: rgb("#fece5a").lighten(70%),
-    inset: (y: 25pt),
+    inset: 25pt,
     radius: 10pt,
     {
       set text(fill: rgb(0, 50, 100), weight: "bold")

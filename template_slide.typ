@@ -67,8 +67,8 @@
 // Vertical gap between text and equation
 #show math.equation.where(block: true): set block(spacing: 0.7em)
 // add new theorion environment
-#show: show-question
-#show: show-summary
+// #show: show-question
+// #show: show-summary
 
 #title-slide()
 

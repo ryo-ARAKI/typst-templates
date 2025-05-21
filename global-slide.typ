@@ -9,7 +9,7 @@
 #import "@preview/cetz:0.3.4" // Draw figures
 #import "@preview/theorion:0.3.3": * // theorem environment
 #import "annotated-equation.typ": pinit-highlight-equation-from // Equation annotation
-#import "@preview/muchpdf:0.1.0": muchpdf // include PDF figure
+#import "@preview/muchpdf:0.1.1": muchpdf // include PDF figure
 
 // ===========================================
 // General settings

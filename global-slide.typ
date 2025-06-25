@@ -64,72 +64,60 @@
 #let question-state = state("question-state", ())
 
 #let summary(body) = {
-  block(
-    width: 100%,
-    fill: rgb("#f93d6e").lighten(70%),
-    inset: 25pt,
-    radius: 10pt,
-    {
-      set text(fill: rgb(0, 50, 100), weight: "bold")
-      [Sum. ]
-      context {
-        let summary-state_arr = summary-state.get()
-        if summary-state_arr.contains(body) {
-          summary-state.get().enumerate().find(it => it.at(1) == body).at(0) + 1
+  block(width: 100%, fill: rgb("#f93d6e").lighten(70%), inset: 25pt, radius: 10pt, {
+    set text(fill: rgb(0, 50, 100), weight: "bold")
+    [Sum. ]
+    context {
+      let summary-state_arr = summary-state.get()
+      if summary-state_arr.contains(body) {
+        summary-state.get().enumerate().find(it => it.at(1) == body).at(0) + 1
+      } else {
+        if type(summary-state_arr) == array {
+          [#{ summary-state_arr.len() + 1 }]
         } else {
-          if type(summary-state_arr) == array {
-            [#{ summary-state_arr.len() + 1 }]
-          } else {
-            1
-          }
+          1
         }
       }
-      summary-state.update(it => {
-        let arr = it
-        if not arr.contains(body) {
-          arr.push(body)
-        }
-        arr
-      })
-      set text(fill: black, weight: "regular")
-      h(0.5em)
-      body
-    },
-  )
+    }
+    summary-state.update(it => {
+      let arr = it
+      if not arr.contains(body) {
+        arr.push(body)
+      }
+      arr
+    })
+    set text(fill: black, weight: "regular")
+    h(0.5em)
+    body
+  })
 }
 
 
 #let question(body) = {
-  block(
-    width: 100%,
-    fill: rgb("#fece5a").lighten(70%),
-    inset: 25pt,
-    radius: 10pt,
-    {
-      set text(fill: rgb(0, 50, 100), weight: "bold")
-      [Q. ]
-      context {
-        let question-state_arr = question-state.get()
-        if question-state_arr.contains(body) {
-          question-state.get().enumerate().find(it => it.at(1) == body).at(0) + 1
+  block(width: 100%, fill: rgb("#fece5a").lighten(70%), inset: 25pt, radius: 10pt, {
+    set text(fill: rgb(0, 50, 100), weight: "bold")
+    [Q. ]
+    context {
+      let question-state_arr = question-state.get()
+      if question-state_arr.contains(body) {
+        question-state.get().enumerate().find(it => it.at(1) == body).at(0) + 1
+      } else {
+        if type(question-state_arr) == array {
+          [#{ question-state_arr.len() + 1 }]
         } else {
-          if type(question-state_arr) == array {
-            [#{ question-state_arr.len() + 1 }]
-          } else {
-            1
-          }
+          1
         }
       }
-      question-state.update(it => {
-        let arr = it
-        if not arr.contains(body) {
-          arr.push(body)
-        }
-        arr
-      })
-      set text(fill: black, weight: "regular")
-      [: ]
-      body
-    },
-  )
+    }
+    question-state.update(it => {
+      let arr = it
+      if not arr.contains(body) {
+        arr.push(body)
+      }
+      arr
+    })
+    set text(fill: black, weight: "regular")
+    [: ]
+    body
+  })
 }

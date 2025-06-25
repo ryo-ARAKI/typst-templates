@@ -76,7 +76,7 @@
 = Chapter title
 // ==================================================
 
-==   // without this, subsection will not be printed. Related with `config-common(new-section-slide-fn: none)`?
+==        // without this, subsection will not be printed. Related with `config-common(new-section-slide-fn: none)`?
 == Simple slide
 
 Slide contents.
@@ -149,33 +149,37 @@ Slide contents.
 
 == Partially two-column slide
 #slide[
-  #box(columns(2, gutter: 10pt)[
-    === Description
-    - test test test
-    - test test test
-    - test test test
-    #colbreak()
-    #align(center)[
-      #cetz.canvas({
-        import cetz.draw: *
-        // for reference
-        grid(
-          (-4, -4),
-          (4, 4),
-          stroke: gray,
-        )
-        circle((0, 0), radius: .1, fill: black, stroke: none)
-        // figure
-        // content((0, 0), image("fig/figure.png", width: 10cm))
-        // Overwrite x label
-        rect(fill: gray, stroke: white, (-2.0, -2.5), (2.0, -3.5))
-        content((0, -3), [#text(16pt)[x label]])
-        // Overwrite y label
-        rect(fill: gray, stroke: white, (-2.5, -2.0), (-3.5, 2.0))
-        content((-3, 0), angle: 90deg, [#text(16pt)[y label]])
-      })
-    ]
-  ])
+  #grid(
+    columns: (60%, 40%),
+    [
+      === Description
+      - test test test
+      - test test test
+      - test test test
+    ],
+    [
+      #align(center)[
+        #cetz.canvas({
+          import cetz.draw: *
+          // for reference
+          grid(
+            (-4, -4),
+            (4, 4),
+            stroke: gray,
+          )
+          circle((0, 0), radius: .1, fill: black, stroke: none)
+          // figure
+          // content((0, 0), image("fig/figure.png", width: 10cm))
+          // Overwrite x label
+          rect(fill: gray, stroke: white, (-2.0, -2.5), (2.0, -3.5))
+          content((0, -3), [#text(16pt)[x label]])
+          // Overwrite y label
+          rect(fill: gray, stroke: white, (-2.5, -2.0), (-3.5, 2.0))
+          content((-3, 0), angle: 90deg, [#text(16pt)[y label]])
+        })
+      ]
+    ],
+  )
   #v(1fr)
   #showybox(frame: showybox_focus, [Important text])
 ]

@@ -184,6 +184,14 @@ Slide contents.
   #showybox(frame: showybox_focus, [Important text])
 ]
 
+== Questions and summaries
+#slide[
+  #question[Question 1]
+  #question[Question 2]
+  #summary[Summary 1]
+  #summary[Summary 2]
+]
+
 // Freeze last-slide-number
 #show: appendix
 

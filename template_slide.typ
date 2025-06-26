@@ -1,7 +1,9 @@
 #import "global-slide.typ": *
+#import "utils.typ": jp-spacing
 
 // ===========================================
 // Set font family
+// NOTE: Noto Sans CJK JP font is required for Japanese.
 // ===========================================
 // Serif fonts: Amiri, Noto Music
 // Sans serif fonts: Inter Display, Nimbus Sans, TeX Gyre Heros
@@ -9,20 +11,16 @@
 #show math.equation: set text(font: "Latin Modern Math")
 #show regex("[\p{scx:Han}\p{scx:Hira}\p{scx:Kana}]"): set text(font: "Noto Sans CJK JP") // For Japanese
 // 和欧文間空白
-// https://qiita.com/zr_tex8r/items/a9d82669881d8442b574
-#show math.equation.where(block: false): it => {
-  let ghost = text(font: "Adobe Blank", "\u{375}") // 欧文ゴースト
-  ghost
-  it
-  ghost
-}
+#show math.equation.where(block: false): it => jp-spacing(it)
 
 // ===========================================
 // Set up slide design
 // ===========================================
+#let footer-columns = (45%, 45%, 10%)
+
 #show: university-theme.with(
   header-right: "", // Remove section
-  footer-columns: (45%, 45%, 10%), // Decompose footer into three columns
+  footer-columns: footer-columns, // Decompose footer into three columns
   // left footer: current section
   footer-a: self => {
     sym.section + " " + utils.display-current-heading(level: 1)
@@ -76,7 +74,7 @@
 = Chapter title
 // ==================================================
 
-==        // without this, subsection will not be printed. Related with `config-common(new-section-slide-fn: none)`?
+==              // without this, subsection will not be printed. Related with `config-common(new-section-slide-fn: none)`?
 == Simple slide
 
 Slide contents.
@@ -96,20 +94,21 @@ Slide contents.
 
 == Annotation for equation using `pint`
 #slide[
+  #let annot-style(color) = (fill: color, height: 30pt, arrow-length: 20pt)
   #v(50pt)
-  #pinit-highlight-equation-from(1, 2, height: 60pt, dx: -4pt, dy: 19pt, pos: bottom, fill: red, arrow-length: 20pt)[
+  #pinit-highlight-equation-from(1, 2, ..annot-style(red), height: 60pt, dx: -4pt, dy: 19pt, pos: "bottom")[
     Time derivative
   ]
-  #pinit-highlight-equation-from(3, 4, height: 30pt, dx: 27pt, dy: 4pt, pos: top, fill: blue, arrow-length: 30pt)[
+  #pinit-highlight-equation-from(3, 4, ..annot-style(blue), dx: 27pt, dy: 4pt, pos: "top", arrow-length: 30pt)[
     Advect
   ]
-  #pinit-highlight-equation-from(5, 6, height: 60pt, dx: 7pt, dy: 17pt, pos: bottom, fill: green, arrow-length: 20pt)[
+  #pinit-highlight-equation-from(5, 6, ..annot-style(green), height: 60pt, dx: 7pt, dy: 17pt, pos: "bottom")[
     Pressure gradient
   ]
-  #pinit-highlight-equation-from(7, 8, height: 30pt, dx: 13pt, dy: 4pt, pos: top, fill: orange, arrow-length: 30pt)[
+  #pinit-highlight-equation-from(7, 8, ..annot-style(orange), dx: 13pt, dy: 4pt, pos: "top", arrow-length: 30pt)[
     Viscous
   ]
-  #pinit-highlight-equation-from(9, 10, height: 30pt, dx: 0pt, dy: 4pt, pos: right, fill: aqua, arrow-length: 20pt)[
+  #pinit-highlight-equation-from(9, 10, ..annot-style(aqua), dx: 0pt, dy: 4pt, pos: "right")[
     Force
   ]
   $
@@ -182,6 +181,14 @@ Slide contents.
   )
   #v(1fr)
   #showybox(frame: showybox_focus, [Important text])
+]
+
+== Questions and summaries
+#slide[
+  #question[Question 1]
+  #question[Question 2]
+  #summary[Summary 1]
+  #summary[Summary 2]
 ]
 
 // Freeze last-slide-number

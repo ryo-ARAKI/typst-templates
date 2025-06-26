@@ -1,7 +1,6 @@
 // ===========================================
 // Equation annotation with pinit
 // https://github.com/OrangeX4/typst-pinit/blob/main/examples/equation-desc.typ
-// add `pos: right` and `pos: left`
 // ===========================================
 #import "@preview/pinit:0.2.2": *
 

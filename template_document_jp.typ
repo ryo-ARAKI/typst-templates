@@ -5,6 +5,7 @@
 #import "@preview/roremu:0.1.0": roremu // 日本語のダミー文書
 
 // 日本語文書の設定
+// NOTE: IPAexMincho and IPAexGothic fonts are required.
 #show: js.with(
   lang: "ja",
   seriffont: "Libertinus Serif",
@@ -30,12 +31,13 @@
 #show math.equation.where(block: true): it => box[#it]
 // 和欧文間空白
 // https://qiita.com/zr_tex8r/items/a9d82669881d8442b574
-#show math.equation.where(block: false): it => {
+#let jp-spacing(it) = {
   let ghost = text(font: "Adobe Blank", "\u{375}") // 欧文ゴースト
   ghost
   it
   ghost
 }
+#show math.equation.where(block: false): it => jp-spacing(it)
 
 // 参考文献
 #import "@preview/enja-bib:0.1.0": *

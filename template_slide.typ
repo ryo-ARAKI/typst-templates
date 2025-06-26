@@ -1,4 +1,5 @@
 #import "global-slide.typ": *
+#import "utils.typ": jp-spacing
 
 // ===========================================
 // Set font family
@@ -10,13 +11,6 @@
 #show math.equation: set text(font: "Latin Modern Math")
 #show regex("[\p{scx:Han}\p{scx:Hira}\p{scx:Kana}]"): set text(font: "Noto Sans CJK JP") // For Japanese
 // 和欧文間空白
-// https://qiita.com/zr_tex8r/items/a9d82669881d8442b574
-#let jp-spacing(it) = {
-  let ghost = text(font: "Adobe Blank", "\u{375}") // 欧文ゴースト
-  ghost
-  it
-  ghost
-}
 #show math.equation.where(block: false): it => jp-spacing(it)
 
 // ===========================================

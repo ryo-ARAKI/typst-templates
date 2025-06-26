@@ -2,6 +2,7 @@
 
 // ===========================================
 // Set font family
+// NOTE: Noto Sans CJK JP font is required for Japanese.
 // ===========================================
 // Serif fonts: Amiri, Noto Music
 // Sans serif fonts: Inter Display, Nimbus Sans, TeX Gyre Heros
@@ -10,19 +11,22 @@
 #show regex("[\p{scx:Han}\p{scx:Hira}\p{scx:Kana}]"): set text(font: "Noto Sans CJK JP") // For Japanese
 // 和欧文間空白
 // https://qiita.com/zr_tex8r/items/a9d82669881d8442b574
-#show math.equation.where(block: false): it => {
+#let jp-spacing(it) = {
   let ghost = text(font: "Adobe Blank", "\u{375}") // 欧文ゴースト
   ghost
   it
   ghost
 }
+#show math.equation.where(block: false): it => jp-spacing(it)
 
 // ===========================================
 // Set up slide design
 // ===========================================
+#let footer-columns = (45%, 45%, 10%)
+
 #show: university-theme.with(
   header-right: "", // Remove section
-  footer-columns: (45%, 45%, 10%), // Decompose footer into three columns
+  footer-columns: footer-columns, // Decompose footer into three columns
   // left footer: current section
   footer-a: self => {
     sym.section + " " + utils.display-current-heading(level: 1)
@@ -76,7 +80,7 @@
 = Chapter title
 // ==================================================
 
-==        // without this, subsection will not be printed. Related with `config-common(new-section-slide-fn: none)`?
+==           // without this, subsection will not be printed. Related with `config-common(new-section-slide-fn: none)`?
 == Simple slide
 
 Slide contents.

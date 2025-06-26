@@ -80,7 +80,7 @@
 = Chapter title
 // ==================================================
 
-==           // without this, subsection will not be printed. Related with `config-common(new-section-slide-fn: none)`?
+==              // without this, subsection will not be printed. Related with `config-common(new-section-slide-fn: none)`?
 == Simple slide
 
 Slide contents.
@@ -101,19 +101,19 @@ Slide contents.
 == Annotation for equation using `pint`
 #slide[
   #v(50pt)
-  #pinit-highlight-equation-from(1, 2, height: 60pt, dx: -4pt, dy: 19pt, pos: bottom, fill: red, arrow-length: 20pt)[
+  #pinit-highlight-equation-from(1, 2, height: 60pt, dx: -4pt, dy: 19pt, pos: "bottom", fill: red, arrow-length: 20pt)[
     Time derivative
   ]
-  #pinit-highlight-equation-from(3, 4, height: 30pt, dx: 27pt, dy: 4pt, pos: top, fill: blue, arrow-length: 30pt)[
+  #pinit-highlight-equation-from(3, 4, height: 30pt, dx: 27pt, dy: 4pt, pos: "top", fill: blue, arrow-length: 30pt)[
     Advect
   ]
-  #pinit-highlight-equation-from(5, 6, height: 60pt, dx: 7pt, dy: 17pt, pos: bottom, fill: green, arrow-length: 20pt)[
+  #pinit-highlight-equation-from(5, 6, height: 60pt, dx: 7pt, dy: 17pt, pos: "bottom", fill: green, arrow-length: 20pt)[
     Pressure gradient
   ]
-  #pinit-highlight-equation-from(7, 8, height: 30pt, dx: 13pt, dy: 4pt, pos: top, fill: orange, arrow-length: 30pt)[
+  #pinit-highlight-equation-from(7, 8, height: 30pt, dx: 13pt, dy: 4pt, pos: "top", fill: orange, arrow-length: 30pt)[
     Viscous
   ]
-  #pinit-highlight-equation-from(9, 10, height: 30pt, dx: 0pt, dy: 4pt, pos: right, fill: aqua, arrow-length: 20pt)[
+  #pinit-highlight-equation-from(9, 10, height: 30pt, dx: 0pt, dy: 4pt, pos: "right", fill: aqua, arrow-length: 20pt)[
     Force
   ]
   $

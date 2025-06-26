@@ -13,6 +13,7 @@
   line-offset-y: -1.5pt, // vertical offset for the line and arrow (矢印と枠線の位置調整)
   pos: "bottom", // position of the arrow (bottom, top, right, left) (矢印の位置)
   fill: rgb(0, 0, 0), // color of the arrow (矢印の色)
+  stroke: auto, // color of the line under the text, defaults to `fill`
   inset: 0.25em, // inset for the text box (テキストのinset)
   pin1, // start pin for the highlight (highlightの始点)
   pin2, // end pin for the highlight (highlightの終点)
@@ -25,7 +26,8 @@
   ))
 
   // Create the annotation text box
-  let out-contents = box(stroke: (bottom: fill + 0.12em), inset: (x: inset, y: 5pt), text(fill: fill)[#body])
+  let stroke-color = if stroke == auto { fill } else { stroke }
+  let out-contents = box(stroke: (bottom: stroke-color + 0.12em), inset: (x: inset, y: 5pt), text(fill: fill)[#body])
 
   // Configurations for each arrow position
   let pos-configs = (

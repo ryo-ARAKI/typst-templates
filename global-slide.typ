@@ -39,30 +39,34 @@
 // ===========================================
 // Configuration of Summary & Question environments
 // ===========================================
-#let create-box-environment(name, title-text, color, state-obj) = {
-  return (body) => {
+#let create-box-environment(name, title-text, color, state-obj, numbering: true) = {
+  return body => {
     block(width: 100%, fill: color.lighten(70%), inset: 25pt, radius: 10pt, {
       set text(fill: rgb(0, 50, 100), weight: "bold")
-      [#title-text ]
-      context {
-        let state_arr = state-obj.get()
-        if state_arr.contains(body) {
-          state_arr.enumerate().find(it => it.at(1) == body).at(0) + 1
-        } else {
-          if type(state_arr) == array {
-            [#{ state_arr.len() + 1 }]
+      if numbering {
+        [#title-text ]
+        context {
+          let state_arr = state-obj.get()
+          if state_arr.contains(body) {
+            state_arr.enumerate().find(it => it.at(1) == body).at(0) + 1
           } else {
-            1
+            if type(state_arr) == array {
+              [#{ state_arr.len() + 1 }]
+            } else {
+              1
+            }
           }
         }
+        state-obj.update(it => {
+          let arr = it
+          if not arr.contains(body) {
+            arr.push(body)
+          }
+          arr
+        })
+      } else {
+        [#title-text]
       }
-      state-obj.update(it => {
-        let arr = it
-        if not arr.contains(body) {
-          arr.push(body)
-        }
-        arr
-      })
       set text(fill: black, weight: "regular")
       h(0.5em)
       body
@@ -75,3 +79,5 @@
 
 #let summary = create-box-environment("summary", "Sum.", rgb("#f93d6e"), summary-state)
 #let question = create-box-environment("question", "Q.", rgb("#fece5a"), question-state)
+#let summary-no-num = create-box-environment("summary", "Sum.", rgb("#f93d6e"), summary-state, numbering: false)
+#let question-no-num = create-box-environment("question", "Q.", rgb("#fece5a"), question-state, numbering: false)

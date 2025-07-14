@@ -74,7 +74,7 @@
 = Chapter title
 // ==================================================
 
-==              // without this, subsection will not be printed. Related with `config-common(new-section-slide-fn: none)`?
+==               // without this, subsection will not be printed. Related with `config-common(new-section-slide-fn: none)`?
 == Simple slide
 
 Slide contents.
@@ -189,6 +189,14 @@ Slide contents.
   #question[Question 2]
   #summary[Summary 1]
   #summary[Summary 2]
+]
+
+== Questions and summaries w/o numberging
+#slide[
+  #question-no-num()[Question 1]
+  #question-no-num()[Question 2]
+  #summary-no-num[Summary 1]
+  #summary-no-num[Summary 2]
 ]
 
 // Freeze last-slide-number

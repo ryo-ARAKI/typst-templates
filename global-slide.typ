@@ -76,8 +76,11 @@
 
 #let summary-state = state("summary-state", ())
 #let question-state = state("question-state", ())
+#let answer-state = state("answer-state", ())
 
 #let summary = create-box-environment("summary", "Sum.", rgb("#f93d6e"), summary-state)
 #let question = create-box-environment("question", "Q.", rgb("#fece5a"), question-state)
-#let summary-no-num = create-box-environment("summary", "Sum.", rgb("#f93d6e"), summary-state, numbering: false)
+#let answer = create-box-environment("answer", "A.", rgb("#f93d6e"), answer-state)
+#let summary-no-num = create-box-environment("summary", "", rgb("#f93d6e"), summary-state, numbering: false)
 #let question-no-num = create-box-environment("question", "Q.", rgb("#fece5a"), question-state, numbering: false)
+#let answer-no-num = create-box-environment("answer", "A.", rgb("#f93d6e"), answer-state, numbering: false)

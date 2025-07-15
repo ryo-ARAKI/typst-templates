@@ -41,7 +41,7 @@
 // ===========================================
 #let create-box-environment(name, title-text, color, state-obj, numbering: true) = {
   return body => {
-    block(width: 100%, fill: color.lighten(70%), inset: 25pt, radius: 10pt, {
+    block(width: 100%, fill: color.lighten(70%), inset: 15pt, radius: 10pt, {
       set text(fill: rgb(0, 50, 100), weight: "bold")
       if numbering {
         [#title-text ]
@@ -68,7 +68,7 @@
         [#title-text]
       }
       set text(fill: black, weight: "regular")
-      h(0.5em)
+      h(0.3em)
       body
     })
   }

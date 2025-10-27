@@ -40,8 +40,8 @@
     title: [Presentation title\ ...continued to the second line],
     subtitle: [Subtitle],
     author: [
-      *Presenter name*: Institution\
-      Co-author name: Institution
+      *Presenter name*$at$Institution\
+      Co-author name$at$Institution
     ],
     date: datetime.today(),
     institution: [], // Now written in `author` field

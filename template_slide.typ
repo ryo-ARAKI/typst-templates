@@ -74,7 +74,7 @@
 = Chapter title
 // ==================================================
 
-==                    // without this, subsection will not be printed. Related with `config-common(new-section-slide-fn: none)`?
+==                      // without this, subsection will not be printed. Related with `config-common(new-section-slide-fn: none)`?
 == Simple slide
 
 Slide contents.
@@ -82,7 +82,7 @@ Slide contents.
 == Slide with `#slide` block and animation
 #slide[
   $
-        f & = m a        \
+        f & = m a \
     pause & = m dv(v, t)
   $
 ]

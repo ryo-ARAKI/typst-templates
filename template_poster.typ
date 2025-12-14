@@ -119,6 +119,7 @@
 
       #question[Research question]
 
+      #v(1em)
       #pinit-highlight-equation-from(
         "NS:dudt1",
         "NS:dudt2",
@@ -172,5 +173,5 @@
 )
 
 #pop.bottom-box()[
-  #h(1fr)#text(20pt)[Conference name$at$~Conference venue, October 1--10, 2025]
+  #h(1fr)#text(32pt)[Conference name$at$~Conference venue, October 1--10, 2025]
 ]

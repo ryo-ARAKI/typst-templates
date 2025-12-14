@@ -19,7 +19,7 @@
   body, // text content (テキスト)
 ) = {
   // Highlight the equation part
-  pinit-highlight(pin1, pin2, dy: -dy - 18pt, extended-height: height, fill: rgb(
+  pinit-highlight(pin1, pin2, dx: dx, dy: -dy - 18pt, extended-height: height, fill: rgb(
     ..fill.components().slice(0, -1),
     100,
   ))

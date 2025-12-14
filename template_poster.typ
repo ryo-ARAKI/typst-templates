@@ -27,11 +27,11 @@
 #set block(spacing: box-spacing)
 #pop.update-poster-layout(
   spacing: box-spacing,
-  title-size: 56pt,
-  heading-size: 42pt,
-  subtitle-size: 14pt,
-  authors-size: 42pt,
-  body-size: 28pt,
+  // title-size: 56pt,
+  // heading-size: 42pt,
+  // subtitle-size: 14pt,
+  // authors-size: 42pt,
+  // body-size: 28pt,
 )
 
 // ===========================================

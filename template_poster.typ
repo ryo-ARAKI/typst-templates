@@ -29,7 +29,7 @@
   spacing: box-spacing,
   // title-size: 56pt,
   // heading-size: 42pt,
-  // subtitle-size: 14pt,
+  subtitle-size: 14pt,
   // authors-size: 42pt,
   // body-size: 28pt,
 )
@@ -91,31 +91,27 @@
   [*Title of the poster*],
   authors: [Presenter name$at$Institution #h(4.5cm) `email@address`],
   logo: grid(
-    columns: (2fr, 1fr),
     gutter: 5pt,
     cetz.canvas({
       import cetz.draw: *
       // for reference
       grid(
-        (-15, -1.5),
-        (15, 1.5),
+        (-6, -1.5),
+        (6, 1.5),
         stroke: gray,
       )
       circle((0, 0), radius: .1, fill: black, stroke: none)
 
-      // content(
-      //   (0, 0),
-      //   image("fig/figure.png", width: 18cm),
-      // )
+      // content((-2, 0), image("logo1.png", height: 4.5cm))
+      // content((2, 0), image("logo2.png", height: 4.5cm))
     }),
-    // image("logo1.png", height: 3.3cm), image("logo2.png", height: 3.3cm),
   ),
 )
 
 #columns(
   2,
   [
-    #pop.column-box(heading: [*Section title*], stretch-to-next: true)[
+    #pop.column-box(heading: [*Section title*])[
 
       #question[Research question]
 
@@ -124,18 +120,17 @@
         "NS:dudt1",
         "NS:dudt2",
         height: 80pt,
-        dx: 335pt,
-        dy: -10pt,
+        dx: 0pt,
+        dy: 30pt,
         pos: "top",
         fill: red,
-        arrow-length: 20pt,
+        arrow-length: 30pt,
       )[Entropy change]
       $
         #pin("NS:dudt1")pdv(vb(u), t, s: \/)#pin("NS:dudt2") + (vb(u) dprod grad) vb(u)
         = - 1/rho grad p + nu laplacian vb(u) + vb(f)
       $<NS>
 
-      // == 三次元乱流の一次元モデルの数値計算
       #grid(
         columns: (1fr, 1fr),
         gutter: 0.2em,
@@ -167,10 +162,70 @@
     ]
     #colbreak()
 
-    #pop.column-box(heading: [*Section title*], stretch-to-next: true)[
+    #pop.column-box(heading: [*Section title*])[
     ]
   ],
 )
+
+#showybox(frame: (border-color: white, body-color: gray.lighten(50%)), [
+  *Research Objective*:
+])
+
+
+#columns(
+  2,
+  [
+    #pop.column-box(heading: [*Section title*])[
+
+      #grid(
+        columns: (1fr, 1fr),
+        gutter: 0.2em,
+        [
+          #cetz.canvas({
+            import cetz.draw: *
+            // for reference
+            grid(
+              (-9, -5),
+              (9, 5),
+              stroke: gray,
+            )
+            circle((0, 0), radius: .1, fill: black, stroke: none)
+
+            // content(
+            //   (0, 0),
+            //   image("fig/figure.png", width: 18cm),
+            // )
+          })
+        ],
+        [
+          Dummy text
+        ],
+      )
+    ]
+    #colbreak()
+
+    #pop.column-box(heading: [*Section title*])[
+    ]
+  ],
+)
+
+#v(1fr)
+#showybox(frame: (border-color: white, body-color: red.lighten(50%)), [
+  #grid(
+    columns: (75%, 25%),
+    gutter: 20pt,
+    [
+      *Summary*:\
+      *Future Plan*:
+    ],
+    [
+      #cetz.canvas({
+        import cetz.draw: *
+        content((-10.2, 0), text(28pt)[*References*\ Araki, _Journal_ (2025)\ Araki, in prep.])
+      })
+    ],
+  )
+])
 
 #pop.bottom-box()[
   #h(1fr)#text(32pt)[Conference name$at$~Conference venue, October 1--10, 2025]

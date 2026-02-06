@@ -39,7 +39,9 @@
 // ===========================================
 #set text(font: "Cabin")
 #show math.equation: set text(font: "Latin Modern Math")
-#show regex("[\p{scx:Han}\p{scx:Hira}\p{scx:Kana}]"): set text(font: "Noto Sans CJK JP") // For Japanese
+#show regex(
+  "[\p{scx:Han}\p{scx:Hira}\p{scx:Kana}　！”＃＄％＆’（）*+，−．／：；＜＝＞？＠［＼］＾＿｀｛｜｝〜、。￥・]",
+): set text(font: "Noto Sans CJK JP") // For Japanese
 #let colormath(math, color) = text(fill: color, $#math$)
 // 和欧文間空白
 // https://qiita.com/zr_tex8r/items/a9d82669881d8442b574

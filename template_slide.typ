@@ -9,7 +9,9 @@
 // Sans serif fonts: Inter Display, Nimbus Sans, TeX Gyre Heros
 #set text(font: "Cabin")
 #show math.equation: set text(font: "Latin Modern Math")
-#show regex("[\p{scx:Han}\p{scx:Hira}\p{scx:Kana}]"): set text(font: "Noto Sans CJK JP") // For Japanese
+#show regex(
+  "[\p{scx:Han}\p{scx:Hira}\p{scx:Kana}　！”＃＄％＆’（）*+，−．／：；＜＝＞？＠［＼］＾＿｀｛｜｝〜、。￥・]",
+): set text(font: "Noto Sans CJK JP") // For Japanese
 // 和欧文間空白
 #show math.equation.where(block: false): it => jp-spacing(it)
 

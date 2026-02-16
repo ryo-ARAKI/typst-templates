@@ -6,7 +6,7 @@
 #import "@preview/showybox:2.0.4": showybox // Colorful and customizable boxes
 #import "@preview/physica:0.9.5": * // Math constructs for science and engineering
 #import "@preview/pinit:0.2.2": * // Annotation
-#import "@preview/cetz:0.3.4" // Draw figures
+#import "@preview/cetz:0.4.2" // Draw figures
 #import "@preview/theorion:0.3.3": * // theorem environment
 #import "annotated-equation.typ": pinit-highlight-equation-from // Equation annotation
 #import "@preview/muchpdf:0.1.1": muchpdf // include PDF figure

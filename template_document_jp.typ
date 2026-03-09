@@ -28,7 +28,6 @@
 #show regex(
   "[\p{scx:Han}\p{scx:Hira}\p{scx:Kana}　！”＃＄％＆’（）*+，−．／：；＜＝＞？＠［＼］＾＿｀｛｜｝〜、。￥・]",
 ): set text(font: "Noto Sans CJK JP") // For Japanese
-#show cjkre: it => it.text.match(cjkre).captures.at(0)
 // 独立行数式を#box[]に入れ，直後の行にインデントがついてしまうのを防ぐ
 // https://github.com/typst/typst/issues/3206
 #show math.equation.where(block: true): it => box[#it]

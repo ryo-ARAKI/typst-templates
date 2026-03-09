@@ -1,5 +1,5 @@
 #import "@preview/js:0.1.3": *
-#import "@preview/physica:0.9.5": * // 物理学関連のコマンド
+#import "@preview/physica:0.9.8": * // 物理学関連のコマンド
 #import "@preview/cetz:0.4.2" // 図形描画
 #import "@preview/unify:0.7.1": * // 単位付き数値
 #import "@preview/roremu:0.1.0": roremu // 日本語のダミー文書

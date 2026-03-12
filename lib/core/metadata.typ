@@ -46,6 +46,17 @@
   }
 }
 
+#let render-author-names(authors) = {
+  let rendered = authors
+    .map(author => author.at("name", default: []))
+    .filter(part => part != [])
+  if rendered.len() == 0 {
+    []
+  } else {
+    rendered.join(linebreak())
+  }
+}
+
 #let render-authors-inline(authors) = {
   let rendered = authors.map(render-author-inline).filter(part => part != [])
   if rendered.len() == 0 {
@@ -89,6 +100,7 @@
     title: config.at("title", default: []),
     subtitle: config.at("subtitle", default: []),
     authors: authors,
+    author-names: render-author-names(authors),
     authors-inline: render-authors-inline(authors),
     affiliations-inline: render-author-affiliations(authors),
     authors-js: authors-for-js(authors),

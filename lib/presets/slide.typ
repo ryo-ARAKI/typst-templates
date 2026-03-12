@@ -29,7 +29,7 @@
     config-info(
       title: metadata.at("title"),
       subtitle: metadata.at("subtitle"),
-      author: metadata.at("authors-inline"),
+      author: metadata.at("author-names"),
       date: metadata.at("date"),
       institution: if resolved.at("institution") != [] {
         resolved.at("institution")

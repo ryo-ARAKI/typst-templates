@@ -12,7 +12,7 @@
 - `examples`: starter を参照する簡単な例
 
 新しく文書を始めるときは `starters/document-jp.typ` `starters/slide.typ` `starters/poster.typ` を入口にする．
-既存の `template_*.typ` は互換用の完成形サンプルとして残している．
+機能カタログは `examples/document-jp.typ` `examples/slide.typ` `examples/poster.typ` を見る．
 
 `starters/<name>.typ` はリポジトリ root で `typst compile --root . starters/<name>.typ` を使ってコンパイルする．
 

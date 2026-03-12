@@ -2,6 +2,7 @@
 #import "@preview/enja-bib:0.1.0": *
 #import bib-setting-jsme: *
 #import "../core/config.typ": document-config
+#import "../core/metadata.typ": authors-for-js
 #import "../core/locale.typ": wrap-block-equation
 #import "../components/math.typ": apply-inline-japanese-math-spacing
 
@@ -33,11 +34,12 @@
 
 #let document-title(config: none) = {
   let resolved = document-config(overrides: config)
+  let metadata = resolved.at("metadata")
   maketitle(
-    title: resolved.at("title"),
-    authors: resolved.at("authors"),
-    date: resolved.at("date"),
-    abstract: resolved.at("abstract"),
+    title: metadata.at("title"),
+    authors: metadata.at("authors-js"),
+    date: metadata.at("date"),
+    abstract: metadata.at("abstract"),
   )
 }
 

@@ -1,12 +1,24 @@
 #import "../lib/presets/slide.typ": *
 
-#show: slide-theme.with(config: (
-  // text-font: "Noto Sans CJK JP",  // 日本語用設定
+#let metadata = (
   title: [Slide Catalog],
   subtitle: [Implemented features overview],
-  author: [Ryo Araki$at$Typst Templates],
+  authors: (
+    (
+      name: [Ryo Araki],
+      affiliation: [Typst Templates],
+      email: [],
+    ),
+  ),
+  date: datetime.today(),
   summary: [catalog$at$slide],
-))
+  abstract: [],
+  venue: [],
+  logo: [],
+  bibliography: none,
+)
+
+#show: slide-theme.with(config: metadata)
 #slide-title-slide()
 
 = Chapter title

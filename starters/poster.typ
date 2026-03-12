@@ -1,11 +1,24 @@
 #import "../lib/presets/poster.typ": *
 
-#show: poster-theme.with(config: (
-  // text-font: "Noto Sans CJK JP",  // 日本語用設定
+#let metadata = (
   title: [*Poster Catalog*],
-  authors: [Ryo Araki$at$Typst Templates],
+  subtitle: [],
+  authors: (
+    (
+      name: [Ryo Araki],
+      affiliation: [Typst Templates],
+      email: [],
+    ),
+  ),
+  date: [],
+  summary: [],
+  abstract: [],
   venue: [Template Showcase$at$Local Workspace, March 12, 2026],
-))
+  logo: [],
+  bibliography: none,
+)
+
+#show: poster-theme.with(config: metadata)
 #poster-title()
 
 #columns(

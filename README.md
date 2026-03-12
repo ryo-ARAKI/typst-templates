@@ -11,6 +11,36 @@
 - `starters`: 新しい文書を始める最小テンプレート
 - `examples`: starter を参照する簡単な例
 
+## 共通 metadata API
+
+`document / slide / poster` は共通の `metadata` 辞書を受け取る。
+
+```typ
+#let metadata = (
+  title: [Title],
+  subtitle: [Subtitle],
+  authors: (
+    (
+      name: [Ryo Araki],
+      affiliation: [Typst Templates],
+      email: [ryo@example.com],
+    ),
+  ),
+  date: datetime.today(),
+  summary: [short summary],
+  abstract: [abstract text],
+  venue: [conference info],
+  logo: [],
+  bibliography: "/starters/biblio.bib",
+)
+```
+
+用途ごとに使わない key は空のままでよい。
+
+- `document`: 主に `title`, `authors`, `date`, `abstract`, `bibliography`
+- `slide`: 主に `title`, `subtitle`, `authors`, `date`, `summary`, `logo`
+- `poster`: 主に `title`, `authors`, `venue`, `logo`
+
 新しく文書を始めるときは `starters/document-jp.typ` `starters/slide.typ` `starters/poster.typ` を入口にする．
 機能カタログは `examples/document-jp.typ` `examples/slide.typ` `examples/poster.typ` を見る．
 

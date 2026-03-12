@@ -1,55 +1,69 @@
 #import "../lib/presets/slide.typ": *
 
-#show: slide-theme.with(config: (
-  // text-font: "Noto Sans CJK JP",  // 日本語用設定
-  title: [Slide Catalog],
-  subtitle: [Implemented features overview],
-  author: [Ryo Araki$at$Typst Templates],
+#let metadata = (
+  text-font: "Noto Sans CJK JP",
+  cjk-font: "Noto Sans CJK JP",
+  title: [スライド機能カタログ],
+  subtitle: [実装済み要素の一覧],
+  authors: (
+    (
+      name: [荒木亮],
+      affiliation: [Typst Templates],
+      email: [],
+    ),
+  ),
+  date: datetime.today(),
   summary: [catalog$at$slide],
-))
+  abstract: [],
+  venue: [],
+  logo: [],
+  bibliography: none,
+)
+
+#show: slide-theme.with(config: metadata)
 #slide-title-slide()
 
-= Catalog
+= カタログ
 
 ==
-== Standard content
+== 基本レイアウト
 
 #slide[
-  This slide shows the base theme, section footer, and standard text layout.
+  このスライドでは、基本テーマ、フッター、標準的な本文レイアウトを確認できます。
 ]
 
-== Questions and answers
+== 質問と要約
 
 #slide[
-  #question[How should I present the main claim?]
-  #answer[Lead with the result, then give the minimum background.]
-  #summary-no-num[Box components are shared across slide and poster presets.]
+  #question[主張はどの順番で提示するべきか？]
+  #answer[結論を先に示し、その後に必要最小限の背景だけを補います。]
+  #summary-no-num[囲み枠コンポーネントは slide と poster で共通利用できます。]
 ]
 
-== Two-column layout
+== 2 カラムレイアウト
 
 #slide[
-  Left column content with a short bullet list:
+  左カラムには短い箇条書きを置けます。
 
-  - Preset theme
-  - Footer metadata
-  - Reusable boxes
+  - preset theme
+  - footer metadata
+  - reusable boxes
 ][
   #align(center)[
-    #textbox([Reusable callout], aqua)
+    #textbox([再利用できるコールアウト], aqua)
   ]
 ]
 
-== Annotated equation
+== 注釈付き数式
 
 #slide[
   #let annot(color) = (fill: color, height: 24pt, arrow-length: 18pt)
   #v(3em)
   #pinit-highlight-equation-from("sl:lhs1", "sl:lhs2", ..annot(red), dx: -4pt, dy: -2pt, pos: "top")[
-    Source term
+    左辺の項
   ]
   #pinit-highlight-equation-from("sl:rhs1", "sl:rhs2", ..annot(green), dx: 0pt, dy: 4pt, pos: "bottom")[
-    Dissipation
+    右辺の拡散項
   ]
   $
     #pin("sl:lhs1"); partial_t u #pin("sl:lhs2")

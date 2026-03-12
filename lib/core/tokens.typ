@@ -34,7 +34,12 @@
   equation-numbering: "(1)",
   title: "文書のタイトル",
   authors: ("荒木亮", "東京理科大学", "araki.ryo@rs.tus.ac.jp"),
+  subtitle: [],
+  summary: [],
   abstract: [文書の要旨．],
+  venue: [],
+  logo: [],
+  bibliography: "/starters/biblio.bib",
   date: datetime.today().display(),
 )
 
@@ -48,10 +53,14 @@
     *Presenter name*$at$Institution\
     Co-author name$at$Institution
   ],
+  authors: (),
   date: datetime.today(),
   institution: [],
   logo: "",
   summary: [presenter$at$subtitle],
+  abstract: [],
+  venue: [],
+  bibliography: none,
   datetime-format: "[month repr:short]. [day], [year]",
   footer-columns: (45%, 45%, 10%),
   handout: false,
@@ -64,5 +73,11 @@
   box-spacing: spacing.at("block-gap"),
   title: [*Title of the poster*],
   authors: [Presenter name$at$Institution #h(4.5cm) `email@address`],
+  subtitle: [],
+  date: [],
+  summary: [],
+  abstract: [],
   venue: [Conference name$at$~Conference venue, October 1--10, 2025],
+  logo: [],
+  bibliography: none,
 )

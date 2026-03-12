@@ -8,6 +8,7 @@
 
 #let poster-theme(body, config: none) = {
   let resolved = poster-config(overrides: config)
+  let metadata = resolved.at("metadata")
   set page("a0", margin: 1cm)
   pop.set-poster-layout(pop.layout-a0)
   pop.set-theme(pop.psi-ch)
@@ -32,7 +33,7 @@
   apply-math-font(font: resolved.at("math-font"))
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
-  poster-runtime-config.update(_ => resolved)
+  poster-runtime-config.update(_ => resolved + (metadata: metadata,))
   body
 }
 
@@ -45,13 +46,13 @@
       poster-config(overrides: config)
     }
     let logo-content = if logo == auto {
-      []
+      resolved.at("metadata").at("logo")
     } else {
       logo
     }
     pop.title-box(
-      resolved.at("title"),
-      authors: resolved.at("authors"),
+      resolved.at("metadata").at("title"),
+      authors: resolved.at("metadata").at("authors-inline"),
       logo: logo-content,
     )
   }
@@ -65,7 +66,7 @@
       poster-config(overrides: config)
     }
     pop.bottom-box()[
-      #h(1fr)#text(32pt)[#resolved.at("venue")]
+      #h(1fr)#text(32pt)[#resolved.at("metadata").at("venue")]
     ]
   }
 }

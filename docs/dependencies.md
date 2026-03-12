@@ -38,3 +38,4 @@
 - Check `lib/adapters` first when a package update breaks compilation.
 - Keep `lib/core` free from package-specific APIs where possible.
 - If a package becomes unstable, replace its adapter before touching starters.
+- When metadata behavior changes, update `lib/core/metadata.typ` before changing any target preset.

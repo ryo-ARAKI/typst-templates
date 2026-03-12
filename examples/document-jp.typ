@@ -2,16 +2,28 @@
 #import "../lib/components/math.typ": pinit-highlight-equation-from
 #import "@preview/pinit:0.2.2": pin
 
-#let catalog-config = (
+#let metadata = (
   title: "Document Catalog",
-  authors: ("Ryo Araki", "Typst Templates", "ryo@example.com"),
+  subtitle: [],
+  authors: (
+    (
+      name: "Ryo Araki",
+      affiliation: "Typst Templates",
+      email: "ryo@example.com",
+    ),
+  ),
+  date: datetime.today().display(),
+  summary: [],
   abstract: [
     日本語文書 preset、数式、注釈、参考文献まわりの機能カタログ．
   ],
+  venue: [],
+  logo: [],
+  bibliography: "/starters/biblio.bib",
 )
 
-#show: setup-document.with(config: catalog-config)
-#document-title(config: catalog-config)
+#show: setup-document.with(config: metadata)
+#document-title(config: metadata)
 
 = 見出しと本文
 
@@ -56,4 +68,4 @@ $
 
 参考文献の引用~#citep(<Tanogami2024_information>)．
 
-#bibliography-list-from(path: "/starters/biblio.bib")
+#bibliography-list-from(path: metadata.at("bibliography"))

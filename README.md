@@ -31,11 +31,11 @@ git submodule add git@github.com:ryo-ARAKI/typst-templates.git
 touch sample.typ
 ```
 
-この`sample.typ`に以下のように記述すると，[annotated-equation.typ](https://github.com/ryo-ARAKI/typst-templates/blob/main/annotated-equation.typ)で管理している`pinit-highlight-equation-from`関数が使える．
+この`sample.typ`に以下のように記述すると，`starters/lib/components/math.typ` で管理している `pinit-highlight-equation-from` 関数が使える．
 
 ```typ
 #import "@preview/physica:0.9.4": *
-#import "typst-templates/annotated-equation.typ": *
+#import "typst-templates/starters/lib/components/math.typ": *
 
 #pinit-highlight-equation-from(1, 2, height: 30pt, dx: -12pt, dy: 0pt, pos: bottom, fill: red, arrow-length: 0pt)[
   Time derivative

@@ -1,4 +1,4 @@
-#import "lib/presets/slide.typ": *
+#import "../lib/presets/slide.typ": *
 
 #show: slide-theme
 #slide-title-slide()

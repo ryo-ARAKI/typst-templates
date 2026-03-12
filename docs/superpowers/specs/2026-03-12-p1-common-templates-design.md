@@ -41,10 +41,7 @@ starters/
   document-jp.typ
   slide.typ
   poster.typ
-examples/
-  document/
-  slide/
-  poster/
+  biblio.bib
 docs/
   architecture.md
   dependencies.md
@@ -68,9 +65,9 @@ docs/
 
 `document / slide / poster` ごとの既定値は `lib/presets` で定義する。preset は `config` 辞書を受けて、必要に応じて利用側が細かく上書きできるようにする。
 
-### 5. Starters become thin entrypoints
+### 5. Starters remain thin entrypoints
 
-`starters` は新しい文書を始めるための最小ファイルとし、本文例は `examples` に分離する。利用者は starter をコピーするか submodule 越しに import する。
+`starters` は新しい文書を始めるための最小ファイルとし、共有本体は root の `lib` に置く。利用者は repo root で `typst compile --root . starters/<name>.typ` を使う。
 
 ### 6. Slide box numbering drops state-based convergence risk
 
@@ -87,11 +84,11 @@ docs/
 
 ## Verification Strategy
 
-- `typst compile starters/document-jp.typ /tmp/...`
-- `typst compile starters/slide.typ /tmp/...`
-- `typst compile starters/poster.typ /tmp/...`
+- `typst compile --root . starters/document-jp.typ /tmp/...`
+- `typst compile --root . starters/slide.typ /tmp/...`
+- `typst compile --root . starters/poster.typ /tmp/...`
 - 収束警告が `slide` で出ないことを確認する
-- 旧テンプレートファイルは互換 import として残すか、preset/starter への移行を示す薄いラッパにする
+- `starters/*.typ` を `--root` 前提の正式手順として README に明記する
 
 ## Risks
 

@@ -1,4 +1,4 @@
-#import "lib/presets/document.typ": *
+#import "../lib/presets/document.typ": *
 
 #setup-document()
 #document-title()
@@ -11,4 +11,4 @@
 
 参考文献の引用~#citep(<Tanogami2024_information>)．
 
-#bibliography-list-from(path: "/biblio.bib")
+#bibliography-list-from(path: "/starters/biblio.bib")

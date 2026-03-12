@@ -1,4 +1,4 @@
-#import "lib/presets/poster.typ": *
+#import "../lib/presets/poster.typ": *
 
 #show: poster-theme
 #poster-title()

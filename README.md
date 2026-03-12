@@ -2,6 +2,20 @@
 
 （個人用）Typstのテンプレートや便利なスニペットのまとめ
 
+## 現在の構成
+
+- `lib/core`: フォント、色、locale、日本語設定、共通 config
+- `lib/components`: box 部品や数式注釈
+- `lib/adapters`: `js` `touying` `peace-of-posters` への依存点
+- `lib/presets`: `document / slide / poster` ごとの既定値
+- `starters`: 新しい文書を始める最小テンプレート
+- `examples`: starter を参照する簡単な例
+
+新しく文書を始めるときは `starters/document-jp.typ` `starters/slide.typ` `starters/poster.typ` を入口にする．
+既存の `template_*.typ` は互換用の完成形サンプルとして残している．
+
+`starters/` 配下を直接コンパイルするときは，リポジトリ直下で `typst compile --root . starters/<name>.typ` を使う．
+
 ## [git submodule](https://git-scm.com/book/ja/v2/Git-%E3%81%AE%E3%81%95%E3%81%BE%E3%81%96%E3%81%BE%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB-%E3%82%B5%E3%83%96%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB)を通じて利用する
 
 以下の手順でこのリポジトリ内のテンプレートやスニペットを利用できる

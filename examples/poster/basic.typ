@@ -1,0 +1,1 @@
+#include "../../starters/poster.typ"

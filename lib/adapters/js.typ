@@ -2,10 +2,10 @@
 #import "@preview/enja-bib:0.1.0": *
 #import bib-setting-jsme: *
 #import "../core/config.typ": document-config
-#import "../core/locale.typ": apply-japanese-text, wrap-block-equation
+#import "../core/locale.typ": wrap-block-equation
 #import "../components/math.typ": apply-inline-japanese-math-spacing
 
-#let apply-js-document(config: none) = {
+#let js-document(body, config: none) = {
   let resolved = document-config(overrides: config)
   show: js.with(
     lang: resolved.at("lang"),
@@ -22,9 +22,9 @@
     cols: 1,
   )
   set par(justify: resolved.at("justify"))
-  apply-japanese-text()
   wrap-block-equation()
   apply-inline-japanese-math-spacing()
+  body
 }
 
 #let apply-document-bibliography() = {

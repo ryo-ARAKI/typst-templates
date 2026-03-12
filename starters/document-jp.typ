@@ -1,6 +1,6 @@
 #import "../lib/presets/document.typ": *
 
-#setup-document()
+#show: setup-document
 #document-title()
 
 = 章

@@ -2,7 +2,7 @@
 #import "../lib/components/math.typ": pinit-highlight-equation-from
 #import "@preview/pinit:0.2.2": pin
 
-#setup-document(config: (
+#show: setup-document.with(config: (
   title: "Document Catalog",
   authors: ("Ryo Araki", "Typst Templates", "ryo@example.com"),
   abstract: [

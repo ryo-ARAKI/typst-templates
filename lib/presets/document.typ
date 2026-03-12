@@ -5,9 +5,10 @@
 #import "../core/config.typ": document-config
 #import "../adapters/js.typ": *
 
-#let setup-document(config: none) = {
+#let setup-document(body, config: none) = {
   let resolved = document-config(overrides: config)
-  apply-js-document(config: resolved)
+  show: js-document.with(config: resolved)
   apply-document-bibliography()
   set math.equation(numbering: resolved.at("equation-numbering"))
+  body
 }

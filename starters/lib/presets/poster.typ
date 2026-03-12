@@ -4,7 +4,7 @@
 #import "../adapters/peace-of-posters.typ": *
 #import "../core/tokens.typ": colors
 
-#let setup-poster(config: none) = {
+#let poster-theme(body, config: none) = {
   let resolved = poster-config(overrides: config)
   set page("a0", margin: 1cm)
   pop.set-poster-layout(pop.layout-a0)
@@ -30,23 +30,14 @@
   apply-math-font(font: resolved.at("math-font"))
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
+  body
 }
 
+#let setup-poster(config: none) = [#show: poster-theme.with(config: config)]
 #let poster-title(config: none, logo: auto) = {
   let resolved = poster-config(overrides: config)
   let logo-content = if logo == auto {
-    grid(
-      gutter: 5pt,
-      cetz.canvas({
-        import cetz.draw: *
-        grid(
-          (-6, -1.5),
-          (6, 1.5),
-          stroke: gray,
-        )
-        circle((0, 0), radius: .1, fill: black, stroke: none)
-      }),
-    )
+    []
   } else {
     logo
   }

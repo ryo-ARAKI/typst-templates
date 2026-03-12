@@ -1,4 +1,4 @@
-#import "../lib/presets/document.typ": *
+#import "lib/presets/document.typ": *
 
 #setup-document()
 #document-title()

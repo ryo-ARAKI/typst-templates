@@ -35,6 +35,6 @@
 
 ## Update Guidance
 
-- Check `lib/adapters` first when a package update breaks compilation.
-- Keep `lib/core` free from package-specific APIs where possible.
+- Check `starters/lib/adapters` first when a package update breaks compilation.
+- Keep `starters/lib/core` free from package-specific APIs where possible.
 - If a package becomes unstable, replace its adapter before touching starters.

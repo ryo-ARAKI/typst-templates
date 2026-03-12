@@ -1,6 +1,6 @@
-#import "../lib/presets/poster.typ": *
+#import "lib/presets/poster.typ": *
 
-#setup-poster()
+#show: poster-theme
 #poster-title()
 
 #columns(
@@ -17,4 +17,5 @@
   ],
 )
 
+#v(1fr)
 #poster-bottom-box()

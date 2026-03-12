@@ -3,7 +3,7 @@
 #import "../components/math.typ": apply-math-font, apply-inline-japanese-math-spacing, apply-block-equation-spacing
 #import "../adapters/touying.typ": *
 
-#let setup-slide(config: none) = {
+#let slide-theme(body, config: none) = {
   let resolved = slide-config(overrides: config)
   set text(font: resolved.at("text-font"))
   apply-math-font(font: resolved.at("math-font"))
@@ -38,6 +38,8 @@
     config-common(new-section-slide-fn: none),
     config-common(handout: resolved.at("handout")),
   )
+  body
 }
 
+#let setup-slide(config: none) = [#show: slide-theme.with(config: config)]
 #let slide-title-slide() = title-slide()

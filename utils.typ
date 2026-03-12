@@ -1,1 +1,1 @@
-#import "lib/core/locale.typ": jp-spacing
+#import "starters/lib/core/locale.typ": jp-spacing

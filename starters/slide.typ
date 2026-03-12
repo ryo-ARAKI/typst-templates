@@ -1,6 +1,6 @@
-#import "../lib/presets/slide.typ": *
+#import "lib/presets/slide.typ": *
 
-#setup-slide()
+#show: slide-theme
 #slide-title-slide()
 
 = Chapter title

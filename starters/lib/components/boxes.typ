@@ -30,8 +30,9 @@
 ) = context {
   let counter-value = if numbering and key != none {
     let c = counter(key)
+    let next = [#(c.get().first() + 1)]
     c.step()
-    c.display()
+    next
   } else {
     none
   }

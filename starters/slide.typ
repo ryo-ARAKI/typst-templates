@@ -1,6 +1,12 @@
 #import "../lib/presets/slide.typ": *
 
-#show: slide-theme
+#show: slide-theme.with(config: (
+  // text-font: "Noto Sans CJK JP",  // 日本語用設定
+  title: [Slide Catalog],
+  subtitle: [Implemented features overview],
+  author: [Ryo Araki$at$Typst Templates],
+  summary: [catalog$at$slide],
+))
 #slide-title-slide()
 
 = Chapter title

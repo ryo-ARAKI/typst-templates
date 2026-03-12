@@ -4,6 +4,8 @@
 #import "../adapters/peace-of-posters.typ": *
 #import "../core/tokens.typ": colors
 
+#let poster-runtime-config = state("poster-runtime-config", poster-config())
+
 #let poster-theme(body, config: none) = {
   let resolved = poster-config(overrides: config)
   set page("a0", margin: 1cm)
@@ -30,27 +32,40 @@
   apply-math-font(font: resolved.at("math-font"))
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
+  poster-runtime-config.update(_ => resolved)
   body
 }
 
 #let setup-poster(config: none) = [#show: poster-theme.with(config: config)]
 #let poster-title(config: none, logo: auto) = {
-  let resolved = poster-config(overrides: config)
-  let logo-content = if logo == auto {
-    []
-  } else {
-    logo
+  context {
+    let resolved = if config == none {
+      poster-runtime-config.get()
+    } else {
+      poster-config(overrides: config)
+    }
+    let logo-content = if logo == auto {
+      []
+    } else {
+      logo
+    }
+    pop.title-box(
+      resolved.at("title"),
+      authors: resolved.at("authors"),
+      logo: logo-content,
+    )
   }
-  pop.title-box(
-    resolved.at("title"),
-    authors: resolved.at("authors"),
-    logo: logo-content,
-  )
 }
 
 #let poster-bottom-box(config: none) = {
-  let resolved = poster-config(overrides: config)
-  pop.bottom-box()[
-    #h(1fr)#text(32pt)[#resolved.at("venue")]
-  ]
+  context {
+    let resolved = if config == none {
+      poster-runtime-config.get()
+    } else {
+      poster-config(overrides: config)
+    }
+    pop.bottom-box()[
+      #h(1fr)#text(32pt)[#resolved.at("venue")]
+    ]
+  }
 }

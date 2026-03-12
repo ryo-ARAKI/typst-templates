@@ -1,7 +1,13 @@
 #import "../lib/presets/document.typ": *
 
-#show: setup-document
-#document-title()
+#let catalog-config = (
+  title: "文書のタイトル",
+  authors: ("荒木亮", "東京理科大学", "araki.ryo@rs.tus.ac.jp"),
+  abstract: [文書の要旨．],
+)
+
+#show: setup-document.with(config: catalog-config)
+#document-title(config: catalog-config)
 
 = 章
 

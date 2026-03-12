@@ -2,20 +2,16 @@
 #import "../lib/components/math.typ": pinit-highlight-equation-from
 #import "@preview/pinit:0.2.2": pin
 
-#show: setup-document.with(config: (
+#let catalog-config = (
   title: "Document Catalog",
   authors: ("Ryo Araki", "Typst Templates", "ryo@example.com"),
   abstract: [
     日本語文書 preset、数式、注釈、参考文献まわりの機能カタログ．
   ],
-))
-#document-title(config: (
-  title: "Document Catalog",
-  authors: ("Ryo Araki", "Typst Templates", "ryo@example.com"),
-  abstract: [
-    日本語文書 preset、数式、注釈、参考文献まわりの機能カタログ．
-  ],
-))
+)
+
+#show: setup-document.with(config: catalog-config)
+#document-title(config: catalog-config)
 
 = 見出しと本文
 

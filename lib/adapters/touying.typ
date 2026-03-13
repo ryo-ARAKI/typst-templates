@@ -5,6 +5,6 @@
 #import "@preview/pinit:0.2.2": *
 #import "@preview/cetz:0.4.2"
 #import "../components/boxes.typ": *
-#import "../components/math.typ": pinit-highlight-equation-from
+#import "../components/math.typ": pinit-highlight-equation-from, colormath
 
 #let cetz-canvas = touying-reducer.with(reduce: cetz.canvas, cover: cetz.draw.hide.with(bounds: true))

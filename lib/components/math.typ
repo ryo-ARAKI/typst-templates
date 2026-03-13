@@ -1,6 +1,8 @@
 #import "@preview/pinit:0.2.2": *
 #import "../core/locale.typ": jp-spacing
 
+#let colormath(math, color) = text(fill: color, math)
+
 #let apply-math-font(font: "Latin Modern Math") = {
   show math.equation: set text(font: font)
 }

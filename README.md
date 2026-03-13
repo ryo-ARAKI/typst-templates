@@ -2,6 +2,50 @@
 
 （個人用）Typstのテンプレートや便利なスニペットのまとめ
 
+## 現在の構成
+
+- `lib/core`: フォント、色、locale、日本語設定、共通 config
+- `lib/components`: box 部品や数式注釈
+- `lib/adapters`: `js` `touying` `peace-of-posters` への依存点
+- `lib/presets`: `document / slide / poster` ごとの既定値
+- `starters`: 新しい文書を始める最小テンプレート
+- `examples`: starter を参照する簡単な例
+
+## 共通 metadata API
+
+`document / slide / poster` は共通の `metadata` 辞書を受け取る。
+
+```typ
+#let metadata = (
+  title: [Title],
+  subtitle: [Subtitle],
+  authors: (
+    (
+      name: [Ryo Araki],
+      affiliation: [Typst Templates],
+      email: [ryo@example.com],
+    ),
+  ),
+  date: datetime.today(),
+  summary: [short summary],
+  abstract: [abstract text],
+  venue: [conference info],
+  logo: [],
+  bibliography: "/starters/biblio.bib",
+)
+```
+
+用途ごとに使わない key は空のままでよい。
+
+- `document`: 主に `title`, `authors`, `date`, `abstract`, `bibliography`
+- `slide`: 主に `title`, `subtitle`, `authors`, `date`, `summary`, `logo`
+- `poster`: 主に `title`, `authors`, `venue`, `logo`
+
+新しく文書を始めるときは `starters/document-jp.typ` `starters/slide.typ` `starters/poster.typ` を入口にする．
+機能カタログは `examples/document-jp.typ` `examples/slide.typ` `examples/poster.typ` を見る．
+
+`starters/<name>.typ` はリポジトリ root で `typst compile --root . starters/<name>.typ` を使ってコンパイルする．
+
 ## [git submodule](https://git-scm.com/book/ja/v2/Git-%E3%81%AE%E3%81%95%E3%81%BE%E3%81%96%E3%81%BE%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB-%E3%82%B5%E3%83%96%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB)を通じて利用する
 
 以下の手順でこのリポジトリ内のテンプレートやスニペットを利用できる
@@ -17,11 +61,11 @@ git submodule add git@github.com:ryo-ARAKI/typst-templates.git
 touch sample.typ
 ```
 
-この`sample.typ`に以下のように記述すると，[annotated-equation.typ](https://github.com/ryo-ARAKI/typst-templates/blob/main/annotated-equation.typ)で管理している`pinit-highlight-equation-from`関数が使える．
+この`sample.typ`に以下のように記述すると，`lib/components/math.typ` で管理している `pinit-highlight-equation-from` 関数が使える．
 
 ```typ
 #import "@preview/physica:0.9.4": *
-#import "typst-templates/annotated-equation.typ": *
+#import "typst-templates/lib/components/math.typ": *
 
 #pinit-highlight-equation-from(1, 2, height: 30pt, dx: -12pt, dy: 0pt, pos: bottom, fill: red, arrow-length: 0pt)[
   Time derivative

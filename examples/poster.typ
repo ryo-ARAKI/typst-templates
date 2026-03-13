@@ -1,0 +1,75 @@
+#import "../lib/presets/poster.typ": *
+
+#let metadata = (
+  text-font: "Noto Sans CJK JP",
+  cjk-font: "Noto Sans CJK JP",
+  title: [*ポスター機能カタログ*],
+  subtitle: [],
+  authors: (
+    (
+      name: [荒木亮],
+      affiliation: [Typst Templates],
+      email: [],
+    ),
+  ),
+  date: [],
+  summary: [],
+  abstract: [],
+  venue: [Template Showcase$at$Local Workspace, 2026-03-12],
+  logo: [],
+  bibliography: none,
+)
+
+#show: poster-theme.with(config: metadata)
+#poster-title()
+
+#columns(
+  2,
+  [
+    #pop.column-box(heading: [*共通の囲み枠*])[
+      #question[どの部品を形式横断で再利用できますか？]
+      #summary[
+        question / summary box と数式注釈は文書種別をまたいで再利用できます。
+      ]
+      #v(0.8em)
+      #showybox(frame: showybox-focus)[
+        *Focus*: 再利用可能なコールアウトを各セクション内に配置できます。
+      ]
+    ]
+    #colbreak()
+    #pop.column-box(heading: [*図表と数式*])[
+      #grid(
+        columns: (1fr, 1fr),
+        gutter: 0.8em,
+        [
+          #rect(
+            width: 100%,
+            height: 6cm,
+            fill: luma(235),
+            stroke: gray,
+          )
+        ],
+        [
+          #pinit-highlight-equation-from(
+            "po:eq1",
+            "po:eq2",
+            fill: blue,
+            height: 18pt,
+            dx: 0pt,
+            dy: -2pt,
+            pos: "top",
+          )[
+            移流項
+          ]
+          $
+            #pin("po:eq1"); partial_t q + u dot grad q #pin("po:eq2")
+            = S(q)
+          $
+        ],
+      )
+    ]
+  ],
+)
+
+#v(1fr)
+#poster-bottom-box()

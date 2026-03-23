@@ -1,4 +1,4 @@
-#import "@preview/touying:0.6.2": *
+#import "@preview/touying:0.6.3": *
 #import themes.university: *
 #import "@preview/showybox:2.0.4": showybox
 #import "@preview/physica:0.9.8": *

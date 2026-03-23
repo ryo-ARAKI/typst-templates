@@ -4,7 +4,7 @@
 
 - `@preview/js:0.1.3`
   Used for Japanese document layout and title helpers in `document`.
-- `@preview/touying:0.6.2`
+- `@preview/touying:0.6.3`
   Used for slide theming and slide utilities in `slide`.
 - `@preview/peace-of-posters:0.5.6`
   Used for poster layout primitives in `poster`.
@@ -22,8 +22,8 @@
 
 ## Support Packages
 
-- `@preview/theorion:0.4.1`
-  Legacy theorem-style boxes in poster examples.
+- `@preview/theorion:0.5.0`
+  Theorem and callout primitives exposed through the poster adapter.
 - `@preview/fletcher:0.5.8`
   Diagram primitives for poster figures.
 - `@preview/unify:0.7.1`

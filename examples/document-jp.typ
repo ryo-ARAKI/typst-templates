@@ -41,10 +41,11 @@ $ integral_0^1 x^2 dif x = 1 / 3 $
   "doc:lhs-start",
   "doc:lhs-end",
   fill: blue,
-  height: 20pt,
-  dx: -8pt,
-  dy: -4pt,
+  height: 16pt,
+  dx: -2pt,
+  dy: -6pt,
   pos: "top",
+  arrow-length: 15pt,
 )[
   Left-hand side
 ]
@@ -52,16 +53,17 @@ $ integral_0^1 x^2 dif x = 1 / 3 $
   "doc:rhs-start",
   "doc:rhs-end",
   fill: green,
-  height: 20pt,
-  dx: 4pt,
-  dy: 4pt,
+  height: 16pt,
+  dx: -2pt,
+  dy: -6pt,
   pos: "bottom",
+  arrow-length: -5pt,
 )[
   Right-hand side
 ]
 $
-  #pin("doc:lhs-start"); a x + b #pin("doc:lhs-end")
-  = #pin("doc:rhs-start"); c x^2 + d #pin("doc:rhs-end")
+  #pin("doc:lhs-start")a x + b #pin("doc:lhs-end")
+  = #pin("doc:rhs-start")c x^2 + d #pin("doc:rhs-end")
 $
 
 == 参考文献

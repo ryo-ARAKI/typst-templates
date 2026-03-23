@@ -54,15 +54,15 @@
             "po:eq1",
             "po:eq2",
             fill: blue,
-            height: 18pt,
-            dx: 0pt,
-            dy: -2pt,
+            height: 32pt,
+            dy: 5pt,
             pos: "top",
+            arrow-length: 25pt,
           )[
             移流項
           ]
           $
-            #pin("po:eq1"); partial_t q + u dot grad q #pin("po:eq2")
+            partial_t q + #pin("po:eq1")u dot grad q #pin("po:eq2")
             = S(q)
           $
         ],

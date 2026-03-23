@@ -21,9 +21,6 @@
 #show: slide-theme.with(config: metadata)
 #slide-title-slide()
 
-= Chapter title
-
-==
 == Simple slide
 
 #slide[
@@ -31,7 +28,6 @@
 ]
 
 == Questions and summaries
-
 #slide[
   #question[Question 1]
   #answer[Answer 1]

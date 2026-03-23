@@ -23,9 +23,6 @@
 #show: slide-theme.with(config: metadata)
 #slide-title-slide()
 
-= カタログ
-
-==
 == 基本レイアウト
 
 #slide[
@@ -40,7 +37,7 @@
   #summary-no-num[囲み枠コンポーネントは slide と poster で共通利用できます。]
 ]
 
-== 2 カラムレイアウト
+== 2カラムレイアウト
 
 #slide[
   左カラムには短い箇条書きを置けます。
@@ -59,10 +56,10 @@
 #slide[
   #let annot(color) = (fill: color, height: 24pt, arrow-length: 18pt)
   #v(3em)
-  #pinit-highlight-equation-from("sl:lhs1", "sl:lhs2", ..annot(red), dx: -4pt, dy: -2pt, pos: "top")[
+  #pinit-highlight-equation-from("sl:lhs1", "sl:lhs2", ..annot(red), height: 30pt, dy: 4pt, pos: "top", arrow-length: 25pt)[
     左辺の項
   ]
-  #pinit-highlight-equation-from("sl:rhs1", "sl:rhs2", ..annot(green), dx: 0pt, dy: 4pt, pos: "bottom")[
+  #pinit-highlight-equation-from("sl:rhs1", "sl:rhs2", ..annot(green), height: 30pt, dy: 4pt, pos: "bottom", arrow-length: 15pt)[
     右辺の拡散項
   ]
   $

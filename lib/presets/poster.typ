@@ -6,6 +6,34 @@
 
 #let poster-runtime-config = state("poster-runtime-config", poster-config())
 
+#let poster-logo-strip(..logos, gap: 1.2em, widths: none) = {
+  let items = logos.pos()
+  let columns = if widths != none and type(widths) == array and widths.len() == items.len() {
+    widths
+  } else {
+    items.map(_ => 1fr)
+  }
+  if items.len() == 0 {
+    []
+  } else if items.len() == 1 {
+    box(width: 100%)[
+      #set image(width: 100%)
+      #align(center + horizon, items.at(0))
+    ]
+  } else {
+    grid(
+      columns: columns,
+      gutter: gap,
+      ..items.map(item => [
+        #box(width: 100%)[
+          #set image(width: 100%)
+          #align(center + horizon, item)
+        ]
+      ]),
+    )
+  }
+}
+
 #let poster-theme(body, config: none) = {
   let resolved = poster-config(overrides: config)
   let metadata = resolved.at("metadata")

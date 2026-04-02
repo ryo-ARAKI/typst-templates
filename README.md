@@ -41,6 +41,36 @@
 - `slide`: 主に `title`, `subtitle`, `authors`, `date`, `summary`, `logo`
 - `poster`: 主に `title`, `authors`, `venue`, `logo`
 
+### Poster logo strip
+
+`poster` では `logo:` に `poster-logo-strip(..logos, gap:, widths:)` を渡すと，
+タイトル右側の logo 領域を分割して複数の画像や content を横並びにできる．
+
+- `gap:` はロゴ間の余白
+- `widths:` は各列の幅比率
+- `widths:` はロゴ数と同じ長さの tuple を渡したときだけ使われ，未指定時は等幅になる
+
+```typ
+#import "../lib/presets/poster.typ": *
+
+#let metadata = (
+  title: [Poster title],
+  authors: (
+    (
+      name: [Ryo Araki],
+      affiliation: [Typst Templates],
+    ),
+  ),
+  venue: [Conference info],
+  logo: poster-logo-strip(
+    widths: (1fr, 1.4fr, 0.8fr),
+    [#image("../fig/logo-a.png")],
+    [#image("../fig/logo-b.png")],
+    [#image("../fig/logo-c.png")],
+  ),
+)
+```
+
 新しく文書を始めるときは `starters/document-jp.typ` `starters/slide.typ` `starters/poster.typ` を入口にする．
 機能カタログは `examples/document-jp.typ` `examples/slide.typ` `examples/poster.typ` を見る．
 

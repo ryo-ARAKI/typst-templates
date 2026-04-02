@@ -16,7 +16,42 @@
   summary: [],
   abstract: [],
   venue: [Template Showcase$at$Local Workspace, 2026-03-12],
-  logo: [],
+  logo: poster-logo-strip(
+    widths: (1fr, 1.4fr, 0.8fr),
+    [
+      #rect(
+        width: 100%,
+        height: 2.3cm,
+        inset: 0.4cm,
+        fill: rgb("#dce7f7"),
+        stroke: none,
+      )[
+        #align(center + horizon)[*Logo A*]
+      ]
+    ],
+    [
+      #rect(
+        width: 100%,
+        height: 2.3cm,
+        inset: 0.4cm,
+        fill: rgb("#f8efd5"),
+        stroke: none,
+      )[
+        #align(center + horizon)[*Logo B*]
+      ]
+    ],
+    [
+      #rect(
+        width: 100%,
+        height: 2.3cm,
+        inset: 0.4cm,
+        fill: rgb("#e1f3e0"),
+        stroke: none,
+      )[
+        #align(center + horizon)[*Logo C*]
+      ]
+    ],
+  ),
   bibliography: none,
 )
 

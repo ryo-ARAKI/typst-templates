@@ -74,15 +74,15 @@
       #v(-0.2em)
       #question[どの部品を形式横断で再利用できますか？]
       #summary[
-        question / summary box と #textbox([inline 強調], navy) は文書種別をまたいで再利用できます。
+        question / summary box と #textbox([inline 強調], navy) は文書種別をまたいで再利用できます．
       ]
       #v(0.2em)
-      行内数式も #colormath($H(Y bar X)$, blue) のように色分けできます。
+      行内数式も #colormath($H(Y bar X)$, blue) のように色分けできます．
       #v(0.2em)
-      本文内の補足も右へ逃がせます。#h(1fr)#text(18pt)[右寄せ注記の例]
+      本文内の補足も右へ逃がせます．#h(1fr)#text(18pt)[右寄せ注記の例]
       #v(0.5em)
       #showybox(frame: showybox-focus)[
-        *Focus*: 再利用可能なコールアウトを各セクション内に配置できます。
+        *Focus*: 再利用可能なコールアウトを各セクション内に配置できます．
       ]
       #v(0.3em)
       #showybox(
@@ -91,7 +91,7 @@
           body-color: rgb("#E03C8A").lighten(70%),
         ),
       )[
-        *Idea*: 実ポスターでは，注目結果やアイデア提示に色違いの `showybox` もよく使います。
+        *Idea*: 実ポスターでは，注目結果やアイデア提示に色違いの `showybox` もよく使います．
       ]
     ]
     #colbreak()
@@ -118,14 +118,14 @@
             ),
           )[
             *Side note*:\
-            狭い列には，図や模式図の横に置く短い補足を入れられます。
+            狭い列には，図や模式図の横に置く短い補足を入れられます．
           ]
           #v(0.4em)
-          #summary[
-            狭い列では `summary` も短く使うと収まりやすいです。
+          #summary-no-num[
+            狭い列では `summary` も短く使うと収まりやすいです．
           ]
           #v(0.4em)
-          #question[
+          #question-no-num[
             狭い列の問いかけ例
           ]
         ],
@@ -167,15 +167,13 @@
       = `cetz.canvas` オーバーレイ
       #align(center)[#cetz.canvas({
         import cetz.draw: *
-        rect((-4.0, -2.0), (4.0, 2.0), fill: luma(235), stroke: gray)
-        rect((1.4, -1.1), (3.5, 0.5), radius: 3pt, fill: rgb("#4C78A8").transparentize(65%), stroke: none)
-        rect((-3.6, 1.2), (-1.2, 1.9), fill: white, stroke: none)
-        rect((-0.8, -1.7), (1.1, -1.1), radius: 2pt, fill: white.transparentize(100%), stroke: rgb("#4C78A8"))
-        content((-2.4, 1.55), text(16pt)[図注])
-        content((0.15, -1.4), text(13pt, fill: rgb("#4C78A8"))[枠線注記])
-        content((2.45, -1.45), text(14pt, fill: rgb("#4C78A8"))[注目領域])
-        line((0, 0), (2.8, 1.1), stroke: (paint: rgb("#D95F02"), thickness: 1.8pt), mark: (end: "stealth"))
-        circle((0, 0), radius: 0.12, fill: rgb("#D95F02"), stroke: none)
+        rect((-10.0, -4.0), (10.0, 4.0), fill: luma(235), stroke: gray)
+        rect((2.0, -1.5), (8.0, 1.5), radius: 3pt, fill: rgb("#4C78A8").transparentize(65%), stroke: none)
+        rect((-4.4, 1.2), (-1.5, 2.7), fill: white, stroke: none)
+        content((-2.95, 1.9), [図注])
+        content((4.5, -2.3), text(fill: rgb("#4C78A8"))[注目領域])
+        line((-6.0, -2.0), (1.0, 1.0), stroke: (paint: red, thickness: 0.2), mark: (end: "stealth"))
+        circle((-6.0, -2.0), radius: 0.3, fill: red, stroke: none)
       })]
     ]
   ],
@@ -191,8 +189,8 @@
     columns: (75%, 25%),
     gutter: 0.8em,
     [
-      *まとめ*: このパネルでは，セクションをまたぐ締めの要点や今後の方針をまとめて配置できます。\
-      *使い方*: 左側に本文，右側に小さな図版・ロゴ・文献メモを置くと，実ポスターの最終ブロックに近い構成になります。
+      *まとめ*: このパネルでは，セクションをまたぐ締めの要点や今後の方針をまとめて配置できます．\
+      *使い方*: 左側に本文，右側に小さな図版・ロゴ・文献メモを置くと，実ポスターの最終ブロックに近い構成になります．
     ],
     [
       #rect(

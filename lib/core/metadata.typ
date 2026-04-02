@@ -46,6 +46,23 @@
   }
 }
 
+#let render-author-poster-inline(entry) = {
+  let base-parts = ()
+  let name = entry.at("name", default: [])
+  let affiliation = entry.at("affiliation", default: [])
+  let email = entry.at("email", default: [])
+  if name != [] { base-parts.push(name) }
+  if affiliation != [] { base-parts.push(affiliation) }
+  let base = if base-parts.len() == 0 { [] } else { base-parts.join($at$) }
+  if email == [] {
+    base
+  } else if base == [] {
+    email
+  } else {
+    [#base（#email）]
+  }
+}
+
 #let render-author-names(authors) = {
   let rendered = authors
     .map(author => author.at("name", default: []))
@@ -59,6 +76,15 @@
 
 #let render-authors-inline(authors) = {
   let rendered = authors.map(render-author-inline).filter(part => part != [])
+  if rendered.len() == 0 {
+    []
+  } else {
+    rendered.join(linebreak())
+  }
+}
+
+#let render-poster-authors-inline(authors) = {
+  let rendered = authors.map(render-author-poster-inline).filter(part => part != [])
   if rendered.len() == 0 {
     []
   } else {
@@ -102,6 +128,7 @@
     authors: authors,
     author-names: render-author-names(authors),
     authors-inline: render-authors-inline(authors),
+    poster-authors-inline: render-poster-authors-inline(authors),
     affiliations-inline: render-author-affiliations(authors),
     authors-js: authors-for-js(authors),
     date: config.at("date", default: auto),

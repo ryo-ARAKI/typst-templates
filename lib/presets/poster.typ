@@ -52,7 +52,7 @@
     }
     pop.title-box(
       resolved.at("metadata").at("title"),
-      authors: resolved.at("metadata").at("authors-inline"),
+      authors: resolved.at("metadata").at("poster-authors-inline"),
       logo: logo-content,
     )
   }

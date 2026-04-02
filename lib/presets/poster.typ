@@ -25,7 +25,7 @@
     grid(
       columns: columns,
       gutter: gap,
-      ..items.map(item => [
+      ..items.map(item => grid.cell(align: center + horizon)[
         #box(width: 100%)[
           #set image(width: 100%)
           #align(center + horizon, item)

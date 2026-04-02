@@ -47,19 +47,25 @@
 }
 
 #let render-author-poster-inline(entry) = {
+  let poster-author-size = 44pt
+  let poster-email-size = 34pt
   let base-parts = ()
   let name = entry.at("name", default: [])
   let affiliation = entry.at("affiliation", default: [])
   let email = entry.at("email", default: [])
   if name != [] { base-parts.push(name) }
   if affiliation != [] { base-parts.push(affiliation) }
-  let base = if base-parts.len() == 0 { [] } else { base-parts.join($at$) }
+  let base = if base-parts.len() == 0 {
+    []
+  } else {
+    text(size: poster-author-size)[#base-parts.join($at$)]
+  }
   if email == [] {
     base
   } else if base == [] {
-    email
+    text(size: poster-email-size)[#email]
   } else {
-    [#base（#email）]
+    [#base #text(size: poster-email-size)[#email]]
   }
 }
 

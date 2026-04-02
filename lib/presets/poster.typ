@@ -5,6 +5,7 @@
 #import "../core/tokens.typ": colors
 
 #let poster-runtime-config = state("poster-runtime-config", poster-config())
+#let poster-title-spacing = 5%
 
 #let poster-logo-strip(..logos, gap: 1.2em, widths: none) = {
   let items = logos.pos()
@@ -66,7 +67,24 @@
 }
 
 #let setup-poster(config: none) = [#show: poster-theme.with(config: config)]
-#let poster-title(config: none, logo: auto) = {
+#let resolve-poster-title-box-args(resolved, logo-relative-width: auto) = {
+  let metadata = resolved.at("metadata")
+  let resolved-logo-relative-width = if logo-relative-width == auto {
+    metadata.at("logo-relative-width", default: none)
+  } else {
+    logo-relative-width
+  }
+  if resolved-logo-relative-width == none {
+    (:)
+  } else {
+    (
+      spacing: poster-title-spacing,
+      text-relative-width: 100% - poster-title-spacing - resolved-logo-relative-width,
+    )
+  }
+}
+
+#let poster-title(config: none, logo: auto, logo-relative-width: auto) = {
   context {
     let resolved = if config == none {
       poster-runtime-config.get()
@@ -82,6 +100,7 @@
       resolved.at("metadata").at("title"),
       authors: resolved.at("metadata").at("poster-authors-inline"),
       logo: logo-content,
+      ..resolve-poster-title-box-args(resolved, logo-relative-width: logo-relative-width),
     )
   }
 }

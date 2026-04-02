@@ -49,6 +49,8 @@
 - `gap:` はロゴ間の余白
 - `widths:` は各列の幅比率
 - `widths:` はロゴ数と同じ長さの tuple を渡したときだけ使われ，未指定時は等幅になる
+- `logo-relative-width:` を metadata に入れると，title box 全体に対する logo 領域の幅を上書きできる
+- `#poster-title(logo-relative-width: 22%)` と書くと，metadata より優先してその場で上書きできる
 
 ```typ
 #import "../lib/presets/poster.typ": *
@@ -62,6 +64,7 @@
     ),
   ),
   venue: [Conference info],
+  logo-relative-width: 22%,
   logo: poster-logo-strip(
     widths: (1fr, 1.4fr, 0.8fr),
     [#image("../fig/logo-a.png")],

@@ -79,5 +79,6 @@
   abstract: [],
   venue: [Conference name$at$~Conference venue, October 1--10, 2025],
   logo: [],
+  logo-relative-width: none,
   bibliography: none,
 )

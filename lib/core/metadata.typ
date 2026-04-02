@@ -94,7 +94,7 @@
   if rendered.len() == 0 {
     []
   } else {
-    rendered.join(linebreak())
+    rendered.join(" / ")
   }
 }
 

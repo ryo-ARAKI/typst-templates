@@ -10,7 +10,7 @@
 
 #let showybox-focus = (
   border-color: white,
-  body-color: colors.at("accent").lighten(60%),
+  body-color: colors.at("accent").lighten(70%),
 )
 
 #let showybox-advanced = (

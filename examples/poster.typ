@@ -1,5 +1,7 @@
 #import "../lib/presets/poster.typ": *
 
+#let colormath(math, color) = text(fill: color, $#math$)
+
 #let metadata = (
   text-font: "Noto Sans CJK JP",
   cjk-font: "Noto Sans CJK JP",
@@ -9,6 +11,11 @@
     (
       name: [荒木亮],
       affiliation: [Typst Templates],
+      email: [`araki.ryo@example.com`],
+    ),
+    (
+      name: [共同研究者A],
+      affiliation: [Reusable Layout Group],
       email: [],
     ),
   ),
@@ -16,39 +23,40 @@
   summary: [],
   abstract: [],
   venue: [Template Showcase$at$Local Workspace, 2026-03-12],
+  logo-relative-width: 20%,
   logo: poster-logo-strip(
-    widths: (1fr, 1.4fr, 0.8fr),
+    widths: (1fr, 1.4fr, 0.6fr),
     [
       #rect(
         width: 100%,
-        height: 2.3cm,
+        height: 3cm,
         inset: 0.4cm,
         fill: rgb("#dce7f7"),
         stroke: none,
       )[
-        #align(center + horizon)[*Logo A*]
+        #align(center + horizon)[*A*]
       ]
     ],
     [
       #rect(
         width: 100%,
-        height: 2.3cm,
+        height: 2cm,
         inset: 0.4cm,
         fill: rgb("#f8efd5"),
         stroke: none,
       )[
-        #align(center + horizon)[*Logo B*]
+        #align(center + horizon)[*B*]
       ]
     ],
     [
       #rect(
         width: 100%,
-        height: 2.3cm,
+        height: 3.5cm,
         inset: 0.4cm,
         fill: rgb("#e1f3e0"),
         stroke: none,
       )[
-        #align(center + horizon)[*Logo C*]
+        #align(center + horizon)[*C*]
       ]
     ],
   ),
@@ -61,47 +69,106 @@
 #columns(
   2,
   [
-    #pop.column-box(heading: [*共通の囲み枠*])[
+    #pop.column-box(heading: [*基本要素*])[
+      #text(24pt)[#align(right)[共同研究者表記のサンプル]]
+      #v(-0.2em)
       #question[どの部品を形式横断で再利用できますか？]
       #summary[
-        question / summary box と数式注釈は文書種別をまたいで再利用できます。
+        question / summary box と #textbox([inline 強調], navy) は文書種別をまたいで再利用できます。
       ]
-      #v(0.8em)
+      #v(0.2em)
+      行内数式も #colormath($H(Y bar X)$, blue) のように色分けできます。
+      #v(0.5em)
       #showybox(frame: showybox-focus)[
         *Focus*: 再利用可能なコールアウトを各セクション内に配置できます。
       ]
+      #v(0.3em)
+      #showybox(
+        frame: (
+          border-color: white,
+          body-color: rgb("#E03C8A").lighten(70%),
+        ),
+      )[
+        *Idea*: 実ポスターでは，注目結果やアイデア提示に色違いの `showybox` もよく使います。
+      ]
     ]
     #colbreak()
-    #pop.column-box(heading: [*図表と数式*])[
+    #pop.column-box(heading: [*レイアウトと図版*])[
+      = 非対称 `grid`
       #grid(
-        columns: (1fr, 1fr),
+        columns: (3fr, 2fr),
         gutter: 0.8em,
         [
           #rect(
             width: 100%,
-            height: 6cm,
+            height: 9cm,
             fill: luma(235),
             stroke: gray,
           )
+          #v(0.3em)
+          非対称 `grid` の左側を広く取る例
         ],
         [
-          #pinit-highlight-equation-from(
-            "po:eq1",
-            "po:eq2",
-            fill: blue,
-            height: 32pt,
-            dy: 5pt,
-            pos: "top",
-            arrow-length: 25pt,
+          #showybox(
+            frame: (
+              border-color: white,
+              body-color: gray.lighten(65%),
+            ),
           )[
-            移流項
+            *Side note*:\
+            狭い列には，図や模式図の横に置く短い補足を入れられます。
           ]
-          $
-            partial_t q + #pin("po:eq1")u dot grad q #pin("po:eq2")
-            = S(q)
-          $
+          #v(0.4em)
+          #summary[
+            狭い列では `summary` も短く使うと収まりやすいです。
+          ]
         ],
       )
+      #v(0.5em)
+      = 注釈付き数式
+      #pinit-highlight-equation-from(
+        "po:eq1",
+        "po:eq2",
+        fill: blue,
+        height: 32pt,
+        dy: 5pt,
+        pos: "top",
+        arrow-length: 25pt,
+      )[
+        移流項
+      ]
+      #pinit-highlight-equation-from(
+        "po:eq3",
+        "po:eq4",
+        fill: rgb("#D95F02"),
+        height: 32pt,
+        dy: 5pt,
+        pos: "bottom",
+        arrow-length: 18pt,
+      )[
+        ソース項
+      ]
+      $
+        partial_t q + #pin("po:eq1")u dot grad q #pin("po:eq2")
+        = #pin("po:eq3")S(q)#pin("po:eq4")
+      $
+      #v(0.3em)
+      == 数式中の強調
+      $
+        partial_t q = #textbox($S(q)$, gray)
+      $
+      #v(0.5em)
+      = `cetz.canvas` オーバーレイ
+      #align(center)[#cetz.canvas({
+        import cetz.draw: *
+        rect((-4.0, -2.0), (4.0, 2.0), fill: luma(235), stroke: gray)
+        rect((1.4, -1.1), (3.5, 0.5), radius: 3pt, fill: rgb("#4C78A8").transparentize(65%), stroke: none)
+        rect((-3.6, 1.2), (-1.2, 1.9), fill: white, stroke: none)
+        content((-2.4, 1.55), text(16pt)[図注])
+        content((2.45, -1.45), text(14pt, fill: rgb("#4C78A8"))[注目領域])
+        line((0, 0), (2.8, 1.1), stroke: (paint: rgb("#D95F02"), thickness: 1.8pt), mark: (end: "stealth"))
+        circle((0, 0), radius: 0.12, fill: rgb("#D95F02"), stroke: none)
+      })]
     ]
   ],
 )

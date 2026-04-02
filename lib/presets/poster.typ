@@ -7,7 +7,7 @@
 #let poster-runtime-config = state("poster-runtime-config", poster-config())
 #let poster-title-spacing = 5%
 
-#let poster-logo-strip(..logos, gap: 1.2em, widths: none) = {
+#let poster-logo-strip(..logos, gap: 0.4em, widths: none) = {
   let items = logos.pos()
   let columns = if widths != none and type(widths) == array and widths.len() == items.len() {
     widths

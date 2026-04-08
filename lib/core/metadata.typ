@@ -109,6 +109,17 @@
   }
 }
 
+#let render-author-emails(authors) = {
+  let rendered = authors
+    .map(author => author.at("email", default: []))
+    .filter(part => part != [])
+  if rendered.len() == 0 {
+    []
+  } else {
+    rendered.join(linebreak())
+  }
+}
+
 #let authors-for-js(authors) = {
   let mapped = authors.map(author => (
     author.at("name", default: []),
@@ -136,6 +147,7 @@
     authors-inline: render-authors-inline(authors),
     poster-authors-inline: render-poster-authors-inline(authors),
     affiliations-inline: render-author-affiliations(authors),
+    author-emails-inline: render-author-emails(authors),
     authors-js: authors-for-js(authors),
     date: config.at("date", default: auto),
     summary: config.at("summary", default: []),

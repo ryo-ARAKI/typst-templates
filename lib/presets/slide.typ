@@ -46,8 +46,8 @@
       title: metadata.at("title"),
       subtitle: metadata.at("subtitle"),
       author: metadata.at("author-names"),
+      authors: metadata.at("slide-title-authors"),
       date: metadata.at("date"),
-      email: metadata.at("author-emails-inline"),
       institution: if resolved.at("institution") != [] {
         resolved.at("institution")
       } else {
@@ -75,8 +75,9 @@
     config,
   )
   let info = self.info + args.named()
-  info.authors = {
-    let authors = if "authors" in info {
+  let has-custom-title-authors = "authors" in info
+  let title-authors = {
+    let authors = if has-custom-title-authors {
       info.authors
     } else {
       info.author
@@ -87,7 +88,7 @@
       (authors,)
     }
   }
-  let has-email = "email" in info and info.email != none and info.email != [] and info.email != ""
+  let has-institution = info.institution != none and info.institution != [] and info.institution != ""
   let body = {
     if info.logo != none {
       place(right, text(fill: self.colors.primary, info.logo))
@@ -107,31 +108,37 @@
           },
         )
         set text(size: .8em)
-        stack(
-          dir: ttb,
-          spacing: 1em,
-          ..info
-            .authors
-            .chunks(3)
-            .map(author-chunk => {
-              grid(
-                columns: (1fr,) * author-chunk.len(),
-                column-gutter: 1em,
-                ..author-chunk.map(author => text(
-                  fill: self.colors.neutral-darkest,
-                  author,
-                ))
-              )
-            }),
-        )
+        if has-custom-title-authors {
+          stack(
+            dir: ttb,
+            spacing: .6em,
+            ..title-authors.map(author => text(
+              fill: self.colors.neutral-darkest,
+              author,
+            )),
+          )
+        } else {
+          stack(
+            dir: ttb,
+            spacing: 1em,
+            ..title-authors
+              .chunks(3)
+              .map(author-chunk => {
+                grid(
+                  columns: (1fr,) * author-chunk.len(),
+                  column-gutter: 1em,
+                  ..author-chunk.map(author => text(
+                    fill: self.colors.neutral-darkest,
+                    author,
+                  ))
+                )
+              }),
+          )
+        }
         v(1em)
-        if info.institution != none {
+        if not has-custom-title-authors and has-institution {
           parbreak()
           text(size: .9em, info.institution)
-        }
-        if has-email {
-          parbreak()
-          text(size: .8em, info.email)
         }
         if info.date != none {
           parbreak()

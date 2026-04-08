@@ -9,7 +9,12 @@
     (
       name: [荒木亮],
       affiliation: [Typst Templates],
-      email: [],
+      email: [`ryo@example.com`],
+    ),
+    (
+      name: [山田花子],
+      affiliation: [Typst Templates],
+      email: [`hanako@example.com`],
     ),
   ),
   date: datetime.today(),

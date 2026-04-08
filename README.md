@@ -44,6 +44,7 @@
 `slide` は `#show: slide-theme.with(config: metadata + (date-locale: "ja",))` のように
 `date-locale` を追加すると，日付表示を日本語に切り替えられる．
 既定値は `"en"` で，`datetime-format` を明示した場合はその指定が優先される．
+title slide では authors[].email のうち空でないものがメール行として表示される．
 
 ### Poster logo strip
 

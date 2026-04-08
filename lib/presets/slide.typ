@@ -87,7 +87,7 @@
       (authors,)
     }
   }
-  let has-email = "email" in info and info.email != none and info.email != []
+  let has-email = "email" in info and info.email != none and info.email != [] and info.email != ""
   let body = {
     if info.logo != none {
       place(right, text(fill: self.colors.primary, info.logo))

@@ -112,7 +112,7 @@
 #let render-author-emails(authors) = {
   let rendered = authors
     .map(author => author.at("email", default: []))
-    .filter(part => part != [])
+    .filter(part => part != [] and part != "")
   if rendered.len() == 0 {
     []
   } else {

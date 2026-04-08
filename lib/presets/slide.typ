@@ -3,9 +3,25 @@
 #import "../components/math.typ": apply-math-font, apply-inline-japanese-math-spacing, apply-block-equation-spacing
 #import "../adapters/touying.typ": *
 
+#let slide-date-formats = (
+  en: "[month repr:short]. [day], [year]",
+  ja: "[year]年[month]月[day]日",
+)
+
+#let resolve-slide-datetime-format(config) = {
+  let explicit-format = config.at("datetime-format", default: auto)
+  if explicit-format != auto {
+    explicit-format
+  } else {
+    let locale = config.at("date-locale", default: "en")
+    slide-date-formats.at(locale, default: slide-date-formats.at("en"))
+  }
+}
+
 #let slide-theme(body, config: none) = {
   let resolved = slide-config(overrides: config)
   let metadata = resolved.at("metadata")
+  let datetime-format = resolve-slide-datetime-format(resolved)
   set text(font: resolved.at("text-font"))
   apply-math-font(font: resolved.at("math-font"))
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
@@ -22,7 +38,7 @@
       h(1fr)
       self.info.summary
       h(1fr)
-      self.info.date.display(self.datetime-format)
+      self.info.date.display(datetime-format)
       h(1fr)
     },
     footer-c: context utils.slide-counter.display() + " / " + utils.last-slide-number,
@@ -39,7 +55,7 @@
       logo: metadata.at("logo"),
       summary: metadata.at("summary"),
     ),
-    config-common(datetime-format: resolved.at("datetime-format")),
+    config-common(datetime-format: datetime-format),
     config-common(new-section-slide-fn: none),
     config-common(handout: resolved.at("handout")),
   )

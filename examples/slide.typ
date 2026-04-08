@@ -20,7 +20,7 @@
   bibliography: none,
 )
 
-#show: slide-theme.with(config: metadata)
+#show: slide-theme.with(config: metadata + (date-locale: "ja"))
 #slide-title-slide()
 
 == 基本レイアウト

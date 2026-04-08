@@ -41,6 +41,10 @@
 - `slide`: 主に `title`, `subtitle`, `authors`, `date`, `summary`, `logo`
 - `poster`: 主に `title`, `authors`, `venue`, `logo`
 
+`slide` は `#show: slide-theme.with(config: metadata + (date-locale: "ja",))` のように
+`date-locale` を追加すると，日付表示を日本語に切り替えられる．
+既定値は `"en"` で，`datetime-format` を明示した場合はその指定が優先される．
+
 ### Poster logo strip
 
 `poster` では `logo:` に `poster-logo-strip(..logos, gap:, widths:)` を渡すと，

@@ -109,6 +109,42 @@
   }
 }
 
+#let render-author-emails(authors) = {
+  let rendered = authors
+    .map(author => author.at("email", default: []))
+    .filter(part => part != [] and part != "")
+  if rendered.len() == 0 {
+    []
+  } else {
+    rendered.join(linebreak())
+  }
+}
+
+#let render-slide-title-author(entry) = {
+  let parts = ()
+  let name = entry.at("name", default: [])
+  let email = entry.at("email", default: [])
+  let affiliation = entry.at("affiliation", default: [])
+  if name != [] and name != "" {
+    parts.push(name)
+  }
+  if email != [] and email != "" {
+    parts.push(if type(email) == str { raw(email) } else { email })
+  }
+  if affiliation != [] and affiliation != "" {
+    parts.push(affiliation)
+  }
+  if parts.len() == 0 {
+    []
+  } else {
+    parts.join(h(0.6em))
+  }
+}
+
+#let render-slide-title-authors(authors) = {
+  authors.map(render-slide-title-author).filter(part => part != [])
+}
+
 #let authors-for-js(authors) = {
   let mapped = authors.map(author => (
     author.at("name", default: []),
@@ -136,6 +172,8 @@
     authors-inline: render-authors-inline(authors),
     poster-authors-inline: render-poster-authors-inline(authors),
     affiliations-inline: render-author-affiliations(authors),
+    author-emails-inline: render-author-emails(authors),
+    slide-title-authors: render-slide-title-authors(authors),
     authors-js: authors-for-js(authors),
     date: config.at("date", default: auto),
     summary: config.at("summary", default: []),

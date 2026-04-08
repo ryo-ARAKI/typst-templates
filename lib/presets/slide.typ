@@ -47,6 +47,7 @@
       subtitle: metadata.at("subtitle"),
       author: metadata.at("author-names"),
       date: metadata.at("date"),
+      email: metadata.at("author-emails-inline"),
       institution: if resolved.at("institution") != [] {
         resolved.at("institution")
       } else {
@@ -63,4 +64,81 @@
 }
 
 #let setup-slide(config: none) = [#show: slide-theme.with(config: config)]
-#let slide-title-slide() = title-slide()
+#let slide-title-slide(
+  config: (:),
+  extra: none,
+  ..args,
+) = touying-slide-wrapper(self => {
+  self = utils.merge-dicts(
+    self,
+    config-common(freeze-slide-counter: true),
+    config,
+  )
+  let info = self.info + args.named()
+  info.authors = {
+    let authors = if "authors" in info {
+      info.authors
+    } else {
+      info.author
+    }
+    if type(authors) == array {
+      authors
+    } else {
+      (authors,)
+    }
+  }
+  let has-email = "email" in info and info.email != none and info.email != []
+  let body = {
+    if info.logo != none {
+      place(right, text(fill: self.colors.primary, info.logo))
+    }
+    std.align(
+      center + horizon,
+      {
+        block(
+          inset: 0em,
+          breakable: false,
+          {
+            text(size: 2em, fill: self.colors.primary, strong(info.title))
+            if info.subtitle != none {
+              parbreak()
+              text(size: 1.2em, fill: self.colors.primary, info.subtitle)
+            }
+          },
+        )
+        set text(size: .8em)
+        stack(
+          dir: ttb,
+          spacing: 1em,
+          ..info
+            .authors
+            .chunks(3)
+            .map(author-chunk => {
+              grid(
+                columns: (1fr,) * author-chunk.len(),
+                column-gutter: 1em,
+                ..author-chunk.map(author => text(
+                  fill: self.colors.neutral-darkest,
+                  author,
+                ))
+              )
+            }),
+        )
+        v(1em)
+        if info.institution != none {
+          parbreak()
+          text(size: .9em, info.institution)
+        }
+        if has-email {
+          parbreak()
+          text(size: .8em, info.email)
+        }
+        if info.date != none {
+          parbreak()
+          text(size: .8em, utils.display-info-date(self))
+        }
+      },
+    )
+  }
+  touying-slide(self: self, body)
+})

@@ -93,6 +93,12 @@
   )
 }
 
+#let poster-has-citation-entry(key, path) = {
+  let bibliography = read(path)
+  let blocks = poster-entry-blocks(bibliography)
+  blocks.find(block => poster-entry-key(block) == key) != none
+}
+
 #let poster-logo-strip(..logos, gap: 0.4em, widths: none) = {
   let items = logos.pos()
   let columns = if widths != none and type(widths) == array and widths.len() == items.len() {
@@ -152,7 +158,13 @@
   body
 }
 
-#let setup-poster(config: none) = [#show: poster-theme.with(config: config)]
+#let setup-poster(config: none) = {
+  let resolved = poster-config(overrides: config)
+  let bibliography-path = resolved.at("metadata").at("bibliography", default: none)
+  if bibliography-path != none {
+    hide(bibliography(bibliography-path, title: none))
+  }
+}
 #let resolve-poster-title-box-args(resolved, logo-relative-width: auto) = {
   let metadata = resolved.at("metadata")
   let resolved-logo-relative-width = if logo-relative-width == auto {
@@ -226,5 +238,20 @@
     }
     let journal = poster-journal-abbrev.at(journal-name, default: journal-name)
     [#poster-author-label(authors), #journal, #volume (#year)]
+  }
+}
+
+#let poster-citation-ref(it, config: none) = {
+  let resolved = poster-config(overrides: config)
+  let bibliography-path = resolved.at("metadata").at("bibliography", default: none)
+  if bibliography-path == none {
+    it
+  } else {
+    let key = str(it.target)
+    if poster-has-citation-entry(key, bibliography-path) {
+      poster-cite(key, config: resolved)
+    } else {
+      it
+    }
   }
 }

@@ -15,13 +15,15 @@
 )
 
 #show: poster-theme.with(config: metadata)
+#setup-poster(config: metadata)
+#show ref: poster-citation-ref.with(config: metadata)
 #poster-title()
 
 #columns(
   1,
   [
     #pop.column-box(heading: [*Citation*])[
-      #poster-cite("Tanogami2024_information")
+      @Tanogami2024_information
     ]
   ],
 )

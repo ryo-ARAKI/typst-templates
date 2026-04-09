@@ -46,6 +46,8 @@
 `poster` は参考文献節を自動生成しない．
 そのために，poster の setup では `#show ref: poster-citation-ref.with(config: metadata)` と
 `#setup-poster(config: metadata)` を入れる．
+`examples/poster.typ` と `starters/poster.typ` にはこの setup が最初から入っているので，
+そのまま `@BibKey` を書けば使い始められる．
 
 `slide` は `#show: slide-theme.with(config: metadata + (date-locale: "ja",))` のように
 `date-locale` を追加すると，日付表示を日本語に切り替えられる．

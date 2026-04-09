@@ -1,4 +1,5 @@
 #import "../core/config.typ": poster-config
+#import "../core/journal-abbrev.typ": abbreviate-journal
 #import "../core/locale.typ": apply-japanese-text
 #import "../components/math.typ": apply-math-font, apply-inline-japanese-math-spacing
 #import "../adapters/peace-of-posters.typ": *
@@ -6,10 +7,6 @@
 
 #let poster-runtime-config = state("poster-runtime-config", poster-config())
 #let poster-title-spacing = 5%
-#let poster-journal-abbrev = (
-  "Physical Review Research": "Phys. Rev. Res.",
-  "Physical Review Fluids": "Phys. Rev. Fluids",
-)
 
 #let poster-cite-error(message) = panic("poster-cite: " + message)
 
@@ -236,7 +233,7 @@
     if authors.len() == 0 {
       poster-cite-error("entry `" + key + "` is missing one of: author, journal, volume, year")
     }
-    let journal = poster-journal-abbrev.at(journal-name, default: journal-name)
+    let journal = abbreviate-journal(journal-name)
     [#poster-author-label(authors), #journal, #volume (#year)]
   }
 }

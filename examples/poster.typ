@@ -167,7 +167,12 @@
       = `cetz.canvas` オーバーレイ
       #align(center)[#cetz.canvas({
         import cetz.draw: *
-        rect((-10.0, -4.0), (10.0, 4.0), fill: luma(235), stroke: gray)
+        grid(
+          (-10, -4),
+          (10, 4),
+          stroke: gray,
+        )
+        circle((0, 0), radius: .3, fill: black, stroke: none)
         rect((2.0, -1.5), (8.0, 1.5), radius: 3pt, fill: rgb("#4C78A8").transparentize(65%), stroke: none)
         rect((-4.4, 1.2), (-1.5, 2.7), fill: white, stroke: none)
         content((-2.95, 1.9), [図注])

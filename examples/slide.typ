@@ -72,3 +72,22 @@
     = - grad p + #pin("sl:rhs1"); nu laplacian u #pin("sl:rhs2")
   $
 ]
+
+== CeTZ
+#slide[
+  #align(center)[#cetz.canvas({
+    import cetz.draw: *
+    grid(
+      (-10, -4),
+      (10, 4),
+      stroke: gray,
+    )
+    circle((0, 0), radius: .3, fill: black, stroke: none)
+    rect((2.0, -1.5), (8.0, 1.5), radius: 3pt, fill: rgb("#4C78A8").transparentize(65%), stroke: none)
+    rect((-4.4, 1.2), (-1.5, 2.7), fill: white, stroke: none)
+    content((-2.95, 1.9), [図注])
+    content((4.5, -2.3), text(fill: rgb("#4C78A8"))[注目領域])
+    line((-6.0, -2.0), (1.0, 1.0), stroke: (paint: red, thickness: 0.2), mark: (end: "stealth"))
+    circle((-6.0, -2.0), radius: 0.3, fill: red, stroke: none)
+  })]
+]

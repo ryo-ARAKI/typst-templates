@@ -3,9 +3,13 @@
   "Computer Physics Communications": "Comput. Phys. Commun.",
   "Europhysics Letters": "EPL",
   "European Physical Letters": "EPL",
+  "Experimental Fluids": "Exp. Fluids",
   "Fluid Dynamics Research": "Fluid Dyn. Res.",
+  "Flow, Turbulence and Combustion": "Flow Turbul. Combust.",
+  "International Journal of Heat and Fluid Flow": "Int. J. Heat Fluid Flow",
   "Journal of Computational Physics": "J. Comput. Phys.",
   "Journal of Fluid Mechanics": "J. Fluid Mech.",
+  "Journal of Nonlinear Science": "J. Nonlinear Sci.",
   "Journal of Statistical Mechanics: Theory and Experiment": "J. Stat. Mech.",
   "Journal of Statistical Physics": "J. Stat. Phys.",
   "Journal of the Atmospheric Sciences": "J. Atmos. Sci.",
@@ -23,6 +27,7 @@
   "Physics Today": "Phys. Today",
   "Proceedings of the National Academy of Sciences": "Proc. Natl. Acad. Sci. USA",
   "Scientific Reports": "Sci. Rep.",
+  "SIAM Journal on Applied Mathematics": "SIAM J. Appl. Math.",
   "Theoretical and Applied Mechanics Letters": "TAML",
 )
 

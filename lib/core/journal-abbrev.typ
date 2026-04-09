@@ -1,0 +1,26 @@
+#let journal-abbrev-map = (
+  "Journal of Fluid Mechanics": "J. Fluid Mech.",
+  "Physical Review E": "Phys. Rev. E",
+  "Physical Review X": "Phys. Rev. X",
+  "Physical Review Letters": "Phys. Rev. Lett.",
+  "Physical Review Fluids": "Phys. Rev. Fluids",
+  "Physical Review Research": "Phys. Rev. Res.",
+  "Annual Review of Fluid Mechanics": "Annu. Rev. Fluid Mech.",
+  "Nature Communications": "Nat. Comm.",
+  "Fluid Dynamics Research": "Fluid Dyn. Res.",
+  "Journal of Computational Physics": "J. Comput. Phys.",
+  "Computer Physics Communications": "Comput. Phys. Commun.",
+  "Proceedings of the National Academy of Sciences": "Proc. Natl. Acad. Sci. USA",
+  "New Journal of Physics": "New J. Phys.",
+  "Theoretical and Applied Mechanics Letters": "Theor. App. Mech. Lett.",
+  "Physics of Fluids": "Phys. Fluids",
+  "Journal of Statistical Physics": "J. Stat. Phys.",
+  "Journal of Turbulence": "J. Turbul.",
+  "Physics Reports": "Phys. Rep.",
+  "European Physical Letters": "EPL",
+  "Journal of the Atmospheric Sciences": "J. Atmos. Sci.",
+  "Scientific Reports": "Sci. Rep.",
+  "Physica D: Nonlinear Phenomena": "Physica D",
+)
+
+#let abbreviate-journal(name) = journal-abbrev-map.at(name, default: name)

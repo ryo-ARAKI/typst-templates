@@ -15,10 +15,12 @@
   abstract: [],
   venue: [Template Showcase$at$Local Workspace, March 12, 2026],
   logo: [],
-  bibliography: none,
+  bibliography: "/starters/biblio.bib",
 )
 
 #show: poster-theme.with(config: metadata)
+#setup-poster(config: metadata)
+#show ref: poster-citation-ref.with(config: metadata)
 #poster-title()
 
 #columns(

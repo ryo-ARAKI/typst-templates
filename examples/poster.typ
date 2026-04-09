@@ -60,10 +60,12 @@
       ]
     ],
   ),
-  bibliography: none,
+  bibliography: "/examples/biblio.bib",
 )
 
 #show: poster-theme.with(config: metadata)
+#setup-poster(config: metadata)
+#show ref: poster-citation-ref.with(config: metadata)
 #poster-title()
 
 #columns(
@@ -76,6 +78,8 @@
       #summary[
         question / summary box と #textbox([inline 強調], navy) は文書種別をまたいで再利用できます．
       ]
+      == 参考文献
+      @Tanogami2024_information
       #v(0.2em)
       行内数式も #colormath($H(Y bar X)$, blue) のように色分けできます．
       #v(0.2em)

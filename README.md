@@ -41,6 +41,15 @@
 - `slide`: 主に `title`, `subtitle`, `authors`, `date`, `summary`, `logo`
 - `poster`: 主に `title`, `authors`, `venue`, `logo`
 
+`poster` では `bibliography` を設定した上で `@BibKey` を使うと，
+本文中に `Author, Journal Abbrev., Volume (Year)` 形式の短い引用を直接出せる．
+`poster` は参考文献節を自動生成しない．
+そのために，poster の setup では `#show ref: poster-citation-ref.with(config: metadata)` と
+`#setup-poster(config: metadata)` を入れる．
+`examples/poster.typ` と `starters/poster.typ` にはこの setup が最初から入っているので，
+そのまま `@BibKey` を書けば使い始められる．
+雑誌名の短縮形は [`lib/core/journal-abbrev.typ`](/home/ryo/github/typst-templates/.worktrees/poster-inline-citation/lib/core/journal-abbrev.typ) に共通定義してある．
+
 `slide` は `#show: slide-theme.with(config: metadata + (date-locale: "ja",))` のように
 `date-locale` を追加すると，日付表示を日本語に切り替えられる．
 既定値は `"en"` で，`datetime-format` を明示した場合はその指定が優先される．

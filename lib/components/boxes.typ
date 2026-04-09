@@ -11,11 +11,13 @@
 #let showybox-focus = (
   border-color: white,
   body-color: colors.at("accent").lighten(70%),
+  radius: 10pt,
 )
 
 #let showybox-advanced = (
   border-color: white,
   body-color: colors.at("advanced").lighten(80%),
+  radius: 10pt,
 )
 
 // Backward-compatible aliases for the old slide template API.

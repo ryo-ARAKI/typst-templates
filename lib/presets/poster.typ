@@ -6,6 +6,92 @@
 
 #let poster-runtime-config = state("poster-runtime-config", poster-config())
 #let poster-title-spacing = 5%
+#let poster-journal-abbrev = (
+  "Physical Review Research": "Phys. Rev. Res.",
+  "Physical Review Fluids": "Phys. Rev. Fluids",
+)
+
+#let poster-cite-error(message) = panic("poster-cite: " + message)
+
+#let poster-bibliography-path(resolved) = {
+  let path = resolved.at("metadata").at("bibliography", default: none)
+  if path == none {
+    poster-cite-error("metadata.bibliography is not set")
+  }
+  path
+}
+
+#let poster-capture-first(text, pattern) = {
+  let matched = text.match(pattern)
+  if matched == none { none } else { matched.captures.at(0) }
+}
+
+#let poster-strip-field-value(text) = {
+  let trimmed = text.trim()
+  let without-comma = if trimmed.ends-with(",") {
+    trimmed.slice(0, trimmed.len() - 1).trim()
+  } else {
+    trimmed
+  }
+  if without-comma.starts-with("{") and without-comma.ends-with("}") {
+    without-comma.slice(1, without-comma.len() - 1).trim()
+  } else if without-comma.starts-with("\"") and without-comma.ends-with("\"") {
+    without-comma.slice(1, without-comma.len() - 1).trim()
+  } else {
+    without-comma
+  }
+}
+
+#let poster-entry-key(block) = {
+  let key = poster-capture-first(block, regex("(?m)^\\s*@[A-Za-z]+\\s*\\{\\s*([^,]+),"))
+  if key == none { none } else { key.trim() }
+}
+
+#let poster-entry-blocks(text) = {
+  let matches = text.matches(regex("(?ms)^\\s*@[A-Za-z]+\\s*\\{.*?^\\s*\\}\\s*$"))
+  matches.map(match => match.text)
+}
+
+#let poster-field(block, name) = {
+  let value = poster-capture-first(block, regex("(?im)^\\s*" + name + "\\s*=\\s*(.+?)\\s*,?\\s*$"))
+  if value == none { none } else { poster-strip-field-value(value) }
+}
+
+#let poster-author-surname(author) = {
+  let normalized = author.trim()
+  if normalized.contains(",") {
+    normalized.split(",").at(0).trim()
+  } else {
+    let parts = normalized.split(" ").filter(part => part != "")
+    parts.at(parts.len() - 1)
+  }
+}
+
+#let poster-author-label(authors) = {
+  let surnames = authors.map(poster-author-surname)
+  if surnames.len() == 1 {
+    surnames.at(0)
+  } else if surnames.len() == 2 {
+    surnames.join(" and ")
+  } else {
+    surnames.at(0) + " et al."
+  }
+}
+
+#let poster-citation-entry(key, path) = {
+  let bibliography = read(path)
+  let blocks = poster-entry-blocks(bibliography)
+  let target = blocks.find(block => poster-entry-key(block) == key)
+  if target == none {
+    poster-cite-error("entry not found for key `" + key + "` in `" + path + "`")
+  }
+  (
+    author: poster-field(target, "author"),
+    journal: poster-field(target, "journal"),
+    volume: poster-field(target, "volume"),
+    year: poster-field(target, "year"),
+  )
+}
 
 #let poster-logo-strip(..logos, gap: 0.4em, widths: none) = {
   let items = logos.pos()
@@ -115,5 +201,30 @@
     pop.bottom-box()[
       #h(1fr)#text(32pt)[#resolved.at("metadata").at("venue")]
     ]
+  }
+}
+
+#let poster-cite(key, config: none) = {
+  context {
+    let resolved = if config == none {
+      poster-runtime-config.get()
+    } else {
+      poster-config(overrides: config)
+    }
+    let path = poster-bibliography-path(resolved)
+    let entry = poster-citation-entry(key, path)
+    let author = if entry.author == none { none } else { entry.author.trim() }
+    let journal-name = if entry.journal == none { none } else { entry.journal.trim() }
+    let volume = if entry.volume == none { none } else { entry.volume.trim() }
+    let year = if entry.year == none { none } else { entry.year.trim() }
+    if author == none or author == "" or journal-name == none or journal-name == "" or volume == none or volume == "" or year == none or year == "" {
+      poster-cite-error("entry `" + key + "` is missing one of: author, journal, volume, year")
+    }
+    let authors = author.split(" and ").map(part => part.trim()).filter(part => part != "")
+    if authors.len() == 0 {
+      poster-cite-error("entry `" + key + "` is missing one of: author, journal, volume, year")
+    }
+    let journal = poster-journal-abbrev.at(journal-name, default: journal-name)
+    [#poster-author-label(authors), #journal, #volume (#year)]
   }
 }

@@ -54,6 +54,19 @@
   if value == none { none } else { poster-strip-field-value(value) }
 }
 
+#let poster-entry-kind(block) = {
+  let kind = poster-capture-first(block, regex("(?im)^\\s*@([A-Za-z]+)\\s*\\{"))
+  if kind == none { none } else { kind.trim() }
+}
+
+#let poster-normalize-title(title) = {
+  title.replace("{", "").replace("}", "").trim()
+}
+
+#let poster-italicized-citation-text(body, text-font) = {
+  text(font: ("Noto Sans", text-font), style: "italic")[#body]
+}
+
 #let poster-author-surname(author) = {
   let normalized = author.trim()
   if normalized.contains(",") {
@@ -83,7 +96,9 @@
     poster-cite-error("entry not found for key `" + key + "` in `" + path + "`")
   }
   (
+    kind: poster-entry-kind(target),
     author: poster-field(target, "author"),
+    title: poster-field(target, "title"),
     journal: poster-field(target, "journal"),
     volume: poster-field(target, "volume"),
     year: poster-field(target, "year"),
@@ -222,19 +237,42 @@
     }
     let path = poster-bibliography-path(resolved)
     let entry = poster-citation-entry(key, path)
+    let kind = if entry.kind == none { none } else { entry.kind.trim() }
     let author = if entry.author == none { none } else { entry.author.trim() }
+    let title = if entry.title == none { none } else { poster-normalize-title(entry.title) }
     let journal-name = if entry.journal == none { none } else { entry.journal.trim() }
     let volume = if entry.volume == none { none } else { entry.volume.trim() }
     let year = if entry.year == none { none } else { entry.year.trim() }
-    if author == none or author == "" or journal-name == none or journal-name == "" or volume == none or volume == "" or year == none or year == "" {
-      poster-cite-error("entry `" + key + "` is missing one of: author, journal, volume, year")
+    let authors = if author == none or author == "" {
+      ()
+    } else {
+      author.split(" and ").map(part => part.trim()).filter(part => part != "")
     }
-    let authors = author.split(" and ").map(part => part.trim()).filter(part => part != "")
     if authors.len() == 0 {
-      poster-cite-error("entry `" + key + "` is missing one of: author, journal, volume, year")
+      poster-cite-error("entry `" + key + "` is missing one of: author, year")
     }
-    let journal = abbreviate-journal(journal-name)
-    [#poster-author-label(authors), #journal, #volume (#year)]
+    let is-article = kind != none and kind.match(regex("(?i)^article$")) != none
+    let is-book = kind != none and kind.match(regex("(?i)^book$")) != none
+    if is-article {
+      if author == none or author == "" or journal-name == none or journal-name == "" or year == none or year == "" {
+        poster-cite-error("entry `" + key + "` is missing one of: author, journal, year")
+      }
+      let journal = abbreviate-journal(journal-name)
+      if volume == none or volume == "" {
+        [#poster-author-label(authors), #poster-italicized-citation-text(journal, resolved.at("text-font")) (#year)]
+      } else {
+        [#poster-author-label(authors), #poster-italicized-citation-text(journal, resolved.at("text-font")), #strong[#volume] (#year)]
+      }
+    } else {
+      if author == none or author == "" or title == none or title == "" or year == none or year == "" {
+        poster-cite-error("entry `" + key + "` is missing one of: author, title, year")
+      }
+      if is-book {
+        [#poster-author-label(authors), #poster-italicized-citation-text(title, resolved.at("text-font")) (#year)]
+      } else {
+        [#poster-author-label(authors), #title (#year)]
+      }
+    }
   }
 }
 

@@ -63,6 +63,24 @@
   title.replace("{", "").replace("}", "").trim()
 }
 
+#let poster-display-journal(name) = {
+  let trimmed = name.trim()
+  let arxiv-preprint-id = poster-capture-first(
+    trimmed,
+    regex("(?i)^arxiv\\s+preprint\\s+arxiv:([^\\s]+)\\s*$"),
+  )
+  if arxiv-preprint-id != none {
+    "arXiv:" + arxiv-preprint-id
+  } else {
+    let arxiv-id = poster-capture-first(trimmed, regex("(?i)^arxiv:([^\\s]+)\\s*$"))
+    if arxiv-id != none {
+      "arXiv:" + arxiv-id
+    } else {
+      abbreviate-journal(trimmed)
+    }
+  }
+}
+
 #let poster-italicized-citation-text(body, text-font) = {
   text(font: ("Noto Sans", text-font), style: "italic")[#body]
 }
@@ -257,7 +275,7 @@
       if author == none or author == "" or journal-name == none or journal-name == "" or year == none or year == "" {
         poster-cite-error("entry `" + key + "` is missing one of: author, journal, year")
       }
-      let journal = abbreviate-journal(journal-name)
+      let journal = poster-display-journal(journal-name)
       if volume == none or volume == "" {
         [#poster-author-label(authors), #poster-italicized-citation-text(journal, resolved.at("text-font")) (#year)]
       } else {

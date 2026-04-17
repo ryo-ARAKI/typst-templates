@@ -1,3 +1,4 @@
+#import "@preview/cjk-spacer:0.2.0": cjk-spacer
 #import "@preview/physica:0.9.8": *
 #import "@preview/cetz:0.4.2"
 #import "@preview/unify:0.7.1": *
@@ -7,6 +8,7 @@
 
 #let setup-document(body, config: none) = {
   let resolved = document-config(overrides: config)
+  show: cjk-spacer
   show: js-document.with(config: resolved)
   apply-document-bibliography()
   set math.equation(numbering: resolved.at("equation-numbering"))

@@ -11,6 +11,8 @@
 
 ## Shared Packages
 
+- `@preview/cjk-spacer:0.2.0`
+  Automatic spacing between CJK and Latin text in all presets.
 - `@preview/pinit:0.2.2`
   Equation annotation pins and arrows.
 - `@preview/physica:0.9.8`

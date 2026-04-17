@@ -1,3 +1,4 @@
+#import "@preview/cjk-spacer:0.2.0": cjk-spacer
 #import "../core/config.typ": poster-config
 #import "../core/journal-abbrev.typ": abbreviate-journal
 #import "../core/locale.typ": apply-japanese-text
@@ -160,6 +161,7 @@
 #let poster-theme(body, config: none) = {
   let resolved = poster-config(overrides: config)
   let metadata = resolved.at("metadata")
+  show: cjk-spacer
   set page("a0", margin: 1cm)
   pop.set-poster-layout(pop.layout-a0)
   pop.set-theme(pop.psi-ch)

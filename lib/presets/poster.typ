@@ -2,6 +2,7 @@
 #import "../core/config.typ": poster-config
 #import "../core/journal-abbrev.typ": abbreviate-journal
 #import "../core/locale.typ": apply-japanese-text
+#import "../components/aligned-list.typ": aligned-items, aligned-enum
 #import "../components/math.typ": apply-math-font, apply-inline-japanese-math-spacing
 #import "../adapters/peace-of-posters.typ": *
 #import "../core/tokens.typ": colors

@@ -1,6 +1,7 @@
 #import "@preview/cjk-spacer:0.2.0": cjk-spacer
 #import "../core/config.typ": slide-config
 #import "../core/locale.typ": apply-japanese-text
+#import "../components/aligned-list.typ": aligned-items, aligned-enum
 #import "../components/math.typ": apply-math-font, apply-inline-japanese-math-spacing, apply-block-equation-spacing
 #import "../adapters/touying.typ": *
 

@@ -1,3 +1,7 @@
+/*
+Normalizes custom marker width/alignment while keeping Typst's default
+marker behavior when no explicit width is requested.
+*/
 #let _aligned-marker(marker, marker-width: auto, marker-align: end) = {
   if marker-width == auto {
     marker
@@ -10,11 +14,19 @@
   }
 }
 
+/*
+Lays out the aligned "label + description" body with a hanging indent
+derived from the measured width of the first column.
+*/
 #let _aligned-item-body(left, right, col-gap: 0.6em) = context {
   let hanging = measure([#left]).width + col-gap
   par(hanging-indent: hanging)[#left#h(col-gap, weak: true)#right]
 }
 
+/*
+Bullet list whose outer marker/spacing follows Typst's standard list
+behavior while the item body keeps the left column aligned.
+*/
 #let aligned-items(
   items,
   bullet: [•],
@@ -37,6 +49,10 @@
   }),
 )
 
+/*
+Numbered list variant of `aligned-items` that keeps Typst's standard enum
+behavior unless a custom marker width is explicitly requested.
+*/
 #let aligned-enum(
   items,
   numbering-pattern: "1.",

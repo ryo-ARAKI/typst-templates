@@ -12,12 +12,7 @@
 
 #let _aligned-item-body(left, right, col-gap: 0.6em) = context {
   let hanging = measure([#left]).width + col-gap
-  terms(
-    separator: h(col-gap, weak: true),
-    hanging-indent: hanging,
-    spacing: auto,
-    terms.item([#left], [#right]),
-  )
+  par(hanging-indent: hanging)[#left#h(col-gap, weak: true)#right]
 }
 
 #let aligned-items(

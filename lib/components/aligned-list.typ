@@ -15,12 +15,30 @@ marker behavior when no explicit width is requested.
 }
 
 /*
-Lays out the aligned "label + description" body with a hanging indent
-derived from the measured width of the first column.
+Measures the widest first-column label so every item can share the same
+second-column starting position.
 */
-#let _aligned-item-body(left, right, col-gap: 0.6em) = context {
-  let hanging = measure([#left]).width + col-gap
-  par(hanging-indent: hanging)[#left#h(col-gap, weak: true)#right]
+#let _aligned-max-left(items) = {
+  items
+    .map(pair => {
+      let (left, _) = pair
+      measure([#left]).width
+    })
+    .fold(0pt, (a, b) => if a > b { a } else { b })
+}
+
+/*
+Lays out the aligned "label + description" body with a shared first-column
+width so the second column lines up across items.
+*/
+#let _aligned-item-body(left, right, max-left, col-gap: 0.6em) = {
+  grid(
+    columns: (max-left, 1fr),
+    column-gutter: col-gap,
+    align: (start, start),
+    [#left],
+    [#right],
+  )
 }
 
 /*
@@ -35,19 +53,22 @@ behavior while the item body keeps the left column aligned.
   col-gap: 0.6em,
   row-gap: auto,
   marker-align: end,
-) = list(
-  marker: _aligned-marker(
-    bullet,
-    marker-width: marker-width,
-    marker-align: marker-align,
-  ),
-  body-indent: marker-gap,
-  spacing: row-gap,
-  ..items.map(pair => {
-    let (left, right) = pair
-    list.item(_aligned-item-body(left, right, col-gap: col-gap))
-  }),
-)
+) = context {
+  let max-left = _aligned-max-left(items)
+  list(
+    marker: _aligned-marker(
+      bullet,
+      marker-width: marker-width,
+      marker-align: marker-align,
+    ),
+    body-indent: marker-gap,
+    spacing: row-gap,
+    ..items.map(pair => {
+      let (left, right) = pair
+      list.item(_aligned-item-body(left, right, max-left, col-gap: col-gap))
+    }),
+  )
+}
 
 /*
 Numbered list variant of `aligned-items` that keeps Typst's standard enum
@@ -61,21 +82,24 @@ behavior unless a custom marker width is explicitly requested.
   col-gap: 0.6em,
   row-gap: auto,
   marker-align: end,
-) = enum(
-  numbering: if marker-width == auto {
-    numbering-pattern
-  } else {
-    n => _aligned-marker(
-      [#numbering(numbering-pattern, n)],
-      marker-width: marker-width,
-      marker-align: marker-align,
-    )
-  },
-  body-indent: marker-gap,
-  spacing: row-gap,
-  number-align: if marker-width == auto { marker-align + top } else { start + top },
-  ..items.map(pair => {
-    let (left, right) = pair
-    enum.item(_aligned-item-body(left, right, col-gap: col-gap))
-  }),
-)
+) = context {
+  let max-left = _aligned-max-left(items)
+  enum(
+    numbering: if marker-width == auto {
+      numbering-pattern
+    } else {
+      n => _aligned-marker(
+        [#numbering(numbering-pattern, n)],
+        marker-width: marker-width,
+        marker-align: marker-align,
+      )
+    },
+    body-indent: marker-gap,
+    spacing: row-gap,
+    number-align: if marker-width == auto { marker-align + top } else { start + top },
+    ..items.map(pair => {
+      let (left, right) = pair
+      enum.item(_aligned-item-body(left, right, max-left, col-gap: col-gap))
+    }),
+  )
+}

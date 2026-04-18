@@ -53,6 +53,25 @@
   ]
 ]
 
+== aligned list
+#slide[
+  `aligned-items` と `aligned-enum` は preset import だけで使えます。
+  #v(0.8em)
+  #aligned-items(
+    (
+      ([目的], [説明ラベルと本文をきれいに揃えたいときに使います。]),
+      ([用途], [用語集、設定表、短い注記一覧に向いています。]),
+    ),
+  )
+  #v(1.0em)
+  #aligned-enum(
+    (
+      ([Step 1], [左列に短い見出しを書きます。]),
+      ([Step 2], [右列に説明や補足を置きます。]),
+    ),
+  )
+]
+
 == 注釈付き数式
 #slide[
   #let annot(color) = (fill: color, height: 24pt, arrow-length: 18pt)

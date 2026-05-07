@@ -60,7 +60,7 @@
       summary: metadata.at("summary"),
     ),
     config-common(datetime-format: datetime-format),
-    config-common(new-section-slide-fn: none),
+    // config-common(new-section-slide-fn: none),
     config-common(handout: resolved.at("handout")),
   )
   body

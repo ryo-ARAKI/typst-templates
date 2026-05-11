@@ -94,7 +94,7 @@
   let has-institution = info.institution != none and info.institution != [] and info.institution != ""
   let body = {
     if info.logo != none {
-      place(right, text(fill: self.colors.primary, info.logo))
+      place(right + bottom, text(fill: self.colors.primary, info.logo))
     }
     std.align(
       center + horizon,

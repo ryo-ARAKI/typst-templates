@@ -57,6 +57,7 @@
         metadata.at("affiliations-inline")
       },
       logo: metadata.at("logo"),
+      logo-position: metadata.at("logo-position"),
       summary: metadata.at("summary"),
     ),
     config-common(datetime-format: datetime-format),
@@ -94,7 +95,14 @@
   let has-institution = info.institution != none and info.institution != [] and info.institution != ""
   let body = {
     if info.logo != none {
-      place(right + bottom, text(fill: self.colors.primary, info.logo))
+      let logo-alignment = if info.logo-position == "right-top" {
+        right + top
+      } else if info.logo-position == "right-bottom" {
+        right + bottom
+      } else {
+        panic("unsupported slide logo-position: " + repr(info.logo-position))
+      }
+      place(logo-alignment, text(fill: self.colors.primary, info.logo))
     }
     std.align(
       center + horizon,

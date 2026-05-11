@@ -58,6 +58,7 @@
   date-locale: "en",
   institution: [],
   logo: "",
+  logo-position: "right-bottom",
   summary: [presenter$at$subtitle],
   abstract: [],
   venue: [],

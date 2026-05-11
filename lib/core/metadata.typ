@@ -180,6 +180,7 @@
     abstract: config.at("abstract", default: []),
     venue: config.at("venue", default: []),
     logo: config.at("logo", default: []),
+    logo-position: config.at("logo-position", default: "right-bottom"),
     logo-relative-width: config.at("logo-relative-width", default: none),
     bibliography: config.at("bibliography", default: none),
   )

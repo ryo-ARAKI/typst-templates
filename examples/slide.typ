@@ -22,6 +22,7 @@
   abstract: [],
   venue: [],
   logo: [],
+  logo-position: "right-bottom",
   bibliography: none,
 )
 

@@ -1,5 +1,6 @@
 #import "@preview/cjk-spacer:0.2.0": cjk-spacer
 #import "../core/config.typ": slide-config
+#import "../core/tokens.typ": slide-palette
 #import "../core/locale.typ": apply-japanese-text
 #import "../components/aligned-list.typ": aligned-items, aligned-enum
 #import "../components/math.typ": apply-math-font, apply-inline-japanese-math-spacing, apply-block-equation-spacing
@@ -26,6 +27,14 @@
   let datetime-format = resolve-slide-datetime-format(resolved)
   show: cjk-spacer
   set text(font: resolved.at("text-font"))
+  show raw: set text(font: resolved.at("code-font"))
+  show raw.where(block: true): set block(
+    fill: rgb("#f6f7f9"),
+    stroke: rgb("#d9dde3"),
+    inset: 0.65em,
+    radius: 4pt,
+    width: 100%,
+  )
   apply-math-font(font: resolved.at("math-font"))
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()

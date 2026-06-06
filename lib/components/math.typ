@@ -11,6 +11,31 @@
   show math.equation.where(block: true): set block(spacing: spacing)
 }
 
+#let apply-referenced-only-equation-numbering(numbering: "(1)") = body => {
+  show math.equation: it => {
+    if it.block and it.has("label") and it.numbering == none {
+      math.equation(it.body, block: true, numbering: numbering)
+    } else {
+      it
+    }
+  }
+  show ref: it => {
+    let el = it.element
+    if el == none or el.func() != math.equation {
+      it
+    } else {
+      {
+        let nums = counter(math.equation).at(el.location())
+        let last-index = nums.len() - 1
+        let current = nums.at(last-index) + 1
+        let display-nums = nums.slice(0, last-index) + (current,)
+        link(el.location(), std.numbering(numbering, ..display-nums))
+      }
+    }
+  }
+  body
+}
+
 #let apply-inline-japanese-math-spacing() = {
   show math.equation.where(block: false): it => jp-spacing(it)
 }

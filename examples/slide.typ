@@ -24,6 +24,8 @@
   logo: [],
   logo-position: "right-bottom",
   bibliography: none,
+  equation-numbering: "referenced-only",
+  equation-numbering-pattern: "(1)",
 )
 
 #show: slide-theme.with(config: metadata + (date-locale: "ja"))
@@ -84,6 +86,19 @@
       ([Step 2], [右列に説明や補足を置きます。]),
     ),
   )
+]
+
+== 参照された数式番号
+#slide[
+  $
+    a^2 + b^2 = c^2
+  $
+
+  $
+    e = m c^2
+  $ <eq:mass-energy>
+
+  参照した式 @eq:mass-energy だけに番号が付きます。
 ]
 
 == 注釈付き数式

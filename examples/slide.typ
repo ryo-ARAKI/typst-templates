@@ -89,6 +89,36 @@
   $
 ]
 
+== Palette and code
+#slide[
+  `slide-palette` はグラフや図注で再利用しやすい色名を提供します。
+
+  #let swatch(name, color) = stack(
+    dir: ttb,
+    spacing: 0.12em,
+    rect(width: 100%, height: 0.42cm, fill: color),
+    text(size: 0.75em, name),
+  )
+
+  #grid(
+    columns: (1fr, 1fr, 1fr, 1fr),
+    gutter: 0.8em,
+    swatch("blue", slide-palette.blue),
+    swatch("orange", slide-palette.orange),
+    swatch("green", slide-palette.green),
+    swatch("red", slide-palette.red),
+    swatch("cyan", slide-palette.cyan),
+    swatch("purple", slide-palette.purple),
+    swatch("brown", slide-palette.brown),
+    swatch("gray", slide-palette.gray),
+  )
+
+  ```typ
+  #let fit = model(data)
+  plot(fit, stroke: slide-palette.blue)
+  ```
+]
+
 == CeTZ
 #slide[
   #align(center)[#cetz.canvas({

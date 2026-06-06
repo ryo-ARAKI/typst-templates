@@ -121,6 +121,42 @@
   )
 })
 
+#let slide-section-slide(
+  config: (:),
+  level: 1,
+  numbered: false,
+  ..args,
+) = touying-slide-wrapper(self => {
+  self = utils.merge-dicts(self, config)
+  let body = args.pos().at(0, default: none)
+  let title = if body == none or body == [] {
+    utils.display-current-heading(level: level, numbered: numbered)
+  } else {
+    body
+  }
+  touying-slide(
+    self: self,
+    std.align(center + horizon)[
+      #set text(size: 1.8em, fill: self.colors.primary, weight: "bold")
+      #title
+    ],
+  )
+})
+
+#let footer-focus-slide(
+  body,
+  config: (:),
+) = touying-slide-wrapper(self => {
+  self = utils.merge-dicts(self, config)
+  touying-slide(
+    self: self,
+    std.align(center + horizon)[
+      #set text(size: 1.7em, fill: self.colors.primary, weight: "bold")
+      #body
+    ],
+  )
+})
+
 #let slide-theme(body, config: none) = {
   let resolved = slide-config(overrides: config)
   let metadata = resolved.at("metadata")
@@ -173,7 +209,7 @@
       equation-numbering: resolved.at("equation-numbering"),
       equation-numbering-pattern: resolved.at("equation-numbering-pattern"),
     ),
-    // config-common(new-section-slide-fn: none),
+    config-common(new-section-slide-fn: slide-section-slide.with(numbered: false)),
     config-common(handout: resolved.at("handout")),
   )
   body
@@ -272,3 +308,4 @@
   }
   touying-slide(self: self, body)
 })
+

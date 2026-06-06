@@ -3,7 +3,7 @@
 #import "../core/tokens.typ": slide-palette
 #import "../core/locale.typ": apply-japanese-text
 #import "../components/aligned-list.typ": aligned-items, aligned-enum
-#import "../components/math.typ": apply-math-font, apply-inline-japanese-math-spacing, apply-block-equation-spacing
+#import "../components/math.typ": apply-math-font, apply-inline-japanese-math-spacing, apply-block-equation-spacing, apply-referenced-only-equation-numbering
 #import "../adapters/touying.typ": *
 
 #let slide-date-formats = (
@@ -20,6 +20,106 @@
     slide-date-formats.at(locale, default: slide-date-formats.at("en"))
   }
 }
+
+#let slide(
+  config: (:),
+  repeat: auto,
+  setting: body => body,
+  composer: auto,
+  align: auto,
+  ..bodies,
+) = touying-slide-wrapper(self => {
+  if align != auto {
+    self.store.align = align
+  }
+  let header(self) = {
+    set std.align(top)
+    grid(
+      rows: (auto, auto),
+      row-gutter: 3mm,
+      if self.store.progress-bar {
+        components.progress-bar(
+          height: 2pt,
+          self.colors.primary,
+          self.colors.tertiary,
+        )
+      },
+      block(
+        inset: (x: .5em),
+        components.left-and-right(
+          text(
+            fill: self.colors.primary,
+            weight: "bold",
+            size: 1.2em,
+            utils.call-or-display(self, self.store.header),
+          ),
+          text(fill: self.colors.primary.lighten(65%), utils.call-or-display(
+            self,
+            self.store.header-right,
+          )),
+        ),
+      ),
+    )
+  }
+  let footer(self) = {
+    set std.align(center + bottom)
+    set text(size: .4em)
+    {
+      let cell(..args, it) = components.cell(
+        ..args,
+        inset: 1mm,
+        std.align(horizon, text(fill: white, it)),
+      )
+      show: block.with(width: 100%, height: auto)
+      grid(
+        columns: self.store.footer-columns,
+        rows: 1.5em,
+        cell(fill: self.colors.primary, utils.call-or-display(
+          self,
+          self.store.footer-a,
+        )),
+        cell(fill: self.colors.secondary, utils.call-or-display(
+          self,
+          self.store.footer-b,
+        )),
+        cell(fill: self.colors.tertiary, utils.call-or-display(
+          self,
+          self.store.footer-c,
+        )),
+      )
+    }
+  }
+  let self = utils.merge-dicts(
+    self,
+    config-page(
+      header: header,
+      footer: footer,
+    ),
+  )
+  let new-setting = body => {
+    show: std.align.with(self.store.align)
+    show: setting
+    body
+  }
+  let slide-bodies = if self.at("equation-numbering", default: none) == "referenced-only" {
+    bodies.pos().map(body => {
+      show: apply-referenced-only-equation-numbering(
+        numbering: self.at("equation-numbering-pattern", default: "(1)"),
+      )
+      body
+    })
+  } else {
+    bodies.pos()
+  }
+  touying-slide(
+    self: self,
+    config: config,
+    repeat: repeat,
+    setting: new-setting,
+    composer: composer,
+    ..slide-bodies,
+  )
+})
 
 #let slide-theme(body, config: none) = {
   let resolved = slide-config(overrides: config)
@@ -39,7 +139,6 @@
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
   apply-block-equation-spacing()
-
   show: university-theme.with(
     header-right: "",
     footer-columns: resolved.at("footer-columns"),
@@ -69,7 +168,11 @@
       logo-position: metadata.at("logo-position"),
       summary: metadata.at("summary"),
     ),
-    config-common(datetime-format: datetime-format),
+    config-common(
+      datetime-format: datetime-format,
+      equation-numbering: resolved.at("equation-numbering"),
+      equation-numbering-pattern: resolved.at("equation-numbering-pattern"),
+    ),
     // config-common(new-section-slide-fn: none),
     config-common(handout: resolved.at("handout")),
   )

@@ -8,6 +8,18 @@
   text,
 )
 
+#let semantic-text(body, color) = text(fill: color, weight: "bold", body)
+#let structure = body => semantic-text(body, colors.at("structure"))
+#let alert = body => semantic-text(body, colors.at("alert"))
+
+#let semantic-colorbox(body, color, baseline: 0%) = box(
+  fill: color.lighten(70%),
+  inset: (x: 0.45em, y: 0.18em),
+  radius: 3pt,
+  baseline: baseline,
+  body,
+)
+
 #let showybox-focus = (
   border-color: white,
   body-color: colors.at("accent").lighten(70%),
@@ -65,6 +77,22 @@
     ],
   )
 }
+
+#let semantic-block(body, title: none, color: gray) = labeled-box(
+  body,
+  label: title,
+  color: color,
+  numbering: false,
+  title-fill: color.darken(20%),
+)
+
+#let structure-block(body, title: none) = semantic-block(body, title: title, color: colors.at("structure"))
+#let alert-block(body, title: none) = semantic-block(body, title: title, color: colors.at("alert"))
+#let example-block(body, title: none) = semantic-block(body, title: title, color: colors.at("example"))
+
+#let structure-colorbox = body => semantic-colorbox(body, colors.at("structure"))
+#let alert-colorbox = body => semantic-colorbox(body, colors.at("alert"))
+#let example-colorbox = body => semantic-colorbox(body, colors.at("example"))
 
 // Legacy state objects kept for compatibility with older slide preambles.
 #let summary-state = state("summary-state", ())

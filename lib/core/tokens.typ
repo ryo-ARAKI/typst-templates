@@ -16,8 +16,20 @@
   document-sans: "Liberation Sans",
   document-sans-cjk: "IPAexGothic",
   ui: "Cabin",
+  code: "Noto Sans Mono",
   math: "Latin Modern Math",
   cjk: "Noto Sans CJK JP",
+)
+
+#let slide-palette = (
+  blue: rgb("#4E79A7"),
+  orange: rgb("#F28E2B"),
+  green: rgb("#59A14F"),
+  red: rgb("#E15759"),
+  cyan: rgb("#76B7B2"),
+  purple: rgb("#B07AA1"),
+  brown: rgb("#9C755F"),
+  gray: rgb("#BAB0AC"),
 )
 
 #let spacing = (
@@ -50,6 +62,7 @@
   text-font: fonts.at("ui"),
   cjk-font: fonts.at("cjk"),
   math-font: fonts.at("math"),
+  code-font: fonts.at("code"),
   title: [Presentation title\ ...continued to the second line],
   subtitle: [Subtitle],
   author: [

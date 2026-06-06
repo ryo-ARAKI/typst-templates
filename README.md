@@ -54,6 +54,9 @@
 `date-locale` を追加すると，日付表示を日本語に切り替えられる．
 既定値は `"en"` で，`datetime-format` を明示した場合はその指定が優先される．
 title slide では各著者が `氏名 `メールアドレス` 所属` の1行形式で表示され，`authors[].email` が空ならその部分は省略される．
+数式番号を参照された表示式だけに付けたい場合は，slide metadata に
+`equation-numbering: "referenced-only"` と `equation-numbering-pattern: "(1)"` を追加する．
+この設定は slide preset だけに効き，未ラベルの表示式は番号なし，ラベル付き表示式と `@eq` 参照は同じ番号へリンクされる．
 
 ### Poster logo strip
 

@@ -1,7 +1,10 @@
 #let colors = (
   accent: rgb("#f93d6e"),
+  structure: rgb("#1f4e79"),
+  alert: rgb("#F77F00"),
+  example: rgb("#2d6a4f"),
   question: rgb("#FFB11B"),
-  answer: rgb("#E03C8A"),
+  answer: rgb("#B23A8E"),
   advanced: orange,
   muted: gray,
   navy: navy,

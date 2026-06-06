@@ -41,6 +41,19 @@
   #summary-no-num[囲み枠コンポーネントは slide と poster で共通利用できます。]
 ]
 
+== Beamer-style helpers
+#slide[
+  #structure[構造化した主張] は通常の強調、#alert[注意すべき条件] は警告に使えます。
+
+  #structure-block(title: [Structure])[主要な概念や前提を短くまとめます。]
+  #alert-block(title: [Alert])[仮定が破れる場合や重要な制約を示します。]
+  #example-block(title: [Example])[具体例や計算例を置けます。]
+
+  #structure-colorbox[Structure] #h(0.4em)
+  #alert-colorbox[Alert] #h(0.4em)
+  #example-colorbox[Example]
+]
+
 == 2カラムレイアウト
 #slide[
   左カラムには短い箇条書きを置けます。

@@ -35,6 +35,17 @@
 - `@preview/enja-bib:0.1.0`
   Japanese bibliography helpers for documents.
 
+## Optional Command-Line Tools
+
+- `pdfpc`
+  Optional presenter view for PDFs that have matching `.pdfpc` metadata.
+- `polylux2pdfpc`
+  Optional legacy workflow tool for Polylux-style presenter metadata; Touying 0.6.3 can also export pdfpc metadata with `typst query`.
+- `touying-exporter`
+  Optional external exporter for PPTX and HTML slide outputs.
+
+These tools are not Typst package imports, and they are not required for normal `slide` compilation.
+
 ## Update Guidance
 
 - Check `lib/adapters` first when a package update breaks compilation.

@@ -32,8 +32,8 @@
 #let starter-trend-figure = fixed-canvas({
   import cetz.draw: *
   grid(
-    (-23, -13),
-    (23, 13),
+    (-23, -17),
+    (23, 17),
     stroke: gray.lighten(38%),
   )
   rect((-22, -11.5), (22, 11.5), radius: 6pt, fill: palette.at("structure").transparentize(94%), stroke: none)

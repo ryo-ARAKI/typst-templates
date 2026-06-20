@@ -461,12 +461,20 @@
     radius: 4pt,
   )[
     #if title != none {
-      text(size: 44pt, fill: palette.at("structure"), weight: "bold")[#title]
-      v(0.25cm)
+      grid(
+        columns: (1fr,),
+        rows: (auto, 1fr),
+        row-gutter: 0.25cm,
+        text(size: 44pt, fill: palette.at("structure"), weight: "bold")[#title],
+        box(width: 100%, height: 100%)[
+          #align(center + horizon)[#body]
+        ],
+      )
+    } else {
+      box(width: 100%, height: 100%)[
+        #align(center + horizon)[#body]
+      ]
     }
-    #box(width: 100%, height: 100%)[
-      #align(center + horizon)[#body]
-    ]
   ]
 }
 

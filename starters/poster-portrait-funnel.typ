@@ -128,7 +128,8 @@
 #show ref: poster-citation-ref.with(config: metadata)
 
 #poster-portrait-funnel(
-  headline: [A short headline states the poster's main result before the details.],
+  headline-takeaway: [State the poster's main result in one sentence.],
+  headline-detail: [Use this second line for the context or condition that makes the takeaway actionable.],
   upper: (
     title: [Main figure],
     figure: starter-trend-figure,
@@ -147,5 +148,6 @@
     caption-title: [Guide],
     figure-side: right,
   ),
-  conclusion: [The support figure strengthens the main claim and points to the next discussion.],
+  conclusion-takeaway: [Name the claim viewers should remember.],
+  conclusion-detail: [Connect the support figure to the main result and point to the next discussion.],
 )

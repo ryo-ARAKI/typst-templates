@@ -421,7 +421,20 @@
   )
 }
 
-#let poster-portrait-band(body, fill: colors.at("structure"), size: 58pt) = {
+#let poster-portrait-required-content(value, name) = {
+  if value == auto or value == none or value == [] {
+    poster-portrait-theme-error(name + " is required")
+  }
+  value
+}
+
+#let poster-portrait-band(
+  takeaway,
+  detail,
+  fill: colors.at("structure"),
+  takeaway-size: 58pt,
+  detail-size: 40pt,
+) = {
   block(
     width: 100%,
     height: 100%,
@@ -429,7 +442,17 @@
     inset: (x: 0.8cm, y: 0.55cm),
     radius: 0pt,
   )[
-    #text(size: size, fill: white, weight: "bold")[#body]
+    #box(width: 100%, height: 100%)[
+      #align(left + horizon)[
+        #grid(
+          columns: (1fr,),
+          rows: (auto, auto),
+          row-gutter: 1cm,
+          text(size: takeaway-size, fill: white, weight: "bold")[#takeaway],
+          text(size: detail-size, fill: white.transparentize(20%))[#detail],
+        )
+      ]
+    ]
   ]
 }
 
@@ -553,10 +576,12 @@
 }
 
 #let poster-portrait-funnel(
-  headline: [],
+  headline-takeaway: auto,
+  headline-detail: auto,
   upper: (:),
   lower: (:),
-  conclusion: [],
+  conclusion-takeaway: auto,
+  conclusion-detail: auto,
   footer: auto,
   acknowledgements: auto,
   logo: auto,
@@ -571,6 +596,10 @@
       poster-config(overrides: config)
     }
     let palette = poster-portrait-palette(theme)
+    let resolved-headline-takeaway = poster-portrait-required-content(headline-takeaway, "headline-takeaway")
+    let resolved-headline-detail = poster-portrait-required-content(headline-detail, "headline-detail")
+    let resolved-conclusion-takeaway = poster-portrait-required-content(conclusion-takeaway, "conclusion-takeaway")
+    let resolved-conclusion-detail = poster-portrait-required-content(conclusion-detail, "conclusion-detail")
     block(width: 100%, height: 100%)[
       #grid(
         columns: (1fr,),
@@ -582,10 +611,20 @@
           logo: logo,
           logo-relative-width: logo-relative-width,
         ),
-        poster-portrait-band(headline, fill: palette.at("headline-fill"), size: 56pt),
+        poster-portrait-band(
+          resolved-headline-takeaway,
+          resolved-headline-detail,
+          fill: palette.at("headline-fill"),
+          takeaway-size: 56pt,
+        ),
         poster-portrait-figure-row(upper, palette, default-side: left),
         poster-portrait-figure-row(lower, palette, default-side: right),
-        poster-portrait-band(conclusion, fill: palette.at("conclusion-fill"), size: 50pt),
+        poster-portrait-band(
+          resolved-conclusion-takeaway,
+          resolved-conclusion-detail,
+          fill: palette.at("conclusion-fill"),
+          takeaway-size: 50pt,
+        ),
         poster-portrait-footer(resolved, palette, footer: footer, acknowledgements: acknowledgements),
       )
     ]

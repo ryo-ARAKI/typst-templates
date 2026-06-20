@@ -282,7 +282,8 @@
 
 #poster-portrait-funnel(
   theme: solarized_magenta_palette,
-  headline: [Main + Support: one result carries the story; the second figure explains why it is credible.],
+  headline-takeaway: [Main result first; support explains why it is credible.],
+  headline-detail: [Use the upper figure for central evidence and the lower figure for a compact check, equation, or comparison.],
   upper: (
     title: [Main figure],
     figure: trend-figure([Main result], solarized_magenta_palette, solarized_magenta_palette.at("structure")),
@@ -310,14 +311,16 @@
     caption-title: [Support notes],
     figure-side: right,
   ),
-  conclusion: [Main + Support: the support figure makes the main claim easier to trust.],
+  conclusion-takeaway: [Support evidence makes the main claim easier to trust.],
+  conclusion-detail: [End by naming what the support figure rules out and what discussion should happen next.],
 )
 
 #pagebreak()
 
 #poster-portrait-funnel(
   theme: wine-palette,
-  headline: [Method + Main: show the analysis path before asking viewers to interpret the result.],
+  headline-takeaway: [Show the method before interpreting the main result.],
+  headline-detail: [Put the schematic first so viewers know which assumptions shape the figure below.],
   upper: (
     title: [Method schematic],
     figure: method-figure(wine-palette),
@@ -355,14 +358,16 @@
     caption-title: [Interpretation],
     figure-side: left,
   ),
-  conclusion: [Method + Main: the method reveals the mechanism behind the result.],
+  conclusion-takeaway: [The method reveals the mechanism behind the result.],
+  conclusion-detail: [Close with the causal or diagnostic link that the schematic made visible.],
 )
 
 #pagebreak()
 
 #poster-portrait-funnel(
   theme: brewer_dark2_magenta_palette,
-  headline: [Main 1 + Main 2: two findings work together to support one conclusion.],
+  headline-takeaway: [Two findings should converge on one conclusion.],
+  headline-detail: [Use matching scale and vocabulary across both figure slots so the comparison reads as one argument.],
   upper: (
     title: [Main figure 1],
     figure: trend-figure([Main figure 1], brewer_dark2_magenta_palette, brewer_dark2_magenta_palette.at("accent")),
@@ -401,5 +406,6 @@
     caption-title: [Comparison notes],
     figure-side: right,
   ),
-  conclusion: [Main 1 + Main 2: both findings point to the same next step.],
+  conclusion-takeaway: [Both findings point to the same next step.],
+  conclusion-detail: [Make the final band synthesize the pair instead of repeating either panel alone.],
 )

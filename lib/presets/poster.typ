@@ -9,6 +9,8 @@
 
 #let poster-runtime-config = state("poster-runtime-config", poster-config())
 #let poster-title-spacing = 5%
+#let poster-portrait-spacing = 1.0cm
+#let poster-portrait-ink = rgb("#172033")
 
 #let poster-cite-error(message) = panic("poster-cite: " + message)
 
@@ -191,6 +193,20 @@
   body
 }
 
+#let poster-portrait-theme(body, config: none) = {
+  let resolved = poster-config(overrides: config)
+  let metadata = resolved.at("metadata")
+  show: cjk-spacer
+  set page("a0", margin: 1.2cm)
+  set text(size: 30pt, font: resolved.at("text-font"), fill: poster-portrait-ink)
+  set block(spacing: poster-portrait-spacing)
+  apply-math-font(font: resolved.at("math-font"))
+  apply-japanese-text(cjk-font: resolved.at("cjk-font"))
+  apply-inline-japanese-math-spacing()
+  poster-runtime-config.update(_ => resolved + (metadata: metadata,))
+  body
+}
+
 #let setup-poster(config: none) = {
   let resolved = poster-config(overrides: config)
   let bibliography-path = resolved.at("metadata").at("bibliography", default: none)
@@ -245,6 +261,141 @@
     }
     pop.bottom-box()[
       #h(1fr)#text(32pt)[#resolved.at("metadata").at("venue")]
+    ]
+  }
+}
+
+#let poster-portrait-figure-side-error(side) = {
+  panic("poster-portrait-funnel: figure-side must be `left` or `right`")
+}
+
+#let poster-portrait-get-section(section, key, default: none) = {
+  if type(section) == dictionary {
+    section.at(key, default: default)
+  } else {
+    default
+  }
+}
+
+#let poster-portrait-compact-title(resolved) = {
+  let metadata = resolved.at("metadata")
+  let logo = metadata.at("logo", default: [])
+  let has-logo = logo != []
+  grid(
+    columns: if has-logo { (1fr, 22%) } else { (1fr,) },
+    gutter: 1cm,
+    align: horizon,
+    [
+      #text(size: 56pt, fill: colors.at("navy"), weight: "bold")[#metadata.at("title")]
+      #v(0.2cm)
+      #text(size: 30pt, fill: poster-portrait-ink)[#metadata.at("poster-authors-inline")]
+    ],
+    ..if has-logo {
+      (align(right + horizon)[#logo],)
+    } else {
+      ()
+    },
+  )
+}
+
+#let poster-portrait-band(body, fill: colors.at("structure"), size: 54pt) = {
+  block(
+    width: 100%,
+    height: 100%,
+    fill: fill,
+    inset: (x: 0.8cm, y: 0.55cm),
+    radius: 0pt,
+  )[
+    #text(size: size, fill: white, weight: "bold")[#body]
+  ]
+}
+
+#let poster-portrait-panel(body, title: none, fill: colors.at("structure").lighten(78%)) = {
+  block(
+    width: 100%,
+    height: 100%,
+    fill: fill,
+    stroke: 2pt + colors.at("structure"),
+    inset: (x: 0.55cm, y: 0.45cm),
+    radius: 4pt,
+  )[
+    #if title != none {
+      text(size: 26pt, fill: colors.at("navy"), weight: "bold")[#title]
+      v(0.22cm)
+    }
+    #text(size: 24pt, fill: poster-portrait-ink)[#body]
+  ]
+}
+
+#let poster-portrait-figure-box(body, title: none) = {
+  block(
+    width: 100%,
+    height: 100%,
+    fill: white,
+    stroke: 3pt + colors.at("structure"),
+    inset: (x: 0.45cm, y: 0.45cm),
+    radius: 4pt,
+  )[
+    #if title != none {
+      text(size: 28pt, fill: colors.at("structure"), weight: "bold")[#title]
+      v(0.25cm)
+    }
+    #box(width: 100%, height: 100%)[
+      #align(center + horizon)[#body]
+    ]
+  ]
+}
+
+#let poster-portrait-figure-row(section, default-side: left) = {
+  let side = poster-portrait-get-section(section, "figure-side", default: default-side)
+  if side != left and side != right {
+    poster-portrait-figure-side-error(side)
+  }
+  let title = poster-portrait-get-section(section, "title", default: none)
+  let figure = poster-portrait-get-section(section, "figure", default: [])
+  let caption = poster-portrait-get-section(section, "caption", default: [])
+  let figure-cell = poster-portrait-figure-box(figure, title: title)
+  let caption-cell = poster-portrait-panel(caption, title: [Guide])
+  let cells = if side == left {
+    (figure-cell, caption-cell)
+  } else {
+    (caption-cell, figure-cell)
+  }
+  box(width: 100%, height: 100%)[
+    #grid(
+      columns: if side == left { (1.18fr, 0.82fr) } else { (0.82fr, 1.18fr) },
+      gutter: poster-portrait-spacing,
+      ..cells,
+    )
+  ]
+}
+
+#let poster-portrait-funnel(
+  headline: [],
+  upper: (:),
+  lower: (:),
+  conclusion: [],
+  config: none,
+) = {
+  context {
+    let resolved = if config == none {
+      poster-runtime-config.get()
+    } else {
+      poster-config(overrides: config)
+    }
+    let metadata = resolved.at("metadata")
+    block(width: 100%, height: 100%)[
+      #grid(
+        columns: (1fr,),
+        rows: (8%, 14%, 28%, 28%, 13%, 5%),
+        gutter: 0.65cm,
+        poster-portrait-compact-title(resolved),
+        poster-portrait-band(headline, fill: colors.at("structure"), size: 46pt),
+        poster-portrait-figure-row(upper, default-side: left),
+        poster-portrait-figure-row(lower, default-side: right),
+        poster-portrait-band(conclusion, fill: colors.at("navy"), size: 38pt),
+        align(right + horizon)[#text(size: 24pt, fill: colors.at("navy"))[#metadata.at("venue")]],
+      )
     ]
   }
 }

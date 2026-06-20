@@ -75,6 +75,12 @@
   text-size: 32pt,
   gutter: 1cm,
 )
+#let poster-portrait-caption-style-defaults = (
+  text-size: 40pt,
+  leading: 0.70em,
+  list-spacing: 0.60em,
+  title-gutter: 1cm,
+)
 
 #let poster-portrait-takeaway-palette(theme: auto, overrides: (:)) = {
   if type(overrides) != dictionary {
@@ -508,6 +514,37 @@
   ]
 }
 
+#let poster-portrait-caption-panel(
+  body,
+  palette,
+  title: none,
+  fill: auto,
+  style: poster-portrait-caption-style-defaults,
+) = {
+  let resolved-fill = if fill == auto { palette.at("panel-fill") } else { fill }
+  block(
+    width: 100%,
+    height: 100%,
+    fill: resolved-fill,
+    stroke: 2pt + palette.at("structure"),
+    inset: (x: 0.55cm, y: 0.45cm),
+    radius: 4pt,
+  )[
+    #poster-portrait-box-content(
+      title,
+      title => poster-portrait-box-heading(title, palette, size: 42pt, fill-key: "heading"),
+      box(width: 100%, height: 100%)[
+        #text(size: style.at("text-size"), fill: palette.at("ink"))[
+          #set par(leading: style.at("leading"))
+          #set list(spacing: style.at("list-spacing"))
+          #body
+        ]
+      ],
+      row-gutter: style.at("title-gutter"),
+    )
+  ]
+}
+
 #let poster-portrait-figure-box(body, palette, title: none) = {
   block(
     width: 100%,
@@ -527,8 +564,19 @@
   ]
 }
 
-#let poster-portrait-figure-row(section, palette, default-side: left, name: "section") = {
+#let poster-portrait-figure-row(
+  section,
+  palette,
+  default-side: left,
+  name: "section",
+  caption-style: poster-portrait-caption-style-defaults,
+) = {
   let resolved-section = poster-portrait-required-section(section, name)
+  let resolved-caption-style = poster-portrait-resolve-style(
+    resolved-section.at("caption-style", default: (:)),
+    caption-style,
+    name + ".caption-style",
+  )
   let side = resolved-section.at("figure-side", default: default-side)
   if side != left and side != right {
     poster-portrait-figure-side-error(side)
@@ -540,7 +588,7 @@
   let figure-width = resolved-section.at("figure-width", default: 1.18fr)
   let caption-width = resolved-section.at("caption-width", default: 0.82fr)
   let figure-cell = poster-portrait-figure-box(figure, palette, title: title)
-  let caption-cell = poster-portrait-panel(caption, palette, title: caption-title)
+  let caption-cell = poster-portrait-caption-panel(caption, palette, title: caption-title, style: resolved-caption-style)
   let columns = if side == left {
     (figure-width, caption-width)
   } else {
@@ -630,7 +678,7 @@
   if calc.rem(index, 2) == 0 { left } else { right }
 }
 
-#let poster-portrait-figure-rows(sections, palette) = {
+#let poster-portrait-figure-rows(sections, palette, caption-style: poster-portrait-caption-style-defaults) = {
   let rows = ()
   for (index, section) in sections.enumerate() {
     rows.push(poster-portrait-figure-row(
@@ -638,6 +686,7 @@
       palette,
       default-side: poster-portrait-section-default-side(index),
       name: "sections.at(" + str(index) + ")",
+      caption-style: caption-style,
     ))
   }
   rows
@@ -660,6 +709,7 @@
   theme: auto,
   palette: auto,
   title-style: (:),
+  caption-style: (:),
   footer-style: (:),
 ) = {
   context {
@@ -670,6 +720,7 @@
     }
     let resolved-palette = poster-portrait-resolve-palette(theme, palette)
     let resolved-title-style = poster-portrait-resolve-style(title-style, poster-portrait-title-style-defaults, "title-style")
+    let resolved-caption-style = poster-portrait-resolve-style(caption-style, poster-portrait-caption-style-defaults, "caption-style")
     let resolved-footer-style = poster-portrait-resolve-style(footer-style, poster-portrait-footer-style-defaults, "footer-style")
     let resolved-headline-takeaway = poster-portrait-required-content(headline-takeaway, "headline-takeaway")
     let resolved-headline-detail = poster-portrait-required-content(headline-detail, "headline-detail")
@@ -677,7 +728,7 @@
     let resolved-conclusion-detail = poster-portrait-required-content(conclusion-detail, "conclusion-detail")
     let resolved-sections = poster-portrait-resolve-sections(sections)
     let resolved-figure-heights = poster-portrait-resolve-figure-heights(figure-heights, resolved-sections.len())
-    let figure-rows = poster-portrait-figure-rows(resolved-sections, resolved-palette)
+    let figure-rows = poster-portrait-figure-rows(resolved-sections, resolved-palette, caption-style: resolved-caption-style)
     block(width: 100%, height: 100%)[
       #grid(
         columns: (1fr,),

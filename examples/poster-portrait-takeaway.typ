@@ -285,6 +285,12 @@
   headline-height: 10%,
   conclusion-height: 13cm,
   figure-heights: (1fr, 1.05fr, 0.85fr),
+  caption-style: (
+    text-size: 38pt,
+    leading: 0.72em,
+    list-spacing: 0.60em,
+    title-gutter: 0.8cm,
+  ),
   headline-takeaway: [Main result first; support explains why it is credible.],
   headline-detail: [Use multiple figure rows for central evidence, support, and a compact check.],
   sections: (
@@ -293,11 +299,9 @@
       figure: trend-figure([Main result], solarized_magenta_palette, solarized_magenta_palette.at("structure")),
       caption: [
         #question[Which result should viewers read first?]
-        #summary[
-          Put the central evidence in the large slot. Cite compactly when needed:
-          @Tanogami2024_information.
-        ]
-        Inline math can stay visible: #colormath($H(Y bar X)$, solarized_magenta_palette.at("structure")).
+        - Put the central evidence in the large slot.
+        - Cite compactly when needed: @Tanogami2024_information.
+        - Inline math can stay visible: #colormath($H(Y bar X)$, solarized_magenta_palette.at("structure")).
       ],
       caption-title: [Read first],
       figure-side: left,

@@ -64,13 +64,17 @@
   bibliography: "/examples/biblio.bib",
 )
 
+#let solarized_magenta_palette = poster-portrait-palette("solarized-magenta")
+#let wine-palette = poster-portrait-palette("wine")
+#let brewer_dark2_magenta_palette = poster-portrait-palette("brewer-dark2-magenta")
+
 #let fixed-canvas(body) = align(center)[#cetz.canvas({
   import cetz.draw: *
   rect((-10, -6), (10, 6), fill: white.transparentize(100%), stroke: none)
   body
 })]
 
-#let trend-figure(label, color) = fixed-canvas({
+#let trend-figure(label, palette, color) = fixed-canvas({
   import cetz.draw: *
   grid(
     (-8, -4),
@@ -86,43 +90,43 @@
     stroke: (paint: color, thickness: 0.35),
     mark: (end: "stealth"),
   )
-  circle((-7, -2.4), radius: 0.35, fill: colors.at("accent"), stroke: none)
+  circle((-7, -2.4), radius: 0.35, fill: palette.at("accent"), stroke: none)
   rect((1.5, 1.0), (7.6, 3.4), radius: 4pt, fill: color.transparentize(72%), stroke: none)
   content((0, -4.7), text(fill: color)[#label])
 })
 
-#let comparison-figure = fixed-canvas({
+#let comparison-figure(palette) = fixed-canvas({
   import cetz.draw: *
   grid(
     (-8, -4),
     (8, 4),
     stroke: gray.lighten(35%),
   )
-  line((-7, -2.5), (-3, -1.5), (0, 0.2), (4, 1.7), (7, 2.5), stroke: (paint: colors.at("structure"), thickness: 0.3))
-  line((-7, 1.5), (-3, 1.0), (0, 0.8), (4, 0.4), (7, -0.2), stroke: (paint: colors.at("accent"), thickness: 0.3))
-  content((-4.9, 3.2), text(fill: colors.at("structure"))[condition A])
-  content((4.6, -1.4), text(fill: colors.at("accent"))[condition B])
-  content((0, -4.7), text(fill: colors.at("structure"))[Support comparison])
+  line((-7, -2.5), (-3, -1.5), (0, 0.2), (4, 1.7), (7, 2.5), stroke: (paint: palette.at("structure"), thickness: 0.3))
+  line((-7, 1.5), (-3, 1.0), (0, 0.8), (4, 0.4), (7, -0.2), stroke: (paint: palette.at("accent"), thickness: 0.3))
+  content((-4.9, 3.2), text(fill: palette.at("structure"))[condition A])
+  content((4.6, -1.4), text(fill: palette.at("accent"))[condition B])
+  content((0, -4.7), text(fill: palette.at("structure"))[Support comparison])
 })
 
-#let method-figure = fixed-canvas({
+#let method-figure(palette) = fixed-canvas({
   import cetz.draw: *
-  rect((-8, -2.4), (-3.6, 2.4), radius: 4pt, fill: colors.at("structure").lighten(78%), stroke: colors.at("structure"))
-  rect((-2.2, -2.4), (2.2, 2.4), radius: 4pt, fill: colors.at("accent").lighten(72%), stroke: colors.at("accent"))
-  rect((3.6, -2.4), (8, 2.4), radius: 4pt, fill: colors.at("example").lighten(76%), stroke: colors.at("example"))
-  line((-3.6, 0), (-2.2, 0), stroke: (paint: colors.at("structure"), thickness: 0.3), mark: (end: "stealth"))
-  line((2.2, 0), (3.6, 0), stroke: (paint: colors.at("structure"), thickness: 0.3), mark: (end: "stealth"))
+  rect((-8, -2.4), (-3.6, 2.4), radius: 4pt, fill: palette.at("structure").lighten(78%), stroke: palette.at("structure"))
+  rect((-2.2, -2.4), (2.2, 2.4), radius: 4pt, fill: palette.at("accent").lighten(72%), stroke: palette.at("accent"))
+  rect((3.6, -2.4), (8, 2.4), radius: 4pt, fill: palette.at("example").lighten(76%), stroke: palette.at("example"))
+  line((-3.6, 0), (-2.2, 0), stroke: (paint: palette.at("structure"), thickness: 0.3), mark: (end: "stealth"))
+  line((2.2, 0), (3.6, 0), stroke: (paint: palette.at("structure"), thickness: 0.3), mark: (end: "stealth"))
   content((-5.8, 0), [Input])
   content((0, 0), [Model])
   content((5.8, 0), [Output])
-  content((0, -4.7), text(fill: colors.at("structure"))[Method schematic])
+  content((0, -4.7), text(fill: palette.at("structure"))[Method schematic])
 })
 
-#let equation-figure = fixed-canvas({
+#let equation-figure(palette) = fixed-canvas({
   import cetz.draw: *
-  rect((-7.5, -2.2), (7.5, 2.2), radius: 4pt, fill: colors.at("structure").lighten(75%), stroke: colors.at("structure"))
-  content((0, 0), text(size: 28pt, fill: colors.at("structure"))[$partial_t q + u dot grad q = S(q)$])
-  content((0, -4.7), text(fill: colors.at("structure"))[Support figure or equation])
+  rect((-7.5, -2.2), (7.5, 2.2), radius: 4pt, fill: palette.at("structure").lighten(75%), stroke: palette.at("structure"))
+  content((0, 0), text(size: 28pt, fill: palette.at("structure"))[$partial_t q + u dot grad q = S(q)$])
+  content((0, -4.7), text(fill: palette.at("structure"))[Support figure or equation])
 })
 
 #show: poster-portrait-theme.with(config: metadata)
@@ -130,23 +134,24 @@
 #show ref: poster-citation-ref.with(config: metadata)
 
 #poster-portrait-funnel(
+  theme: solarized_magenta_palette,
   headline: [Main + Support: one result carries the story; the second figure explains why it is credible.],
   upper: (
     title: [Main figure],
-    figure: trend-figure([Main result], colors.at("structure")),
+    figure: trend-figure([Main result], solarized_magenta_palette, solarized_magenta_palette.at("structure")),
     caption: [
       #question[Which result should viewers read first?]
       #summary[
         Put the central evidence in the large slot. Cite compactly when needed:
         @Tanogami2024_information.
       ]
-      Inline math can stay visible: #colormath($H(Y bar X)$, colors.at("structure")).
+      Inline math can stay visible: #colormath($H(Y bar X)$, solarized_magenta_palette.at("structure")).
     ],
     figure-side: left,
   ),
   lower: (
     title: [Support figure or equation],
-    figure: equation-figure,
+    figure: equation-figure(solarized_magenta_palette),
     caption: [
       *Support slot*: Use this area for a robustness check, governing equation, or a short comparison.
       #v(0.35em)
@@ -162,10 +167,11 @@
 #pagebreak()
 
 #poster-portrait-funnel(
+  theme: wine-palette,
   headline: [Method + Main: show the analysis path before asking viewers to interpret the result.],
   upper: (
     title: [Method schematic],
-    figure: method-figure,
+    figure: method-figure(wine-palette),
     caption: [
       #aligned-enum(
         (
@@ -183,14 +189,14 @@
   ),
   lower: (
     title: [Main figure],
-    figure: trend-figure([Main figure], colors.at("example")),
+    figure: trend-figure([Main figure], wine-palette, wine-palette.at("example")),
     caption: [
       *Meaning*: Interpret the result using the vocabulary established above.
       #v(0.35em)
       #showybox(
         frame: (
           border-color: white,
-          body-color: gray.lighten(65%),
+          body-color: wine-palette.at("panel-fill"),
         ),
       )[
         *Side note*: A narrow guide column works well for caveats or reading order.
@@ -204,10 +210,11 @@
 #pagebreak()
 
 #poster-portrait-funnel(
+  theme: brewer_dark2_magenta_palette,
   headline: [Main 1 + Main 2: two findings work together to support one conclusion.],
   upper: (
     title: [Main figure 1],
-    figure: trend-figure([Main figure 1], colors.at("accent")),
+    figure: trend-figure([Main figure 1], brewer_dark2_magenta_palette, brewer_dark2_magenta_palette.at("accent")),
     caption: [
       #aligned-items(
         (
@@ -224,7 +231,7 @@
   ),
   lower: (
     title: [Main figure 2],
-    figure: comparison-figure,
+    figure: comparison-figure(brewer_dark2_magenta_palette),
     caption: [
       #question-no-num[
         What changes when the second condition is added?
@@ -233,7 +240,7 @@
       #showybox(
         frame: (
           border-color: white,
-          body-color: colors.at("accent").lighten(76%),
+          body-color: brewer_dark2_magenta_palette.at("accent").lighten(76%),
         ),
       )[
         *Idea*: Use color only to separate roles, not to encode every detail.

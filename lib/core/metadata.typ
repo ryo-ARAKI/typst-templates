@@ -179,6 +179,7 @@
     summary: config.at("summary", default: []),
     abstract: config.at("abstract", default: []),
     venue: config.at("venue", default: []),
+    acknowledgements: config.at("acknowledgements", default: []),
     logo: config.at("logo", default: []),
     logo-position: config.at("logo-position", default: "right-bottom"),
     logo-relative-width: config.at("logo-relative-width", default: none),

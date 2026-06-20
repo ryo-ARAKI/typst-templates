@@ -135,6 +135,7 @@
     caption: [
       *Read first*: The largest visual element should carry the central evidence.
     ],
+    caption-title: [Guide],
     figure-side: left,
   ),
   lower: (
@@ -143,6 +144,7 @@
     caption: [
       *Support*: Use the second large slot for a robustness check, comparison, or equation.
     ],
+    caption-title: [Guide],
     figure-side: right,
   ),
   conclusion: [The support figure strengthens the main claim and points to the next discussion.],

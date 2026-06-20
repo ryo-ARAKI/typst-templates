@@ -294,6 +294,7 @@
       ]
       Inline math can stay visible: #colormath($H(Y bar X)$, solarized_magenta_palette.at("structure")).
     ],
+    caption-title: [Read first],
     figure-side: left,
   ),
   lower: (
@@ -306,6 +307,7 @@
         partial_t q = #textbox($S(q)$, gray)
       $
     ],
+    caption-title: [Support notes],
     figure-side: right,
   ),
   conclusion: [Main + Support: the support figure makes the main claim easier to trust.],
@@ -332,6 +334,7 @@
         *Focus*: Keep the method block schematic and scannable.
       ]
     ],
+    caption-title: [Method notes],
     figure-side: right,
   ),
   lower: (
@@ -349,6 +352,7 @@
         *Side note*: A narrow guide column works well for caveats or reading order.
       ]
     ],
+    caption-title: [Interpretation],
     figure-side: left,
   ),
   conclusion: [Method + Main: the method reveals the mechanism behind the result.],
@@ -374,6 +378,7 @@
         Short summaries fit well when both figure slots are equally important.
       ]
     ],
+    caption-title: [Pairing notes],
     figure-side: left,
   ),
   lower: (
@@ -393,6 +398,7 @@
         *Idea*: Use color only to separate roles, not to encode every detail.
       ]
     ],
+    caption-title: [Comparison notes],
     figure-side: right,
   ),
   conclusion: [Main 1 + Main 2: both findings point to the same next step.],

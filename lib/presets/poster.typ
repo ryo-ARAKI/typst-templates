@@ -2,8 +2,8 @@
 #import "../core/config.typ": poster-config
 #import "../core/journal-abbrev.typ": abbreviate-journal
 #import "../core/locale.typ": apply-japanese-text
-#import "../components/aligned-list.typ": aligned-items, aligned-enum
-#import "../components/math.typ": apply-math-font, apply-inline-japanese-math-spacing
+#import "../components/aligned-list.typ": aligned-enum, aligned-items
+#import "../components/math.typ": apply-inline-japanese-math-spacing, apply-math-font
 #import "../adapters/peace-of-posters.typ": *
 #import "../core/tokens.typ": colors
 
@@ -261,7 +261,7 @@
   apply-math-font(font: resolved.at("math-font"))
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
-  poster-runtime-config.update(_ => resolved + (metadata: metadata,))
+  poster-runtime-config.update(_ => resolved + (metadata: metadata))
   body
 }
 
@@ -275,7 +275,7 @@
   apply-math-font(font: resolved.at("math-font"))
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
-  poster-runtime-config.update(_ => resolved + (metadata: metadata,))
+  poster-runtime-config.update(_ => resolved + (metadata: metadata))
   body
 }
 
@@ -433,6 +433,24 @@
   ]
 }
 
+#let poster-portrait-box-heading(title, palette, size: 44pt, fill-key: "structure") = {
+  text(size: size, fill: palette.at(fill-key), weight: "bold")[#title]
+}
+
+#let poster-portrait-box-content(title, heading, body, row-gutter: 0cm) = {
+  if title != none {
+    grid(
+      columns: (1fr,),
+      rows: (auto, 1fr),
+      row-gutter: row-gutter,
+      heading(title),
+      body,
+    )
+  } else {
+    body
+  }
+}
+
 #let poster-portrait-panel(body, palette, title: none, fill: auto) = {
   let resolved-fill = if fill == auto { palette.at("panel-fill") } else { fill }
   block(
@@ -443,11 +461,14 @@
     inset: (x: 0.55cm, y: 0.45cm),
     radius: 4pt,
   )[
-    #if title != none {
-      text(size: 42pt, fill: palette.at("heading"), weight: "bold")[#title]
-      v(0.22cm)
-    }
-    #text(size: 40pt, fill: palette.at("ink"))[#body]
+    #poster-portrait-box-content(
+      title,
+      title => poster-portrait-box-heading(title, palette, size: 42pt, fill-key: "heading"),
+      box(width: 100%, height: 100%)[
+        #text(size: 40pt, fill: palette.at("ink"))[#body]
+      ],
+      row-gutter: 1cm,
+    )
   ]
 }
 
@@ -460,21 +481,13 @@
     inset: (x: 0.45cm, y: 0.45cm),
     radius: 4pt,
   )[
-    #if title != none {
-      grid(
-        columns: (1fr,),
-        rows: (auto, 1fr),
-        row-gutter: 0.25cm,
-        text(size: 44pt, fill: palette.at("structure"), weight: "bold")[#title],
-        box(width: 100%, height: 100%)[
-          #align(center + horizon)[#body]
-        ],
-      )
-    } else {
+    #poster-portrait-box-content(
+      title,
+      title => poster-portrait-box-heading(title, palette, size: 44pt, fill-key: "structure"),
       box(width: 100%, height: 100%)[
         #align(center + horizon)[#body]
-      ]
-    }
+      ],
+    )
   ]
 }
 
@@ -484,10 +497,11 @@
     poster-portrait-figure-side-error(side)
   }
   let title = poster-portrait-get-section(section, "title", default: none)
+  let caption-title = poster-portrait-get-section(section, "caption-title", default: [Guide])
   let figure = poster-portrait-get-section(section, "figure", default: [])
   let caption = poster-portrait-get-section(section, "caption", default: [])
   let figure-cell = poster-portrait-figure-box(figure, palette, title: title)
-  let caption-cell = poster-portrait-panel(caption, palette, title: [Guide])
+  let caption-cell = poster-portrait-panel(caption, palette, title: caption-title)
   let cells = if side == left {
     (figure-cell, caption-cell)
   } else {

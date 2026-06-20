@@ -282,6 +282,9 @@
 
 #poster-portrait-funnel(
   theme: solarized_magenta_palette,
+  headline-height: 10%,
+  conclusion-height: 13cm,
+  figure-heights: (1fr, 1.25fr),
   headline-takeaway: [Main result first; support explains why it is credible.],
   headline-detail: [Use the upper figure for central evidence and the lower figure for a compact check, equation, or comparison.],
   upper: (

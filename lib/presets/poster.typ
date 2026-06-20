@@ -577,13 +577,23 @@
   }
 }
 
+#let poster-portrait-resolve-figure-heights(figure-heights) = {
+  if type(figure-heights) != array or figure-heights.len() != 2 {
+    poster-portrait-theme-error("figure-heights must be a two-item array like (1fr, 1fr)")
+  }
+  figure-heights
+}
+
 #let poster-portrait-funnel(
   headline-takeaway: auto,
   headline-detail: auto,
+  headline-height: 12%,
   upper: (:),
   lower: (:),
+  figure-heights: (1fr, 1fr),
   conclusion-takeaway: auto,
   conclusion-detail: auto,
+  conclusion-height: 15.6%,
   footer: auto,
   acknowledgements: auto,
   logo: auto,
@@ -602,10 +612,18 @@
     let resolved-headline-detail = poster-portrait-required-content(headline-detail, "headline-detail")
     let resolved-conclusion-takeaway = poster-portrait-required-content(conclusion-takeaway, "conclusion-takeaway")
     let resolved-conclusion-detail = poster-portrait-required-content(conclusion-detail, "conclusion-detail")
+    let resolved-figure-heights = poster-portrait-resolve-figure-heights(figure-heights)
     block(width: 100%, height: 100%)[
       #grid(
         columns: (1fr,),
-        rows: (5.8%, 12%, 31.1%, 31.1%, 15.6%, 1.4%),
+        rows: (
+          5.8%,
+          headline-height,
+          resolved-figure-heights.at(0),
+          resolved-figure-heights.at(1),
+          conclusion-height,
+          1.4%,
+        ),
         gutter: 0.65cm,
         poster-portrait-compact-title(
           resolved,

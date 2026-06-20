@@ -523,6 +523,8 @@
   let caption-title = poster-portrait-get-section(section, "caption-title", default: [Guide])
   let figure = poster-portrait-get-section(section, "figure", default: [])
   let caption = poster-portrait-get-section(section, "caption", default: [])
+  let default-widths = if side == left { (1.18fr, 0.82fr) } else { (0.82fr, 1.18fr) }
+  let widths = poster-portrait-get-section(section, "widths", default: default-widths)
   let figure-cell = poster-portrait-figure-box(figure, palette, title: title)
   let caption-cell = poster-portrait-panel(caption, palette, title: caption-title)
   let cells = if side == left {
@@ -532,7 +534,7 @@
   }
   box(width: 100%, height: 100%)[
     #grid(
-      columns: if side == left { (1.18fr, 0.82fr) } else { (0.82fr, 1.18fr) },
+      columns: widths,
       gutter: poster-portrait-spacing,
       ..cells,
     )

@@ -370,7 +370,9 @@
   headline-detail: [Use matching scale and vocabulary across both figure slots so the comparison reads as one argument.],
   upper: (
     title: [Main figure 1],
-    figure: trend-figure([Main figure 1], brewer_dark2_magenta_palette, brewer_dark2_magenta_palette.at("accent")),
+    figure: scale(85%, reflow: true)[
+      #trend-figure([Main figure 1], brewer_dark2_magenta_palette, brewer_dark2_magenta_palette.at("accent"))
+    ],
     caption: [
       #aligned-items(
         (
@@ -385,10 +387,13 @@
     ],
     caption-title: [Pairing notes],
     figure-side: left,
+    widths: (1fr, 1fr),
   ),
   lower: (
     title: [Main figure 2],
-    figure: comparison-figure(brewer_dark2_magenta_palette),
+    figure: scale(85%, reflow: true)[
+      #comparison-figure(brewer_dark2_magenta_palette)
+    ],
     caption: [
       #question-no-num[
         What changes when the second condition is added?
@@ -405,6 +410,7 @@
     ],
     caption-title: [Comparison notes],
     figure-side: right,
+    widths: (1fr, 1fr),
   ),
   conclusion-takeaway: [Both findings point to the same next step.],
   conclusion-detail: [Make the final band synthesize the pair instead of repeating either panel alone.],

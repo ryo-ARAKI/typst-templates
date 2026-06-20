@@ -338,9 +338,10 @@
     gutter: 1cm,
     align: horizon,
     [
-      #text(size: 78pt, fill: colors.at("navy"), weight: "bold")[#metadata.at("title")]
-      #v(0.05cm)
-      #text(fill: poster-portrait-ink)[#poster-portrait-render-authors(metadata.at("authors"))]
+      #text(size: 78pt, fill: colors.at("navy"), weight: "bold")[
+        #metadata.at("title")\
+        #text(fill: poster-portrait-ink, weight: "regular")[#poster-portrait-render-authors(metadata.at("authors"))]
+      ]
     ],
     ..if has-logo {
       (align(right + horizon)[#logo-content],)

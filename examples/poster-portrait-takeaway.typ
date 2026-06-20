@@ -284,35 +284,50 @@
   palette: solarized_magenta_palette,
   headline-height: 10%,
   conclusion-height: 13cm,
-  figure-heights: (1fr, 1.25fr),
+  figure-heights: (1fr, 1.05fr, 0.85fr),
   headline-takeaway: [Main result first; support explains why it is credible.],
-  headline-detail: [Use the upper figure for central evidence and the lower figure for a compact check, equation, or comparison.],
-  upper: (
-    title: [Main figure],
-    figure: trend-figure([Main result], solarized_magenta_palette, solarized_magenta_palette.at("structure")),
-    caption: [
-      #question[Which result should viewers read first?]
-      #summary[
-        Put the central evidence in the large slot. Cite compactly when needed:
-        @Tanogami2024_information.
-      ]
-      Inline math can stay visible: #colormath($H(Y bar X)$, solarized_magenta_palette.at("structure")).
-    ],
-    caption-title: [Read first],
-    figure-side: left,
-  ),
-  lower: (
-    title: [Support figure or equation],
-    figure: equation-figure(solarized_magenta_palette),
-    caption: [
-      *Support slot*: Use this area for a robustness check, governing equation, or a short comparison.
-      #v(0.35em)
-      $
-        partial_t q = #textbox($S(q)$, gray)
-      $
-    ],
-    caption-title: [Support notes],
-    figure-side: right,
+  headline-detail: [Use multiple figure rows for central evidence, support, and a compact check.],
+  sections: (
+    (
+      title: [Main figure],
+      figure: trend-figure([Main result], solarized_magenta_palette, solarized_magenta_palette.at("structure")),
+      caption: [
+        #question[Which result should viewers read first?]
+        #summary[
+          Put the central evidence in the large slot. Cite compactly when needed:
+          @Tanogami2024_information.
+        ]
+        Inline math can stay visible: #colormath($H(Y bar X)$, solarized_magenta_palette.at("structure")).
+      ],
+      caption-title: [Read first],
+      figure-side: left,
+    ),
+    (
+      title: [Support figure or equation],
+      figure: equation-figure(solarized_magenta_palette),
+      caption: [
+        *Support slot*: Use this area for a robustness check, governing equation, or a short comparison.
+        #v(0.35em)
+        $
+          partial_t q = #textbox($S(q)$, gray)
+        $
+      ],
+      caption-title: [Support notes],
+      figure-side: right,
+    ),
+    (
+      title: [Compact comparison],
+      figure: scale(76%, reflow: true)[
+        #comparison-figure(solarized_magenta_palette)
+      ],
+      caption: [
+        *Third row*: Add a short check when the poster needs more than two figure/caption rows.
+      ],
+      caption-title: [Extra check],
+      figure-side: left,
+      figure-width: 1.05fr,
+      caption-width: 0.95fr,
+    ),
   ),
   conclusion-takeaway: [Support evidence makes the main claim easier to trust.],
   conclusion-detail: [End by naming what the support figure rules out and what discussion should happen next.],
@@ -324,42 +339,44 @@
   palette: wine-palette,
   headline-takeaway: [Show the method before interpreting the main result.],
   headline-detail: [Put the schematic first so viewers know which assumptions shape the figure below.],
-  upper: (
-    title: [Method schematic],
-    figure: method-figure(wine-palette),
-    caption: [
-      #aligned-enum(
-        (
-          ([Step 1], [Define the input and assumptions.]),
-          ([Step 2], [Run the model or workflow.]),
-          ([Step 3], [Read the output as evidence.]),
-        ),
-      )
-      #v(0.35em)
-      #showybox(frame: showybox-focus)[
-        *Focus*: Keep the method block schematic and scannable.
-      ]
-    ],
-    caption-title: [Method notes],
-    figure-side: right,
-  ),
-  lower: (
-    title: [Main figure],
-    figure: trend-figure([Main figure], wine-palette, wine-palette.at("example")),
-    caption: [
-      *Meaning*: Interpret the result using the vocabulary established above.
-      #v(0.35em)
-      #showybox(
-        frame: (
-          border-color: white,
-          body-color: wine-palette.at("panel-fill"),
-        ),
-      )[
-        *Side note*: A narrow guide column works well for caveats or reading order.
-      ]
-    ],
-    caption-title: [Interpretation],
-    figure-side: left,
+  sections: (
+    (
+      title: [Method schematic],
+      figure: method-figure(wine-palette),
+      caption: [
+        #aligned-enum(
+          (
+            ([Step 1], [Define the input and assumptions.]),
+            ([Step 2], [Run the model or workflow.]),
+            ([Step 3], [Read the output as evidence.]),
+          ),
+        )
+        #v(0.35em)
+        #showybox(frame: showybox-focus)[
+          *Focus*: Keep the method block schematic and scannable.
+        ]
+      ],
+      caption-title: [Method notes],
+      figure-side: right,
+    ),
+    (
+      title: [Main figure],
+      figure: trend-figure([Main figure], wine-palette, wine-palette.at("example")),
+      caption: [
+        *Meaning*: Interpret the result using the vocabulary established above.
+        #v(0.35em)
+        #showybox(
+          frame: (
+            border-color: white,
+            body-color: wine-palette.at("panel-fill"),
+          ),
+        )[
+          *Side note*: A narrow guide column works well for caveats or reading order.
+        ]
+      ],
+      caption-title: [Interpretation],
+      figure-side: left,
+    ),
   ),
   conclusion-takeaway: [The method reveals the mechanism behind the result.],
   conclusion-detail: [Close with the causal or diagnostic link that the schematic made visible.],
@@ -371,51 +388,53 @@
   palette: brewer_dark2_magenta_palette,
   headline-takeaway: [Two findings should converge on one conclusion.],
   headline-detail: [Use matching scale and vocabulary across both figure slots so the comparison reads as one argument.],
-  upper: (
-    title: [Main figure 1],
-    figure: scale(85%, reflow: true)[
-      #trend-figure([Main figure 1], brewer_dark2_magenta_palette, brewer_dark2_magenta_palette.at("accent"))
-    ],
-    caption: [
-      #aligned-items(
-        (
-          ([Role], [Establish the central contrast.]),
-          ([Use], [Pair with the second result, not a separate story.]),
-        ),
-      )
-      #v(0.35em)
-      #summary-no-num[
-        Short summaries fit well when both figure slots are equally important.
-      ]
-    ],
-    caption-title: [Pairing notes],
-    figure-side: left,
-    figure-width: 1fr,
-    caption-width: 1fr,
-  ),
-  lower: (
-    title: [Main figure 2],
-    figure: scale(85%, reflow: true)[
-      #comparison-figure(brewer_dark2_magenta_palette)
-    ],
-    caption: [
-      #question-no-num[
-        What changes when the second condition is added?
-      ]
-      #v(0.35em)
-      #showybox(
-        frame: (
-          border-color: white,
-          body-color: brewer_dark2_magenta_palette.at("accent").lighten(76%),
-        ),
-      )[
-        *Idea*: Use color only to separate roles, not to encode every detail.
-      ]
-    ],
-    caption-title: [Comparison notes],
-    figure-side: right,
-    figure-width: 1fr,
-    caption-width: 1fr,
+  sections: (
+    (
+      title: [Main figure 1],
+      figure: scale(85%, reflow: true)[
+        #trend-figure([Main figure 1], brewer_dark2_magenta_palette, brewer_dark2_magenta_palette.at("accent"))
+      ],
+      caption: [
+        #aligned-items(
+          (
+            ([Role], [Establish the central contrast.]),
+            ([Use], [Pair with the second result, not a separate story.]),
+          ),
+        )
+        #v(0.35em)
+        #summary-no-num[
+          Short summaries fit well when both figure slots are equally important.
+        ]
+      ],
+      caption-title: [Pairing notes],
+      figure-side: left,
+      figure-width: 1fr,
+      caption-width: 1fr,
+    ),
+    (
+      title: [Main figure 2],
+      figure: scale(85%, reflow: true)[
+        #comparison-figure(brewer_dark2_magenta_palette)
+      ],
+      caption: [
+        #question-no-num[
+          What changes when the second condition is added?
+        ]
+        #v(0.35em)
+        #showybox(
+          frame: (
+            border-color: white,
+            body-color: brewer_dark2_magenta_palette.at("accent").lighten(76%),
+          ),
+        )[
+          *Idea*: Use color only to separate roles, not to encode every detail.
+        ]
+      ],
+      caption-title: [Comparison notes],
+      figure-side: right,
+      figure-width: 1fr,
+      caption-width: 1fr,
+    ),
   ),
   conclusion-takeaway: [Both findings point to the same next step.],
   conclusion-detail: [Make the final band synthesize the pair instead of repeating either panel alone.],

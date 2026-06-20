@@ -16,6 +16,7 @@
   summary: [],
   abstract: [],
   venue: [Template Showcase$at$Local Workspace, 2026-06-20],
+  acknowledgements: [Acknowledgements: JSPS KAKENHI JP00H00000],
   logo: [],
   bibliography: "/starters/biblio.bib",
 )

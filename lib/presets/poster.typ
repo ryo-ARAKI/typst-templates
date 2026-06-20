@@ -422,18 +422,38 @@
   ]
 }
 
-#let poster-portrait-footer(resolved, footer: auto) = {
+#let poster-portrait-footer(resolved, footer: auto, acknowledgements: auto) = {
   let metadata = resolved.at("metadata")
   let footer-content = if footer == auto {
     metadata.at("venue")
   } else {
     footer
   }
-  if footer-content == none or footer-content == [] {
+  let acknowledgements-content = if acknowledgements == auto {
+    metadata.at("acknowledgements", default: [])
+  } else {
+    acknowledgements
+  }
+  let has-footer = footer-content != none and footer-content != []
+  let has-acknowledgements = acknowledgements-content != none and acknowledgements-content != []
+  if not has-footer and not has-acknowledgements {
     []
   } else {
-    align(bottom + right)[
-      #text(size: 32pt, fill: colors.at("navy"))[#footer-content]
+    align(bottom)[
+      #grid(
+        columns: (1fr, 1fr),
+        gutter: 1cm,
+        align(left + bottom)[
+          #if has-acknowledgements {
+            text(size: 32pt, fill: colors.at("navy"))[#acknowledgements-content]
+          }
+        ],
+        align(right + bottom)[
+          #if has-footer {
+            text(size: 32pt, fill: colors.at("navy"))[#footer-content]
+          }
+        ],
+      )
     ]
   }
 }
@@ -444,6 +464,7 @@
   lower: (:),
   conclusion: [],
   footer: auto,
+  acknowledgements: auto,
   logo: auto,
   logo-relative-width: auto,
   config: none,
@@ -457,7 +478,7 @@
     block(width: 100%, height: 100%)[
       #grid(
         columns: (1fr,),
-        rows: (5.8%, 12%, 31.1%, 31.1%, 14%, 3%),
+        rows: (5.8%, 12%, 31.1%, 31.1%, 15.6%, 1.4%),
         gutter: 0.65cm,
         poster-portrait-compact-title(
           resolved,
@@ -468,7 +489,7 @@
         poster-portrait-figure-row(upper, default-side: left),
         poster-portrait-figure-row(lower, default-side: right),
         poster-portrait-band(conclusion, fill: colors.at("navy"), size: 50pt),
-        poster-portrait-footer(resolved, footer: footer),
+        poster-portrait-footer(resolved, footer: footer, acknowledgements: acknowledgements),
       )
     ]
   }

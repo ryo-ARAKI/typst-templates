@@ -12,8 +12,79 @@
 #let poster-portrait-spacing = 1.0cm
 #let poster-portrait-ink = rgb("#172033")
 #let poster-portrait-default-logo-width = 24%
+#let poster-portrait-default-theme = "default"
+#let poster-portrait-base-palette = (
+  structure: colors.at("structure"),
+  accent: colors.at("accent"),
+  example: colors.at("example"),
+  heading: colors.at("navy"),
+  ink: poster-portrait-ink,
+  panel-fill: colors.at("structure").lighten(78%),
+  headline-fill: colors.at("structure"),
+  conclusion-fill: colors.at("navy"),
+)
+#let poster-portrait-named-palettes = (
+  "default": poster-portrait-base-palette,
+  "solarized-magenta": (
+    structure: rgb("#d33682"),
+    accent: rgb("#b58900"),
+    example: rgb("#6c71c4"),
+    heading: rgb("#5a1739"),
+    ink: rgb("#172033"),
+    panel-fill: rgb("#f4dce8"),
+    headline-fill: rgb("#d33682"),
+    conclusion-fill: rgb("#5a1739"),
+  ),
+  wine: (
+    structure: rgb("#8f2d56"),
+    accent: rgb("#d4a017"),
+    example: rgb("#6f4e7c"),
+    heading: rgb("#4a1d2f"),
+    ink: rgb("#24141c"),
+    panel-fill: rgb("#f7d9e6"),
+    headline-fill: rgb("#8f2d56"),
+    conclusion-fill: rgb("#4a1d2f"),
+  ),
+  "brewer-dark2-magenta": (
+    structure: rgb("#6f64b5"),
+    accent: rgb("#e7298a"),
+    example: rgb("#d95f02"),
+    heading: rgb("#30295f"),
+    ink: rgb("#202124"),
+    panel-fill: rgb("#e5e2f2"),
+    headline-fill: rgb("#6f64b5"),
+    conclusion-fill: rgb("#30295f"),
+  ),
+)
 
 #let poster-cite-error(message) = panic("poster-cite: " + message)
+
+#let poster-portrait-theme-error(message) = panic("poster-portrait-funnel: " + message)
+
+#let poster-portrait-palette(..theme) = {
+  let positional = theme.pos()
+  let named = theme.named()
+  let resolved-theme = if positional.len() > 0 {
+    positional.at(0)
+  } else {
+    named.at("theme", default: auto)
+  }
+  if positional.len() > 1 {
+    poster-portrait-theme-error("poster-portrait-palette accepts at most one positional theme")
+  } else if resolved-theme == auto or resolved-theme == none {
+    poster-portrait-named-palettes.at(poster-portrait-default-theme)
+  } else if type(resolved-theme) == dictionary {
+    poster-portrait-base-palette + resolved-theme
+  } else if type(resolved-theme) == str {
+    if poster-portrait-named-palettes.keys().contains(resolved-theme) {
+      poster-portrait-base-palette + poster-portrait-named-palettes.at(resolved-theme)
+    } else {
+      poster-portrait-theme-error("unknown theme `" + resolved-theme + "`")
+    }
+  } else {
+    poster-portrait-theme-error("theme must be auto, none, a string, or a dictionary")
+  }
+}
 
 #let poster-bibliography-path(resolved) = {
   let path = resolved.at("metadata").at("bibliography", default: none)
@@ -323,7 +394,7 @@
   }
 }
 
-#let poster-portrait-compact-title(resolved, logo: auto, logo-relative-width: auto) = {
+#let poster-portrait-compact-title(resolved, palette, logo: auto, logo-relative-width: auto) = {
   let metadata = resolved.at("metadata")
   let logo-content = if logo == auto {
     metadata.at("logo", default: [])
@@ -338,9 +409,9 @@
     gutter: 1cm,
     align: horizon,
     [
-      #text(size: 92pt, fill: colors.at("navy"), weight: "bold")[#metadata.at("title")]
+      #text(size: 92pt, fill: palette.at("heading"), weight: "bold")[#metadata.at("title")]
       #v(-2.4cm)
-      #text(fill: poster-portrait-ink, weight: "regular")[#poster-portrait-render-authors(metadata.at("authors"))]
+      #text(fill: palette.at("ink"), weight: "regular")[#poster-portrait-render-authors(metadata.at("authors"))]
     ],
     ..if has-logo {
       (align(right + horizon)[#logo-content],)
@@ -362,34 +433,35 @@
   ]
 }
 
-#let poster-portrait-panel(body, title: none, fill: colors.at("structure").lighten(78%)) = {
+#let poster-portrait-panel(body, palette, title: none, fill: auto) = {
+  let resolved-fill = if fill == auto { palette.at("panel-fill") } else { fill }
   block(
     width: 100%,
     height: 100%,
-    fill: fill,
-    stroke: 2pt + colors.at("structure"),
+    fill: resolved-fill,
+    stroke: 2pt + palette.at("structure"),
     inset: (x: 0.55cm, y: 0.45cm),
     radius: 4pt,
   )[
     #if title != none {
-      text(size: 42pt, fill: colors.at("navy"), weight: "bold")[#title]
+      text(size: 42pt, fill: palette.at("heading"), weight: "bold")[#title]
       v(0.22cm)
     }
-    #text(size: 40pt, fill: poster-portrait-ink)[#body]
+    #text(size: 40pt, fill: palette.at("ink"))[#body]
   ]
 }
 
-#let poster-portrait-figure-box(body, title: none) = {
+#let poster-portrait-figure-box(body, palette, title: none) = {
   block(
     width: 100%,
     height: 100%,
     fill: white,
-    stroke: 3pt + colors.at("structure"),
+    stroke: 3pt + palette.at("structure"),
     inset: (x: 0.45cm, y: 0.45cm),
     radius: 4pt,
   )[
     #if title != none {
-      text(size: 44pt, fill: colors.at("structure"), weight: "bold")[#title]
+      text(size: 44pt, fill: palette.at("structure"), weight: "bold")[#title]
       v(0.25cm)
     }
     #box(width: 100%, height: 100%)[
@@ -398,7 +470,7 @@
   ]
 }
 
-#let poster-portrait-figure-row(section, default-side: left) = {
+#let poster-portrait-figure-row(section, palette, default-side: left) = {
   let side = poster-portrait-get-section(section, "figure-side", default: default-side)
   if side != left and side != right {
     poster-portrait-figure-side-error(side)
@@ -406,8 +478,8 @@
   let title = poster-portrait-get-section(section, "title", default: none)
   let figure = poster-portrait-get-section(section, "figure", default: [])
   let caption = poster-portrait-get-section(section, "caption", default: [])
-  let figure-cell = poster-portrait-figure-box(figure, title: title)
-  let caption-cell = poster-portrait-panel(caption, title: [Guide])
+  let figure-cell = poster-portrait-figure-box(figure, palette, title: title)
+  let caption-cell = poster-portrait-panel(caption, palette, title: [Guide])
   let cells = if side == left {
     (figure-cell, caption-cell)
   } else {
@@ -422,7 +494,7 @@
   ]
 }
 
-#let poster-portrait-footer(resolved, footer: auto, acknowledgements: auto) = {
+#let poster-portrait-footer(resolved, palette, footer: auto, acknowledgements: auto) = {
   let metadata = resolved.at("metadata")
   let footer-content = if footer == auto {
     metadata.at("venue")
@@ -445,12 +517,12 @@
         gutter: 1cm,
         align(left + bottom)[
           #if has-acknowledgements {
-            text(size: 32pt, fill: colors.at("navy"))[#acknowledgements-content]
+            text(size: 32pt, fill: palette.at("heading"))[#acknowledgements-content]
           }
         ],
         align(right + bottom)[
           #if has-footer {
-            text(size: 32pt, fill: colors.at("navy"))[#footer-content]
+            text(size: 32pt, fill: palette.at("heading"))[#footer-content]
           }
         ],
       )
@@ -468,6 +540,7 @@
   logo: auto,
   logo-relative-width: auto,
   config: none,
+  theme: auto,
 ) = {
   context {
     let resolved = if config == none {
@@ -475,6 +548,7 @@
     } else {
       poster-config(overrides: config)
     }
+    let palette = poster-portrait-palette(theme)
     block(width: 100%, height: 100%)[
       #grid(
         columns: (1fr,),
@@ -482,14 +556,15 @@
         gutter: 0.65cm,
         poster-portrait-compact-title(
           resolved,
+          palette,
           logo: logo,
           logo-relative-width: logo-relative-width,
         ),
-        poster-portrait-band(headline, fill: colors.at("structure"), size: 56pt),
-        poster-portrait-figure-row(upper, default-side: left),
-        poster-portrait-figure-row(lower, default-side: right),
-        poster-portrait-band(conclusion, fill: colors.at("navy"), size: 50pt),
-        poster-portrait-footer(resolved, footer: footer, acknowledgements: acknowledgements),
+        poster-portrait-band(headline, fill: palette.at("headline-fill"), size: 56pt),
+        poster-portrait-figure-row(upper, palette, default-side: left),
+        poster-portrait-figure-row(lower, palette, default-side: right),
+        poster-portrait-band(conclusion, fill: palette.at("conclusion-fill"), size: 50pt),
+        poster-portrait-footer(resolved, palette, footer: footer, acknowledgements: acknowledgements),
       )
     ]
   }

@@ -16,7 +16,43 @@
   summary: [],
   abstract: [],
   venue: [Template Showcase$at$Local Workspace, 2026-06-20],
-  logo: [],
+  logo-relative-width: 24%,
+  logo: poster-logo-strip(
+    widths: (0.8fr, 1.4fr, 1.2fr),
+    [
+      #rect(
+        width: 100%,
+        height: 3.0cm,
+        inset: 0.35cm,
+        fill: colors.at("structure").lighten(78%),
+        stroke: none,
+      )[
+        #align(center + horizon)[*TUS*]
+      ]
+    ],
+    [
+      #rect(
+        width: 100%,
+        height: 2.4cm,
+        inset: 0.35cm,
+        fill: colors.at("accent").lighten(72%),
+        stroke: none,
+      )[
+        #align(center + horizon)[*Template Lab*]
+      ]
+    ],
+    [
+      #rect(
+        width: 100%,
+        height: 3.0cm,
+        inset: 0.35cm,
+        fill: colors.at("example").lighten(76%),
+        stroke: none,
+      )[
+        #align(center + horizon)[*Research Unit*]
+      ]
+    ],
+  ),
   bibliography: "/examples/biblio.bib",
 )
 

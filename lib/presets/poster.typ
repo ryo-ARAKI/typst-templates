@@ -11,6 +11,7 @@
 #let poster-title-spacing = 5%
 #let poster-portrait-spacing = 1.0cm
 #let poster-portrait-ink = rgb("#172033")
+#let poster-portrait-default-logo-width = 24%
 
 #let poster-cite-error(message) = panic("poster-cite: " + message)
 
@@ -198,7 +199,7 @@
   let metadata = resolved.at("metadata")
   show: cjk-spacer
   set page("a0", margin: 1.2cm)
-  set text(size: 30pt, font: resolved.at("text-font"), fill: poster-portrait-ink)
+  set text(size: 34pt, font: resolved.at("text-font"), fill: poster-portrait-ink)
   set block(spacing: poster-portrait-spacing)
   apply-math-font(font: resolved.at("math-font"))
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
@@ -277,21 +278,72 @@
   }
 }
 
-#let poster-portrait-compact-title(resolved) = {
+#let poster-portrait-render-author(entry) = {
+  let base-size = 46pt
+  let email-size = 36pt
+  let parts = ()
+  let name = entry.at("name", default: [])
+  let affiliation = entry.at("affiliation", default: [])
+  let email = entry.at("email", default: [])
+  if name != [] { parts.push(name) }
+  if affiliation != [] { parts.push(affiliation) }
+  let base = if parts.len() == 0 {
+    []
+  } else {
+    text(size: base-size)[#parts.join($at$)]
+  }
+  if email == [] {
+    base
+  } else if base == [] {
+    text(size: email-size)[#email]
+  } else {
+    [#base #text(size: email-size)[#email]]
+  }
+}
+
+#let poster-portrait-render-authors(authors) = {
+  let rendered = authors.map(poster-portrait-render-author).filter(part => part != [])
+  if rendered.len() == 0 {
+    []
+  } else {
+    rendered.join(" / ")
+  }
+}
+
+#let poster-portrait-resolve-logo-width(metadata, logo-relative-width) = {
+  let resolved-logo-relative-width = if logo-relative-width == auto {
+    metadata.at("logo-relative-width", default: none)
+  } else {
+    logo-relative-width
+  }
+  if resolved-logo-relative-width == none {
+    poster-portrait-default-logo-width
+  } else {
+    resolved-logo-relative-width
+  }
+}
+
+#let poster-portrait-compact-title(resolved, logo: auto, logo-relative-width: auto) = {
   let metadata = resolved.at("metadata")
-  let logo = metadata.at("logo", default: [])
-  let has-logo = logo != []
+  let logo-content = if logo == auto {
+    metadata.at("logo", default: [])
+  } else {
+    logo
+  }
+  let has-logo = logo-content != [] and logo-content != none
+  let logo-width = poster-portrait-resolve-logo-width(metadata, logo-relative-width)
+  let text-width = 100% - 1.0cm - logo-width
   grid(
-    columns: if has-logo { (1fr, 22%) } else { (1fr,) },
+    columns: if has-logo { (text-width, logo-width) } else { (1fr,) },
     gutter: 1cm,
     align: horizon,
     [
-      #text(size: 56pt, fill: colors.at("navy"), weight: "bold")[#metadata.at("title")]
-      #v(0.2cm)
-      #text(size: 30pt, fill: poster-portrait-ink)[#metadata.at("poster-authors-inline")]
+      #text(size: 78pt, fill: colors.at("navy"), weight: "bold")[#metadata.at("title")]
+      #v(0.05cm)
+      #text(fill: poster-portrait-ink)[#poster-portrait-render-authors(metadata.at("authors"))]
     ],
     ..if has-logo {
-      (align(right + horizon)[#logo],)
+      (align(right + horizon)[#logo-content],)
     } else {
       ()
     },
@@ -320,10 +372,10 @@
     radius: 4pt,
   )[
     #if title != none {
-      text(size: 26pt, fill: colors.at("navy"), weight: "bold")[#title]
+      text(size: 34pt, fill: colors.at("navy"), weight: "bold")[#title]
       v(0.22cm)
     }
-    #text(size: 24pt, fill: poster-portrait-ink)[#body]
+    #text(size: 30pt, fill: poster-portrait-ink)[#body]
   ]
 }
 
@@ -337,7 +389,7 @@
     radius: 4pt,
   )[
     #if title != none {
-      text(size: 28pt, fill: colors.at("structure"), weight: "bold")[#title]
+      text(size: 34pt, fill: colors.at("structure"), weight: "bold")[#title]
       v(0.25cm)
     }
     #box(width: 100%, height: 100%)[
@@ -370,11 +422,30 @@
   ]
 }
 
+#let poster-portrait-footer(resolved, footer: auto) = {
+  let metadata = resolved.at("metadata")
+  let footer-content = if footer == auto {
+    metadata.at("venue")
+  } else {
+    footer
+  }
+  if footer-content == none or footer-content == [] {
+    []
+  } else {
+    align(bottom + right)[
+      #text(size: 28pt, fill: colors.at("navy"))[#footer-content]
+    ]
+  }
+}
+
 #let poster-portrait-funnel(
   headline: [],
   upper: (:),
   lower: (:),
   conclusion: [],
+  footer: auto,
+  logo: auto,
+  logo-relative-width: auto,
   config: none,
 ) = {
   context {
@@ -383,18 +454,21 @@
     } else {
       poster-config(overrides: config)
     }
-    let metadata = resolved.at("metadata")
     block(width: 100%, height: 100%)[
       #grid(
         columns: (1fr,),
-        rows: (8%, 14%, 28%, 28%, 13%, 5%),
+        rows: (10%, 12%, 29%, 29%, 14%, 3%),
         gutter: 0.65cm,
-        poster-portrait-compact-title(resolved),
-        poster-portrait-band(headline, fill: colors.at("structure"), size: 46pt),
+        poster-portrait-compact-title(
+          resolved,
+          logo: logo,
+          logo-relative-width: logo-relative-width,
+        ),
+        poster-portrait-band(headline, fill: colors.at("structure"), size: 52pt),
         poster-portrait-figure-row(upper, default-side: left),
         poster-portrait-figure-row(lower, default-side: right),
-        poster-portrait-band(conclusion, fill: colors.at("navy"), size: 38pt),
-        align(right + horizon)[#text(size: 24pt, fill: colors.at("navy"))[#metadata.at("venue")]],
+        poster-portrait-band(conclusion, fill: colors.at("navy"), size: 44pt),
+        poster-portrait-footer(resolved, footer: footer),
       )
     ]
   }

@@ -3,7 +3,7 @@
 #let metadata = (
   text-font: "Noto Sans CJK JP",
   cjk-font: "Noto Sans CJK JP",
-  title: [*Portrait Funnel Poster*],
+  title: [*Portrait Takeaway Poster*],
   subtitle: [],
   authors: (
     (
@@ -21,7 +21,7 @@
   bibliography: "/starters/biblio.bib",
 )
 
-#let palette = poster-portrait-palette("default")
+#let palette = poster-portrait-takeaway-palette("default")
 
 #let fixed-canvas(body) = align(center)[#cetz.canvas({
   import cetz.draw: *
@@ -123,11 +123,11 @@
   content((16.5, -9.0), text(size: 30pt, fill: palette.at("ink"))[units])
 })
 
-#show: poster-portrait-theme.with(config: metadata)
+#show: poster-portrait-takeaway-theme.with(config: metadata)
 #setup-poster(config: metadata)
 #show ref: poster-citation-ref.with(config: metadata)
 
-#poster-portrait-funnel(
+#poster-portrait-takeaway(
   headline-takeaway: [State the poster's main result in one sentence.],
   headline-detail: [Use this second line for the context or condition that makes the takeaway actionable.],
   upper: (

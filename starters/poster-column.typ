@@ -1,7 +1,7 @@
 #import "../lib/presets/poster.typ": *
 
 #let metadata = (
-  title: [*Poster Catalog*],
+  title: [*Column Poster Starter*],
   subtitle: [],
   authors: (
     (
@@ -18,10 +18,10 @@
   bibliography: "/starters/biblio.bib",
 )
 
-#show: poster-theme.with(config: metadata)
+#show: poster-column-theme.with(config: metadata)
 #setup-poster(config: metadata)
 #show ref: poster-citation-ref.with(config: metadata)
-#poster-title()
+#poster-column-title()
 
 #columns(
   2,
@@ -38,4 +38,4 @@
 )
 
 #v(1fr)
-#poster-bottom-box()
+#poster-column-bottom-box()

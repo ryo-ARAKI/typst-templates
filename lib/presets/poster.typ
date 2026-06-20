@@ -8,7 +8,7 @@
 #import "../core/tokens.typ": colors
 
 #let poster-runtime-config = state("poster-runtime-config", poster-config())
-#let poster-title-spacing = 5%
+#let poster-column-title-spacing = 5%
 #let poster-portrait-spacing = 1.0cm
 #let poster-portrait-ink = rgb("#172033")
 #let poster-portrait-default-logo-width = 24%
@@ -59,9 +59,9 @@
 
 #let poster-cite-error(message) = panic("poster-cite: " + message)
 
-#let poster-portrait-theme-error(message) = panic("poster-portrait-funnel: " + message)
+#let poster-portrait-takeaway-theme-error(message) = panic("poster-portrait-takeaway: " + message)
 
-#let poster-portrait-palette(..theme) = {
+#let poster-portrait-takeaway-palette(..theme) = {
   let positional = theme.pos()
   let named = theme.named()
   let resolved-theme = if positional.len() > 0 {
@@ -70,7 +70,7 @@
     named.at("theme", default: auto)
   }
   if positional.len() > 1 {
-    poster-portrait-theme-error("poster-portrait-palette accepts at most one positional theme")
+    poster-portrait-takeaway-theme-error("poster-portrait-takeaway-palette accepts at most one positional theme")
   } else if resolved-theme == auto or resolved-theme == none {
     poster-portrait-named-palettes.at(poster-portrait-default-theme)
   } else if type(resolved-theme) == dictionary {
@@ -79,10 +79,10 @@
     if poster-portrait-named-palettes.keys().contains(resolved-theme) {
       poster-portrait-base-palette + poster-portrait-named-palettes.at(resolved-theme)
     } else {
-      poster-portrait-theme-error("unknown theme `" + resolved-theme + "`")
+      poster-portrait-takeaway-theme-error("unknown theme `" + resolved-theme + "`")
     }
   } else {
-    poster-portrait-theme-error("theme must be auto, none, a string, or a dictionary")
+    poster-portrait-takeaway-theme-error("theme must be auto, none, a string, or a dictionary")
   }
 }
 
@@ -233,7 +233,7 @@
   }
 }
 
-#let poster-theme(body, config: none) = {
+#let poster-column-theme(body, config: none) = {
   let resolved = poster-config(overrides: config)
   let metadata = resolved.at("metadata")
   show: cjk-spacer
@@ -265,7 +265,7 @@
   body
 }
 
-#let poster-portrait-theme(body, config: none) = {
+#let poster-portrait-takeaway-theme(body, config: none) = {
   let resolved = poster-config(overrides: config)
   let metadata = resolved.at("metadata")
   show: cjk-spacer
@@ -286,7 +286,7 @@
     hide(bibliography(bibliography-path, title: none))
   }
 }
-#let resolve-poster-title-box-args(resolved, logo-relative-width: auto) = {
+#let resolve-poster-column-title-box-args(resolved, logo-relative-width: auto) = {
   let metadata = resolved.at("metadata")
   let resolved-logo-relative-width = if logo-relative-width == auto {
     metadata.at("logo-relative-width", default: none)
@@ -297,13 +297,13 @@
     (:)
   } else {
     (
-      spacing: poster-title-spacing,
-      text-relative-width: 100% - poster-title-spacing - resolved-logo-relative-width,
+      spacing: poster-column-title-spacing,
+      text-relative-width: 100% - poster-column-title-spacing - resolved-logo-relative-width,
     )
   }
 }
 
-#let poster-title(config: none, logo: auto, logo-relative-width: auto) = {
+#let poster-column-title(config: none, logo: auto, logo-relative-width: auto) = {
   context {
     let resolved = if config == none {
       poster-runtime-config.get()
@@ -319,12 +319,12 @@
       resolved.at("metadata").at("title"),
       authors: resolved.at("metadata").at("poster-authors-inline"),
       logo: logo-content,
-      ..resolve-poster-title-box-args(resolved, logo-relative-width: logo-relative-width),
+      ..resolve-poster-column-title-box-args(resolved, logo-relative-width: logo-relative-width),
     )
   }
 }
 
-#let poster-bottom-box(config: none) = {
+#let poster-column-bottom-box(config: none) = {
   context {
     let resolved = if config == none {
       poster-runtime-config.get()
@@ -338,7 +338,7 @@
 }
 
 #let poster-portrait-figure-side-error(side) = {
-  panic("poster-portrait-funnel: figure-side must be `left` or `right`")
+  panic("poster-portrait-takeaway: figure-side must be `left` or `right`")
 }
 
 #let poster-portrait-get-section(section, key, default: none) = {
@@ -423,7 +423,7 @@
 
 #let poster-portrait-required-content(value, name) = {
   if value == auto or value == none or value == [] {
-    poster-portrait-theme-error(name + " is required")
+    poster-portrait-takeaway-theme-error(name + " is required")
   }
   value
 }
@@ -579,12 +579,12 @@
 
 #let poster-portrait-resolve-figure-heights(figure-heights) = {
   if type(figure-heights) != array or figure-heights.len() != 2 {
-    poster-portrait-theme-error("figure-heights must be a two-item array like (1fr, 1fr)")
+    poster-portrait-takeaway-theme-error("figure-heights must be a two-item array like (1fr, 1fr)")
   }
   figure-heights
 }
 
-#let poster-portrait-funnel(
+#let poster-portrait-takeaway(
   headline-takeaway: auto,
   headline-detail: auto,
   headline-height: 12%,
@@ -607,7 +607,7 @@
     } else {
       poster-config(overrides: config)
     }
-    let palette = poster-portrait-palette(theme)
+    let palette = poster-portrait-takeaway-palette(theme)
     let resolved-headline-takeaway = poster-portrait-required-content(headline-takeaway, "headline-takeaway")
     let resolved-headline-detail = poster-portrait-required-content(headline-detail, "headline-detail")
     let resolved-conclusion-takeaway = poster-portrait-required-content(conclusion-takeaway, "conclusion-takeaway")

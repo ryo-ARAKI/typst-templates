@@ -199,7 +199,7 @@
   let metadata = resolved.at("metadata")
   show: cjk-spacer
   set page("a0", margin: 1.2cm)
-  set text(size: 34pt, font: resolved.at("text-font"), fill: poster-portrait-ink)
+  set text(size: 40pt, font: resolved.at("text-font"), fill: poster-portrait-ink)
   set block(spacing: poster-portrait-spacing)
   apply-math-font(font: resolved.at("math-font"))
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
@@ -279,8 +279,8 @@
 }
 
 #let poster-portrait-render-author(entry) = {
-  let base-size = 46pt
-  let email-size = 36pt
+  let base-size = 50pt
+  let email-size = 40pt
   let parts = ()
   let name = entry.at("name", default: [])
   let affiliation = entry.at("affiliation", default: [])
@@ -338,10 +338,9 @@
     gutter: 1cm,
     align: horizon,
     [
-      #text(size: 78pt, fill: colors.at("navy"), weight: "bold")[
-        #metadata.at("title")\
-        #text(fill: poster-portrait-ink, weight: "regular")[#poster-portrait-render-authors(metadata.at("authors"))]
-      ]
+      #text(size: 92pt, fill: colors.at("navy"), weight: "bold")[#metadata.at("title")]
+      #v(-2.4cm)
+      #text(fill: poster-portrait-ink, weight: "regular")[#poster-portrait-render-authors(metadata.at("authors"))]
     ],
     ..if has-logo {
       (align(right + horizon)[#logo-content],)
@@ -351,7 +350,7 @@
   )
 }
 
-#let poster-portrait-band(body, fill: colors.at("structure"), size: 54pt) = {
+#let poster-portrait-band(body, fill: colors.at("structure"), size: 58pt) = {
   block(
     width: 100%,
     height: 100%,
@@ -373,10 +372,10 @@
     radius: 4pt,
   )[
     #if title != none {
-      text(size: 34pt, fill: colors.at("navy"), weight: "bold")[#title]
+      text(size: 42pt, fill: colors.at("navy"), weight: "bold")[#title]
       v(0.22cm)
     }
-    #text(size: 30pt, fill: poster-portrait-ink)[#body]
+    #text(size: 40pt, fill: poster-portrait-ink)[#body]
   ]
 }
 
@@ -390,7 +389,7 @@
     radius: 4pt,
   )[
     #if title != none {
-      text(size: 34pt, fill: colors.at("structure"), weight: "bold")[#title]
+      text(size: 44pt, fill: colors.at("structure"), weight: "bold")[#title]
       v(0.25cm)
     }
     #box(width: 100%, height: 100%)[
@@ -434,7 +433,7 @@
     []
   } else {
     align(bottom + right)[
-      #text(size: 28pt, fill: colors.at("navy"))[#footer-content]
+      #text(size: 32pt, fill: colors.at("navy"))[#footer-content]
     ]
   }
 }
@@ -458,17 +457,17 @@
     block(width: 100%, height: 100%)[
       #grid(
         columns: (1fr,),
-        rows: (6%, 12%, 31%, 31%, 14%, 3%),
+        rows: (5.8%, 12%, 31.1%, 31.1%, 14%, 3%),
         gutter: 0.65cm,
         poster-portrait-compact-title(
           resolved,
           logo: logo,
           logo-relative-width: logo-relative-width,
         ),
-        poster-portrait-band(headline, fill: colors.at("structure"), size: 52pt),
+        poster-portrait-band(headline, fill: colors.at("structure"), size: 56pt),
         poster-portrait-figure-row(upper, default-side: left),
         poster-portrait-figure-row(lower, default-side: right),
-        poster-portrait-band(conclusion, fill: colors.at("navy"), size: 44pt),
+        poster-portrait-band(conclusion, fill: colors.at("navy"), size: 50pt),
         poster-portrait-footer(resolved, footer: footer),
       )
     ]

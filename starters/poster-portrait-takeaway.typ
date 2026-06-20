@@ -21,7 +21,7 @@
   bibliography: "/starters/biblio.bib",
 )
 
-#let palette = poster-portrait-takeaway-palette("default")
+#let palette = poster-portrait-takeaway-palette(theme: "default")
 
 #let fixed-canvas(body) = align(center)[#cetz.canvas({
   import cetz.draw: *
@@ -128,6 +128,7 @@
 #show ref: poster-citation-ref.with(config: metadata)
 
 #poster-portrait-takeaway(
+  palette: palette,
   headline-takeaway: [State the poster's main result in one sentence.],
   headline-detail: [Use this second line for the context or condition that makes the takeaway actionable.],
   upper: (

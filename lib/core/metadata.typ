@@ -46,9 +46,7 @@
   }
 }
 
-#let render-author-poster-inline(entry) = {
-  let poster-author-size = 44pt
-  let poster-email-size = 34pt
+#let render-author-poster-inline(entry, author-size: 44pt, email-size: 34pt) = {
   let base-parts = ()
   let name = entry.at("name", default: [])
   let affiliation = entry.at("affiliation", default: [])
@@ -58,14 +56,14 @@
   let base = if base-parts.len() == 0 {
     []
   } else {
-    text(size: poster-author-size)[#base-parts.join($at$)]
+    text(size: author-size)[#base-parts.join($at$)]
   }
   if email == [] {
     base
   } else if base == [] {
-    text(size: poster-email-size)[#email]
+    text(size: email-size)[#email]
   } else {
-    [#base #text(size: poster-email-size)[#email]]
+    [#base #text(size: email-size)[#email]]
   }
 }
 
@@ -89,8 +87,8 @@
   }
 }
 
-#let render-poster-authors-inline(authors) = {
-  let rendered = authors.map(render-author-poster-inline).filter(part => part != [])
+#let render-poster-authors-inline(authors, author-size: 44pt, email-size: 34pt) = {
+  let rendered = authors.map(author => render-author-poster-inline(author, author-size: author-size, email-size: email-size)).filter(part => part != [])
   if rendered.len() == 0 {
     []
   } else {

@@ -173,6 +173,40 @@ write_case "$tmp_dir/valid-three-sections.typ" "$common_prefix
 )
 "
 
+write_case "$tmp_dir/valid-caption-style.typ" "$common_prefix
+#poster-portrait-takeaway(
+  headline-takeaway: [Headline],
+  headline-detail: [Detail],
+  caption-style: (
+    text-size: 34pt,
+    leading: 0.72em,
+    list-spacing: 0.60em,
+    title-gutter: 0.7cm,
+  ),
+  sections: (
+    (
+      title: [Upper],
+      figure: [Upper figure],
+      caption: [
+        - Upper list item wraps safely across lines.
+        - Upper list item uses top-level caption spacing.
+      ],
+      caption-style: (list-spacing: 0.70em,),
+    ),
+    (
+      title: [Lower],
+      figure: [Lower figure],
+      caption: [
+        - Lower list item wraps safely across lines.
+        - Lower list item uses top-level caption spacing.
+      ],
+    ),
+  ),
+  conclusion-takeaway: [Conclusion],
+  conclusion-detail: [Detail],
+)
+"
+
 write_case "$tmp_dir/invalid-theme-palette.typ" "$common_prefix
 #poster-portrait-takeaway(
   theme: \"wine\",
@@ -303,11 +337,32 @@ write_case "$tmp_dir/invalid-title-style-key.typ" "$common_prefix
 )
 "
 
+write_case "$tmp_dir/invalid-section-caption-style-key.typ" "$common_prefix
+#poster-portrait-takeaway(
+  headline-takeaway: [Headline],
+  headline-detail: [Detail],
+  sections: (
+    (
+      figure: [Upper figure],
+      caption: [Upper caption],
+      caption-style: (padding: 1cm),
+    ),
+    (
+      figure: [Lower figure],
+      caption: [Lower caption],
+    ),
+  ),
+  conclusion-takeaway: [Conclusion],
+  conclusion-detail: [Detail],
+)
+"
+
 compile_repo_doc "examples/poster-portrait-takeaway.typ" "$tmp_dir/example.pdf"
 compile_repo_doc "starters/poster-portrait-takeaway.typ" "$tmp_dir/starter.pdf"
 compile_tmp_case "$tmp_dir/valid-theme.typ" "$tmp_dir/valid-theme.pdf"
 compile_tmp_case "$tmp_dir/valid-palette.typ" "$tmp_dir/valid-palette.pdf"
 compile_tmp_case "$tmp_dir/valid-three-sections.typ" "$tmp_dir/valid-three-sections.pdf"
+compile_tmp_case "$tmp_dir/valid-caption-style.typ" "$tmp_dir/valid-caption-style.pdf"
 
 expect_fail "invalid-theme-palette" "$tmp_dir/invalid-theme-palette.typ" "specify either theme or palette"
 expect_fail "invalid-missing-sections" "$tmp_dir/invalid-missing-sections.typ" "sections is required"
@@ -318,3 +373,4 @@ expect_fail "invalid-missing-figure" "$tmp_dir/invalid-missing-figure.typ" "sect
 expect_fail "invalid-widths" "$tmp_dir/invalid-widths.typ" "sections.at(0).widths is no longer supported"
 expect_fail "invalid-figure-side" "$tmp_dir/invalid-figure-side.typ" 'figure-side must be `left` or `right`'
 expect_fail "invalid-title-style-key" "$tmp_dir/invalid-title-style-key.typ" "unknown title-style key"
+expect_fail "invalid-section-caption-style-key" "$tmp_dir/invalid-section-caption-style-key.typ" "unknown sections.at(0).caption-style key"

@@ -2,8 +2,8 @@
 #import "../core/config.typ": poster-config
 #import "../core/journal-abbrev.typ": abbreviate-journal
 #import "../core/locale.typ": apply-japanese-text
-#import "../components/aligned-list.typ": aligned-items, aligned-enum
-#import "../components/math.typ": apply-math-font, apply-inline-japanese-math-spacing
+#import "../components/aligned-list.typ": aligned-enum, aligned-items
+#import "../components/math.typ": apply-inline-japanese-math-spacing, apply-math-font
 #import "../adapters/peace-of-posters.typ": *
 #import "../core/tokens.typ": colors
 
@@ -261,7 +261,7 @@
   apply-math-font(font: resolved.at("math-font"))
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
-  poster-runtime-config.update(_ => resolved + (metadata: metadata,))
+  poster-runtime-config.update(_ => resolved + (metadata: metadata))
   body
 }
 
@@ -275,7 +275,7 @@
   apply-math-font(font: resolved.at("math-font"))
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
-  poster-runtime-config.update(_ => resolved + (metadata: metadata,))
+  poster-runtime-config.update(_ => resolved + (metadata: metadata))
   body
 }
 
@@ -421,7 +421,20 @@
   )
 }
 
-#let poster-portrait-band(body, fill: colors.at("structure"), size: 58pt) = {
+#let poster-portrait-required-content(value, name) = {
+  if value == auto or value == none or value == [] {
+    poster-portrait-theme-error(name + " is required")
+  }
+  value
+}
+
+#let poster-portrait-band(
+  takeaway,
+  detail,
+  fill: colors.at("structure"),
+  takeaway-size: 58pt,
+  detail-size: 40pt,
+) = {
   block(
     width: 100%,
     height: 100%,
@@ -429,8 +442,36 @@
     inset: (x: 0.8cm, y: 0.55cm),
     radius: 0pt,
   )[
-    #text(size: size, fill: white, weight: "bold")[#body]
+    #box(width: 100%, height: 100%)[
+      #align(left + horizon)[
+        #grid(
+          columns: (1fr,),
+          rows: (auto, auto),
+          row-gutter: 1cm,
+          text(size: takeaway-size, fill: white, weight: "bold")[#takeaway],
+          text(size: detail-size, fill: white.transparentize(20%))[#detail],
+        )
+      ]
+    ]
   ]
+}
+
+#let poster-portrait-box-heading(title, palette, size: 44pt, fill-key: "structure") = {
+  text(size: size, fill: palette.at(fill-key), weight: "bold")[#title]
+}
+
+#let poster-portrait-box-content(title, heading, body, row-gutter: 0cm) = {
+  if title != none {
+    grid(
+      columns: (1fr,),
+      rows: (auto, 1fr),
+      row-gutter: row-gutter,
+      heading(title),
+      body,
+    )
+  } else {
+    body
+  }
 }
 
 #let poster-portrait-panel(body, palette, title: none, fill: auto) = {
@@ -443,11 +484,14 @@
     inset: (x: 0.55cm, y: 0.45cm),
     radius: 4pt,
   )[
-    #if title != none {
-      text(size: 42pt, fill: palette.at("heading"), weight: "bold")[#title]
-      v(0.22cm)
-    }
-    #text(size: 40pt, fill: palette.at("ink"))[#body]
+    #poster-portrait-box-content(
+      title,
+      title => poster-portrait-box-heading(title, palette, size: 42pt, fill-key: "heading"),
+      box(width: 100%, height: 100%)[
+        #text(size: 40pt, fill: palette.at("ink"))[#body]
+      ],
+      row-gutter: 1cm,
+    )
   ]
 }
 
@@ -460,13 +504,13 @@
     inset: (x: 0.45cm, y: 0.45cm),
     radius: 4pt,
   )[
-    #if title != none {
-      text(size: 44pt, fill: palette.at("structure"), weight: "bold")[#title]
-      v(0.25cm)
-    }
-    #box(width: 100%, height: 100%)[
-      #align(center + horizon)[#body]
-    ]
+    #poster-portrait-box-content(
+      title,
+      title => poster-portrait-box-heading(title, palette, size: 44pt, fill-key: "structure"),
+      box(width: 100%, height: 100%)[
+        #align(center + horizon)[#body]
+      ],
+    )
   ]
 }
 
@@ -476,10 +520,13 @@
     poster-portrait-figure-side-error(side)
   }
   let title = poster-portrait-get-section(section, "title", default: none)
+  let caption-title = poster-portrait-get-section(section, "caption-title", default: [Guide])
   let figure = poster-portrait-get-section(section, "figure", default: [])
   let caption = poster-portrait-get-section(section, "caption", default: [])
+  let default-widths = if side == left { (1.18fr, 0.82fr) } else { (0.82fr, 1.18fr) }
+  let widths = poster-portrait-get-section(section, "widths", default: default-widths)
   let figure-cell = poster-portrait-figure-box(figure, palette, title: title)
-  let caption-cell = poster-portrait-panel(caption, palette, title: [Guide])
+  let caption-cell = poster-portrait-panel(caption, palette, title: caption-title)
   let cells = if side == left {
     (figure-cell, caption-cell)
   } else {
@@ -487,7 +534,7 @@
   }
   box(width: 100%, height: 100%)[
     #grid(
-      columns: if side == left { (1.18fr, 0.82fr) } else { (0.82fr, 1.18fr) },
+      columns: widths,
       gutter: poster-portrait-spacing,
       ..cells,
     )
@@ -530,11 +577,23 @@
   }
 }
 
+#let poster-portrait-resolve-figure-heights(figure-heights) = {
+  if type(figure-heights) != array or figure-heights.len() != 2 {
+    poster-portrait-theme-error("figure-heights must be a two-item array like (1fr, 1fr)")
+  }
+  figure-heights
+}
+
 #let poster-portrait-funnel(
-  headline: [],
+  headline-takeaway: auto,
+  headline-detail: auto,
+  headline-height: 12%,
   upper: (:),
   lower: (:),
-  conclusion: [],
+  figure-heights: (1fr, 1fr),
+  conclusion-takeaway: auto,
+  conclusion-detail: auto,
+  conclusion-height: 15.6%,
   footer: auto,
   acknowledgements: auto,
   logo: auto,
@@ -549,10 +608,22 @@
       poster-config(overrides: config)
     }
     let palette = poster-portrait-palette(theme)
+    let resolved-headline-takeaway = poster-portrait-required-content(headline-takeaway, "headline-takeaway")
+    let resolved-headline-detail = poster-portrait-required-content(headline-detail, "headline-detail")
+    let resolved-conclusion-takeaway = poster-portrait-required-content(conclusion-takeaway, "conclusion-takeaway")
+    let resolved-conclusion-detail = poster-portrait-required-content(conclusion-detail, "conclusion-detail")
+    let resolved-figure-heights = poster-portrait-resolve-figure-heights(figure-heights)
     block(width: 100%, height: 100%)[
       #grid(
         columns: (1fr,),
-        rows: (5.8%, 12%, 31.1%, 31.1%, 15.6%, 1.4%),
+        rows: (
+          5.8%,
+          headline-height,
+          resolved-figure-heights.at(0),
+          resolved-figure-heights.at(1),
+          conclusion-height,
+          1.4%,
+        ),
         gutter: 0.65cm,
         poster-portrait-compact-title(
           resolved,
@@ -560,10 +631,20 @@
           logo: logo,
           logo-relative-width: logo-relative-width,
         ),
-        poster-portrait-band(headline, fill: palette.at("headline-fill"), size: 56pt),
+        poster-portrait-band(
+          resolved-headline-takeaway,
+          resolved-headline-detail,
+          fill: palette.at("headline-fill"),
+          takeaway-size: 56pt,
+        ),
         poster-portrait-figure-row(upper, palette, default-side: left),
         poster-portrait-figure-row(lower, palette, default-side: right),
-        poster-portrait-band(conclusion, fill: palette.at("conclusion-fill"), size: 50pt),
+        poster-portrait-band(
+          resolved-conclusion-takeaway,
+          resolved-conclusion-detail,
+          fill: palette.at("conclusion-fill"),
+          takeaway-size: 50pt,
+        ),
         poster-portrait-footer(resolved, palette, footer: footer, acknowledgements: acknowledgements),
       )
     ]

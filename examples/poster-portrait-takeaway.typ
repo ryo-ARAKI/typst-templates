@@ -64,9 +64,9 @@
   bibliography: "/examples/biblio.bib",
 )
 
-#let solarized_magenta_palette = poster-portrait-takeaway-palette("solarized-magenta")
-#let wine-palette = poster-portrait-takeaway-palette("wine")
-#let brewer_dark2_magenta_palette = poster-portrait-takeaway-palette("brewer-dark2-magenta")
+#let solarized_magenta_palette = poster-portrait-takeaway-palette(theme: "solarized-magenta")
+#let wine-palette = poster-portrait-takeaway-palette(theme: "wine")
+#let brewer_dark2_magenta_palette = poster-portrait-takeaway-palette(theme: "brewer-dark2-magenta")
 
 #let fixed-canvas(body) = align(center)[#cetz.canvas({
   import cetz.draw: *
@@ -281,7 +281,7 @@
 #show ref: poster-citation-ref.with(config: metadata)
 
 #poster-portrait-takeaway(
-  theme: solarized_magenta_palette,
+  palette: solarized_magenta_palette,
   headline-height: 10%,
   conclusion-height: 13cm,
   figure-heights: (1fr, 1.25fr),
@@ -321,7 +321,7 @@
 #pagebreak()
 
 #poster-portrait-takeaway(
-  theme: wine-palette,
+  palette: wine-palette,
   headline-takeaway: [Show the method before interpreting the main result.],
   headline-detail: [Put the schematic first so viewers know which assumptions shape the figure below.],
   upper: (
@@ -368,7 +368,7 @@
 #pagebreak()
 
 #poster-portrait-takeaway(
-  theme: brewer_dark2_magenta_palette,
+  palette: brewer_dark2_magenta_palette,
   headline-takeaway: [Two findings should converge on one conclusion.],
   headline-detail: [Use matching scale and vocabulary across both figure slots so the comparison reads as one argument.],
   upper: (
@@ -390,7 +390,8 @@
     ],
     caption-title: [Pairing notes],
     figure-side: left,
-    widths: (1fr, 1fr),
+    figure-width: 1fr,
+    caption-width: 1fr,
   ),
   lower: (
     title: [Main figure 2],
@@ -413,7 +414,8 @@
     ],
     caption-title: [Comparison notes],
     figure-side: right,
-    widths: (1fr, 1fr),
+    figure-width: 1fr,
+    caption-width: 1fr,
   ),
   conclusion-takeaway: [Both findings point to the same next step.],
   conclusion-detail: [Make the final band synthesize the pair instead of repeating either panel alone.],

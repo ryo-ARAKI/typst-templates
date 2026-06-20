@@ -131,23 +131,25 @@
   palette: palette,
   headline-takeaway: [State the poster's main result in one sentence.],
   headline-detail: [Use this second line for the context or condition that makes the takeaway actionable.],
-  upper: (
-    title: [Main figure],
-    figure: starter-trend-figure,
-    caption: [
-      *Read first*: The largest visual element should carry the central evidence.
-    ],
-    caption-title: [Guide],
-    figure-side: left,
-  ),
-  lower: (
-    title: [Support figure or equation],
-    figure: starter-equation-figure,
-    caption: [
-      *Support*: Use the second large slot for a robustness check, comparison, or equation.
-    ],
-    caption-title: [Guide],
-    figure-side: right,
+  sections: (
+    (
+      title: [Main figure],
+      figure: starter-trend-figure,
+      caption: [
+        *Read first*: The largest visual element should carry the central evidence.
+      ],
+      caption-title: [Guide],
+      figure-side: left,
+    ),
+    (
+      title: [Support figure or equation],
+      figure: starter-equation-figure,
+      caption: [
+        *Support*: Use the second large slot for a robustness check, comparison, or equation.
+      ],
+      caption-title: [Guide],
+      figure-side: right,
+    ),
   ),
   conclusion-takeaway: [Name the claim viewers should remember.],
   conclusion-detail: [Connect the support figure to the main result and point to the next discussion.],

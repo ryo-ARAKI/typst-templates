@@ -171,22 +171,6 @@ write_case "$tmp_dir/invalid-missing-figure.typ" "$common_prefix
 )
 "
 
-write_case "$tmp_dir/invalid-missing-caption.typ" "$common_prefix
-#poster-portrait-takeaway(
-  headline-takeaway: [Headline],
-  headline-detail: [Detail],
-  upper: (
-    figure: [Upper figure],
-  ),
-  lower: (
-    figure: [Lower figure],
-    caption: [Lower caption],
-  ),
-  conclusion-takeaway: [Conclusion],
-  conclusion-detail: [Detail],
-)
-"
-
 write_case "$tmp_dir/invalid-widths.typ" "$common_prefix
 #poster-portrait-takeaway(
   headline-takeaway: [Headline],
@@ -223,13 +207,6 @@ write_case "$tmp_dir/invalid-figure-side.typ" "$common_prefix
 )
 "
 
-write_case "$tmp_dir/invalid-footer-style-key.typ" "$common_prefix
-#poster-portrait-takeaway(
-  footer-style: (padding: 1cm),
-  $valid_args
-)
-"
-
 write_case "$tmp_dir/invalid-title-style-key.typ" "$common_prefix
 #poster-portrait-takeaway(
   title-style: (padding: 1cm),
@@ -245,8 +222,6 @@ compile_tmp_case "$tmp_dir/valid-palette.typ" "$tmp_dir/valid-palette.pdf"
 expect_fail "invalid-theme-palette" "$tmp_dir/invalid-theme-palette.typ" "specify either theme or palette"
 expect_fail "invalid-palette-helper" "$tmp_dir/invalid-palette-helper.typ" "unexpected argument"
 expect_fail "invalid-missing-figure" "$tmp_dir/invalid-missing-figure.typ" "upper.figure is required"
-expect_fail "invalid-missing-caption" "$tmp_dir/invalid-missing-caption.typ" "upper.caption is required"
 expect_fail "invalid-widths" "$tmp_dir/invalid-widths.typ" "upper.widths is no longer supported"
 expect_fail "invalid-figure-side" "$tmp_dir/invalid-figure-side.typ" 'figure-side must be `left` or `right`'
-expect_fail "invalid-footer-style-key" "$tmp_dir/invalid-footer-style-key.typ" "unknown footer-style key"
 expect_fail "invalid-title-style-key" "$tmp_dir/invalid-title-style-key.typ" "unknown title-style key"

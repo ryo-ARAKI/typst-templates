@@ -5,7 +5,7 @@
 #let metadata = (
   text-font: "Noto Sans CJK JP",
   cjk-font: "Noto Sans CJK JP",
-  title: [*Portrait A0 Funnel Feature Catalog*],
+  title: [*Portrait A0 Takeaway Feature Catalog*],
   subtitle: [],
   authors: (
     (
@@ -64,9 +64,9 @@
   bibliography: "/examples/biblio.bib",
 )
 
-#let solarized_magenta_palette = poster-portrait-palette("solarized-magenta")
-#let wine-palette = poster-portrait-palette("wine")
-#let brewer_dark2_magenta_palette = poster-portrait-palette("brewer-dark2-magenta")
+#let solarized_magenta_palette = poster-portrait-takeaway-palette("solarized-magenta")
+#let wine-palette = poster-portrait-takeaway-palette("wine")
+#let brewer_dark2_magenta_palette = poster-portrait-takeaway-palette("brewer-dark2-magenta")
 
 #let fixed-canvas(body) = align(center)[#cetz.canvas({
   import cetz.draw: *
@@ -276,11 +276,11 @@
   content((16.5, -9.0), text(size: 30pt, fill: palette.at("ink"))[units])
 })
 
-#show: poster-portrait-theme.with(config: metadata)
+#show: poster-portrait-takeaway-theme.with(config: metadata)
 #setup-poster(config: metadata)
 #show ref: poster-citation-ref.with(config: metadata)
 
-#poster-portrait-funnel(
+#poster-portrait-takeaway(
   theme: solarized_magenta_palette,
   headline-height: 10%,
   conclusion-height: 13cm,
@@ -320,7 +320,7 @@
 
 #pagebreak()
 
-#poster-portrait-funnel(
+#poster-portrait-takeaway(
   theme: wine-palette,
   headline-takeaway: [Show the method before interpreting the main result.],
   headline-detail: [Put the schematic first so viewers know which assumptions shape the figure below.],
@@ -367,7 +367,7 @@
 
 #pagebreak()
 
-#poster-portrait-funnel(
+#poster-portrait-takeaway(
   theme: brewer_dark2_magenta_palette,
   headline-takeaway: [Two findings should converge on one conclusion.],
   headline-detail: [Use matching scale and vocabulary across both figure slots so the comparison reads as one argument.],

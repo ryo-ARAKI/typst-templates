@@ -5,7 +5,7 @@
 #let metadata = (
   text-font: "Noto Sans CJK JP",
   cjk-font: "Noto Sans CJK JP",
-  title: [*ポスター機能カタログ*],
+  title: [*カラムポスター機能カタログ*],
   subtitle: [],
   authors: (
     (
@@ -63,10 +63,10 @@
   bibliography: "/examples/biblio.bib",
 )
 
-#show: poster-theme.with(config: metadata)
+#show: poster-column-theme.with(config: metadata)
 #setup-poster(config: metadata)
 #show ref: poster-citation-ref.with(config: metadata)
-#poster-title()
+#poster-column-title()
 
 #columns(
   2,
@@ -231,4 +231,4 @@
 ]
 
 #v(1fr)
-#poster-bottom-box()
+#poster-column-bottom-box()

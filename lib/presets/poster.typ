@@ -458,7 +458,7 @@
     block(width: 100%, height: 100%)[
       #grid(
         columns: (1fr,),
-        rows: (10%, 12%, 29%, 29%, 14%, 3%),
+        rows: (6%, 12%, 31%, 31%, 14%, 3%),
         gutter: 0.65cm,
         poster-portrait-compact-title(
           resolved,

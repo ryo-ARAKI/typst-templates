@@ -596,20 +596,59 @@
   }
 }
 
-#let poster-portrait-resolve-figure-heights(figure-heights) = {
-  if type(figure-heights) != array or figure-heights.len() != 2 {
-    poster-portrait-takeaway-theme-error("figure-heights must be a two-item array like (1fr, 1fr)")
+#let poster-portrait-resolve-sections(sections) = {
+  if sections == auto or sections == none {
+    poster-portrait-takeaway-theme-error("sections is required")
   }
-  figure-heights
+  if type(sections) != array {
+    poster-portrait-takeaway-theme-error("sections must be an array")
+  }
+  if sections.len() < 2 {
+    poster-portrait-takeaway-theme-error("sections must contain at least two items")
+  }
+  let resolved-sections = ()
+  for (index, section) in sections.enumerate() {
+    resolved-sections.push(poster-portrait-required-section(section, "sections.at(" + str(index) + ")"))
+  }
+  resolved-sections
+}
+
+#let poster-portrait-resolve-figure-heights(figure-heights, section-count) = {
+  if figure-heights == auto {
+    (1fr,) * section-count
+  } else if type(figure-heights) == array {
+    if figure-heights.len() != section-count {
+      poster-portrait-takeaway-theme-error("figure-heights length must match sections length")
+    }
+    figure-heights
+  } else {
+    poster-portrait-takeaway-theme-error("figure-heights must be auto or an array")
+  }
+}
+
+#let poster-portrait-section-default-side(index) = {
+  if calc.rem(index, 2) == 0 { left } else { right }
+}
+
+#let poster-portrait-figure-rows(sections, palette) = {
+  let rows = ()
+  for (index, section) in sections.enumerate() {
+    rows.push(poster-portrait-figure-row(
+      section,
+      palette,
+      default-side: poster-portrait-section-default-side(index),
+      name: "sections.at(" + str(index) + ")",
+    ))
+  }
+  rows
 }
 
 #let poster-portrait-takeaway(
   headline-takeaway: auto,
   headline-detail: auto,
   headline-height: 12%,
-  upper: (:),
-  lower: (:),
-  figure-heights: (1fr, 1fr),
+  sections: auto,
+  figure-heights: auto,
   conclusion-takeaway: auto,
   conclusion-detail: auto,
   conclusion-height: 15.6%,
@@ -636,15 +675,16 @@
     let resolved-headline-detail = poster-portrait-required-content(headline-detail, "headline-detail")
     let resolved-conclusion-takeaway = poster-portrait-required-content(conclusion-takeaway, "conclusion-takeaway")
     let resolved-conclusion-detail = poster-portrait-required-content(conclusion-detail, "conclusion-detail")
-    let resolved-figure-heights = poster-portrait-resolve-figure-heights(figure-heights)
+    let resolved-sections = poster-portrait-resolve-sections(sections)
+    let resolved-figure-heights = poster-portrait-resolve-figure-heights(figure-heights, resolved-sections.len())
+    let figure-rows = poster-portrait-figure-rows(resolved-sections, resolved-palette)
     block(width: 100%, height: 100%)[
       #grid(
         columns: (1fr,),
         rows: (
           resolved-title-style.at("height"),
           headline-height,
-          resolved-figure-heights.at(0),
-          resolved-figure-heights.at(1),
+        ) + resolved-figure-heights + (
           conclusion-height,
           resolved-footer-style.at("height"),
         ),
@@ -662,8 +702,7 @@
           fill: resolved-palette.at("headline-fill"),
           takeaway-size: 56pt,
         ),
-        poster-portrait-figure-row(upper, resolved-palette, default-side: left, name: "upper"),
-        poster-portrait-figure-row(lower, resolved-palette, default-side: right, name: "lower"),
+        ..figure-rows,
         poster-portrait-band(
           resolved-conclusion-takeaway,
           resolved-conclusion-detail,

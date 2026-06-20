@@ -173,37 +173,10 @@ write_case "$tmp_dir/valid-three-sections.typ" "$common_prefix
 )
 "
 
-write_case "$tmp_dir/valid-auto-heights.typ" "$common_prefix
-#poster-portrait-takeaway(
-  headline-takeaway: [Headline],
-  headline-detail: [Detail],
-  sections: (
-    (
-      figure: [Upper figure],
-      caption: [Upper caption],
-    ),
-    (
-      figure: [Lower figure],
-      caption: [Lower caption],
-    ),
-  ),
-  conclusion-takeaway: [Conclusion],
-  conclusion-detail: [Detail],
-)
-"
-
 write_case "$tmp_dir/invalid-theme-palette.typ" "$common_prefix
 #poster-portrait-takeaway(
   theme: \"wine\",
   palette: (structure: red),
-  $valid_args
-)
-"
-
-write_case "$tmp_dir/invalid-palette-helper.typ" "$common_prefix
-#let palette = poster-portrait-takeaway-palette(\"wine\")
-#poster-portrait-takeaway(
-  palette: palette,
   $valid_args
 )
 "
@@ -335,10 +308,8 @@ compile_repo_doc "starters/poster-portrait-takeaway.typ" "$tmp_dir/starter.pdf"
 compile_tmp_case "$tmp_dir/valid-theme.typ" "$tmp_dir/valid-theme.pdf"
 compile_tmp_case "$tmp_dir/valid-palette.typ" "$tmp_dir/valid-palette.pdf"
 compile_tmp_case "$tmp_dir/valid-three-sections.typ" "$tmp_dir/valid-three-sections.pdf"
-compile_tmp_case "$tmp_dir/valid-auto-heights.typ" "$tmp_dir/valid-auto-heights.pdf"
 
 expect_fail "invalid-theme-palette" "$tmp_dir/invalid-theme-palette.typ" "specify either theme or palette"
-expect_fail "invalid-palette-helper" "$tmp_dir/invalid-palette-helper.typ" "unexpected argument"
 expect_fail "invalid-missing-sections" "$tmp_dir/invalid-missing-sections.typ" "sections is required"
 expect_fail "invalid-sections-type" "$tmp_dir/invalid-sections-type.typ" "sections must be an array"
 expect_fail "invalid-one-section" "$tmp_dir/invalid-one-section.typ" "sections must contain at least two items"

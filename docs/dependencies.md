@@ -40,7 +40,7 @@
 - `pdfpc`
   Optional presenter view for PDFs that have matching `.pdfpc` metadata.
 - `polylux2pdfpc`
-  Optional legacy workflow tool for Polylux-style presenter metadata; Touying 0.6.3 can also export pdfpc metadata with `typst query`.
+  Optional legacy workflow tool for Polylux-style presenter metadata; Touying 0.6.3 can also expose pdfpc metadata that can be exported with `typst eval`.
 - `touying-exporter`
   Optional external exporter for PPTX and HTML slide outputs.
 

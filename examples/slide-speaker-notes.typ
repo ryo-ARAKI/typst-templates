@@ -11,7 +11,7 @@
     ),
   ),
   date: datetime.today(),
-  summary: [notes$at$slide],
+  summary: [#("notes")#sym.at#("slide")],
   abstract: [],
   venue: [],
   logo: [],
@@ -38,6 +38,6 @@
   Speaker notes stay out of the normal PDF view.
 
   #speaker-note[
-    Mention that `.pdfpc` metadata can be exported with `typst query`.
+    Mention that `.pdfpc` metadata can be exported with `typst eval`.
   ]
 ]

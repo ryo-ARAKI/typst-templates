@@ -66,8 +66,8 @@
   title: [Presentation title\ ...continued to the second line],
   subtitle: [Subtitle],
   author: [
-    *Presenter name*$at$Institution\
-    Co-author name$at$Institution
+    *Presenter name*#sym.at#("Institution")\
+    #("Co-author name")#sym.at#("Institution")
   ],
   authors: (),
   date: datetime.today(),
@@ -75,7 +75,7 @@
   institution: [],
   logo: "",
   logo-position: "right-bottom",
-  summary: [presenter$at$subtitle],
+  summary: [#("presenter")#sym.at#("subtitle")],
   abstract: [],
   venue: [],
   bibliography: none,
@@ -92,12 +92,12 @@
   math-font: fonts.at("math"),
   box-spacing: spacing.at("block-gap"),
   title: [*Title of the poster*],
-  authors: [Presenter name$at$Institution #h(4.5cm) `email@address`],
+  authors: [#("Presenter name")#sym.at#("Institution") #h(4.5cm) `email@address`],
   subtitle: [],
   date: [],
   summary: [],
   abstract: [],
-  venue: [Conference name$at$~Conference venue, October 1--10, 2025],
+  venue: [#("Conference name")#sym.at~Conference venue, October 1--10, 2025],
   logo: [],
   logo-relative-width: none,
   bibliography: none,

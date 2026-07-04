@@ -21,6 +21,40 @@
   }
 }
 
+#let slide-title-author-has-content(author) = {
+  let name = author.at("name", default: [])
+  let affiliation = author.at("affiliation", default: [])
+  let email = author.at("email", default: [])
+  name != [] and name != "" or affiliation != [] and affiliation != "" or email != [] and email != ""
+}
+
+#let slide-title-author-email(email) = {
+  if type(email) == str {
+    raw(email)
+  } else {
+    email
+  }
+}
+
+#let slide-title-author-table(authors, fill) = {
+  let rows = authors.filter(slide-title-author-has-content)
+  let cells = ()
+  for author in rows {
+    let name = author.at("name", default: [])
+    let affiliation = author.at("affiliation", default: [])
+    let email = author.at("email", default: [])
+    cells.push(std.align(left, text(fill: fill, name)))
+    cells.push(std.align(left, text(fill: fill, affiliation)))
+    cells.push(std.align(left, text(fill: fill, slide-title-author-email(email))))
+  }
+  grid(
+    columns: (auto, auto, auto),
+    column-gutter: 1em,
+    row-gutter: .6em,
+    ..cells,
+  )
+}
+
 #let slide(
   config: (:),
   repeat: auto,
@@ -158,6 +192,7 @@
       subtitle: metadata.at("subtitle"),
       author: metadata.at("author-names"),
       authors: metadata.at("slide-title-authors"),
+      title-author-entries: metadata.at("authors"),
       date: metadata.at("date"),
       institution: if resolved.at("institution") != [] {
         resolved.at("institution")
@@ -190,10 +225,18 @@
     config-common(freeze-slide-counter: true),
     config,
   )
-  let info = self.info + args.named()
-  let has-custom-title-authors = "authors" in info
+  let named-args = args.named()
+  let info = self.info + named-args
+  let has-direct-title-authors = "authors" in named-args
+  let title-author-entries = info.at("title-author-entries", default: ())
+  let structured-title-authors = if type(title-author-entries) == array {
+    title-author-entries.filter(slide-title-author-has-content)
+  } else {
+    ()
+  }
+  let has-metadata-author-table = not has-direct-title-authors and structured-title-authors.len() > 1
   let title-authors = {
-    let authors = if has-custom-title-authors {
+    let authors = if "authors" in info {
       info.authors
     } else {
       info.author
@@ -231,7 +274,9 @@
           },
         )
         set text(size: .8em)
-        if has-custom-title-authors {
+        if has-metadata-author-table {
+          slide-title-author-table(structured-title-authors, self.colors.neutral-darkest)
+        } else if "authors" in info {
           stack(
             dir: ttb,
             spacing: .6em,
@@ -259,7 +304,7 @@
           )
         }
         v(1em)
-        if not has-custom-title-authors and has-institution {
+        if not ("authors" in info) and has-institution {
           parbreak()
           text(size: .9em, info.institution)
         }

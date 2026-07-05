@@ -170,6 +170,7 @@
     width: 100%,
   )
   apply-math-font(font: resolved.at("math-font"))
+  set math.accent(dotless: false)
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
   apply-block-equation-spacing()

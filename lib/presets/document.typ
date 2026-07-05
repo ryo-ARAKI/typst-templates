@@ -13,5 +13,6 @@
   show: js-document.with(config: resolved)
   apply-document-bibliography()
   set math.equation(numbering: resolved.at("equation-numbering"))
+  set math.accent(dotless: false)
   body
 }

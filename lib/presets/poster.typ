@@ -297,6 +297,7 @@
     subtitle-size: 14pt,
   )
   apply-math-font(font: resolved.at("math-font"))
+  set math.accent(dotless: false)
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
   poster-runtime-config.update(_ => resolved + (metadata: metadata))
@@ -311,6 +312,7 @@
   set text(size: 40pt, font: resolved.at("text-font"), fill: poster-portrait-ink)
   set block(spacing: poster-portrait-spacing)
   apply-math-font(font: resolved.at("math-font"))
+  set math.accent(dotless: false)
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
   poster-runtime-config.update(_ => resolved + (metadata: metadata))

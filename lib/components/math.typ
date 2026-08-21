@@ -54,10 +54,14 @@
   pin2,
   body,
 ) = {
-  pinit-highlight(pin1, pin2, dx: dx, dy: -dy - 18pt, extended-height: height, fill: rgb(
-    ..fill.components().slice(0, -1),
-    100,
-  ))
+  pinit-highlight(
+    pin1,
+    pin2,
+    dx: dx,
+    dy: -dy - 18pt,
+    extended-height: height,
+    fill: fill.lighten(50%),
+  )
 
   let stroke-color = if stroke == auto { fill } else { stroke }
   let out-contents = box(

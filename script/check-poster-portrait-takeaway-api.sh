@@ -357,8 +357,14 @@ write_case "$tmp_dir/invalid-section-caption-style-key.typ" "$common_prefix
 )
 "
 
+write_case "$tmp_dir/valid-bibliography-comments.typ" "
+#import \"$repo_root/lib/presets/poster.typ\": poster-has-citation-entry
+#assert(poster-has-citation-entry(\"Tanogami2024_information\", \"$repo_root/examples/biblio.bib\"))
+"
+
 compile_repo_doc "examples/poster-portrait-takeaway.typ" "$tmp_dir/example.pdf"
 compile_repo_doc "starters/poster-portrait-takeaway.typ" "$tmp_dir/starter.pdf"
+compile_tmp_case "$tmp_dir/valid-bibliography-comments.typ" "$tmp_dir/valid-bibliography-comments.pdf"
 compile_tmp_case "$tmp_dir/valid-theme.typ" "$tmp_dir/valid-theme.pdf"
 compile_tmp_case "$tmp_dir/valid-palette.typ" "$tmp_dir/valid-palette.pdf"
 compile_tmp_case "$tmp_dir/valid-three-sections.typ" "$tmp_dir/valid-three-sections.pdf"

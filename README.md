@@ -67,26 +67,8 @@ slide で通常の引用と参考文献スライドを使う最小例は `exampl
 `= Section` 直後の本文を section slide へ暗黙に取り込まない．
 section heading の後も本文スライドは `#slide[...]` で明示する．
 
-Touying 0.7 の `touying-get-config`，`cols`，`lazy-v` は
-`lib/presets/slide.typ` からそのまま利用できる．
-内容量が異なるカラムの高さと下端を揃える最小例は次のとおりで，
-実際の表示は `examples/slide.typ` にある．
-
-```typ
-#slide[
-  Handout mode: #touying-get-config("handout")
-
-  #cols(lazy-layout: true)[
-    First column.
-    #lazy-v(1fr)
-    Bottom left.
-  ][
-    A longer second column.
-    #lazy-v(1fr)
-    Bottom right.
-  ]
-]
-```
+Touying 0.7 の `touying-get-config`，`cols(lazy-layout: true)`，`lazy-v` の利用例は
+`examples/slide.typ` にある．
 
 ### Slide speaker notes and exports
 

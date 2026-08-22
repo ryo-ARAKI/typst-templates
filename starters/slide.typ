@@ -33,3 +33,14 @@
   #answer[Answer 1]
   #summary-no-num[Important text]
 ]
+
+// Freeze last-slide-number
+#show: appendix
+
+#slide[
+  #bibliography(
+    title: "参考文献",
+    style: "annual-reviews-author-date",
+    "biblio.bib",
+  )
+]

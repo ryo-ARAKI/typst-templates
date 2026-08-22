@@ -1,4 +1,4 @@
-#import "@preview/cjk-spacer:0.2.0": cjk-spacer
+#import "@preview/cjk-spacer:0.2.1": cjk-spacer
 #import "../core/config.typ": slide-config
 #import "../core/tokens.typ": slide-palette
 #import "../core/locale.typ": apply-japanese-text
@@ -260,6 +260,7 @@
       datetime-format: datetime-format,
       equation-numbering: resolved.at("equation-numbering"),
       equation-numbering-pattern: resolved.at("equation-numbering-pattern"),
+      receive-body-for-new-section-slide-fn: false,
     ),
     // config-common(new-section-slide-fn: none),
     config-common(handout: resolved.at("handout")),

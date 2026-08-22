@@ -4,43 +4,47 @@
 
 - `@preview/js:0.1.3`
   Used for Japanese document layout and title helpers in `document`.
-- `@preview/touying:0.6.3`
+- `@preview/touying:0.7.4`
   Used for slide theming and slide utilities in `slide`.
-- `@preview/peace-of-posters:0.5.6`
+- `@preview/peace-of-posters:0.6.0`
   Used for poster layout primitives in `poster`.
 
 ## Shared Packages
 
-- `@preview/cjk-spacer:0.2.0`
+- `@preview/cjk-spacer:0.2.1`
   Automatic spacing between CJK and Latin text in all presets.
 - `@preview/pinit:0.2.2`
   Equation annotation pins and arrows.
 - `@preview/physica:0.9.8`
   Physics-oriented math shortcuts used in examples.
-- `@preview/cetz:0.4.2`
+- `@preview/cetz:0.5.2`
   Drawing utilities used by slide and poster examples.
 - `@preview/showybox:2.0.4`
   Highlight box for poster callouts.
 
 ## Support Packages
 
-- `@preview/theorion:0.5.0`
+- `@preview/theorion:0.6.0`
   Theorem and callout primitives exposed through the poster adapter.
 - `@preview/fletcher:0.5.8`
   Diagram primitives for poster figures.
-- `@preview/unify:0.7.1`
+- `@preview/unify:0.8.1`
   Unit-aware helpers for documents.
 - `@preview/roremu:0.1.0`
   Dummy Japanese text for documents.
-- `@preview/enja-bib:0.1.0`
-  Japanese bibliography helpers for documents.
+
+## Built-in Bibliography
+
+- `document` uses Typst's built-in `cite` and `bibliography` with the `harvard-cite-them-right` style.
+- `citep(key)` and `bibliography-list-from(path:)` remain available as compatibility wrappers.
+- APIs exported only by the former `enja-bib` dependency are no longer available.
 
 ## Optional Command-Line Tools
 
 - `pdfpc`
   Optional presenter view for PDFs that have matching `.pdfpc` metadata.
 - `polylux2pdfpc`
-  Optional legacy workflow tool for Polylux-style presenter metadata; Touying 0.6.3 can also expose pdfpc metadata that can be exported with `typst eval`.
+  Optional legacy workflow tool for Polylux-style presenter metadata; Touying 0.7.4 exposes pdfpc metadata that can be exported with `typst eval`.
 - `touying-exporter`
   Optional external exporter for PPTX and HTML slide outputs.
 

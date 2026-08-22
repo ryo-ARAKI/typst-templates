@@ -63,9 +63,15 @@ slide で通常の引用と参考文献スライドを使う最小例は `exampl
 この例では `metadata.bibliography` に `examples/biblio.bib` を指定し，citation section ごとに reference slide を置いて Typst 0.15 の multiple bibliographies を示す．
 各 reference slide では Typst 標準の `#bibliography(...)` を明示的に呼び出す．
 
+`slide-theme` は `receive-body-for-new-section-slide-fn: false` を明示しているため，
+`= Section` 直後の本文を section slide へ暗黙に取り込まない．
+section heading の後も本文スライドは `#slide[...]` で明示する．
+
 ### Slide speaker notes and exports
 
 speaker notes の最小例は `examples/slide-speaker-notes.typ` にある．
+Touying 0.7.4 では `#speaker-note[]` は常に直前の slide に紐づく．
+帰属を明確にするため，このリポジトリの例では notes を対象の `#slide[...]` 内に置く．
 通常の PDF は Typst だけでコンパイルできる．
 
 ```bash
@@ -235,7 +241,7 @@ touch sample.typ
 この`sample.typ`に以下のように記述すると，`lib/components/math.typ` で管理している `pinit-highlight-equation-from` 関数が使える．
 
 ```typ
-#import "@preview/physica:0.9.4": *
+#import "@preview/physica:0.9.8": *
 #import "typst-templates/lib/components/math.typ": *
 
 #pinit-highlight-equation-from(1, 2, height: 30pt, dx: -12pt, dy: 0pt, pos: bottom, fill: red, arrow-length: 0pt)[

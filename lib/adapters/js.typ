@@ -1,6 +1,4 @@
 #import "@preview/js:0.1.3": *
-#import "@preview/enja-bib:0.1.0": *
-#import bib-setting-jsme: *
 #import "../core/config.typ": document-config
 #import "../core/metadata.typ": authors-for-js
 #import "../core/locale.typ": wrap-block-equation
@@ -28,9 +26,16 @@
   body
 }
 
-#let apply-document-bibliography() = {
-  show: bib-init
-}
+#let citep(
+  key,
+  supplement: none,
+  style: auto,
+) = cite(
+  key,
+  supplement: supplement,
+  form: "normal",
+  style: style,
+)
 
 #let document-title(config: none) = {
   let resolved = document-config(overrides: config)
@@ -43,4 +48,10 @@
   )
 }
 
-#let bibliography-list-from(path: "biblio.bib") = bibliography-list(..bib-file(read(path)))
+#let bibliography-list-from(
+  path: "biblio.bib",
+) = bibliography(
+  path,
+  full: true,
+  style: "harvard-cite-them-right",
+)

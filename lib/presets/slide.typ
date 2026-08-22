@@ -55,6 +55,55 @@
   )
 }
 
+#let _slide-footer-has-linebreak(body) = {
+  if body.func() == linebreak {
+    return true
+  }
+  let children = body.at("children", default: none)
+  if children != none {
+    for child in children {
+      if _slide-footer-has-linebreak(child) {
+        return true
+      }
+    }
+  } else if body.has("body") and type(body.body) == content {
+    return _slide-footer-has-linebreak(body.body)
+  } else if body.has("child") and type(body.child) == content {
+    return _slide-footer-has-linebreak(body.child)
+  }
+  false
+}
+
+#let _slide-footer-heading-body(body) = {
+  if body.func() == linebreak {
+    return []
+  }
+  let children = body.at("children", default: none)
+  if children == none {
+    if body.has("body") and type(body.body) == content and _slide-footer-has-linebreak(body.body) {
+      _slide-footer-heading-body(body.body)
+    } else if body.has("child") and type(body.child) == content and _slide-footer-has-linebreak(body.child) {
+      _slide-footer-heading-body(body.child)
+    } else {
+      body
+    }
+  } else {
+    let title = []
+    let skip-space = false
+    for child in children {
+      if child.func() == linebreak {
+        skip-space = true
+      } else if skip-space and child.func() == [ ].func() {
+        skip-space = false
+      } else {
+        title += _slide-footer-heading-body(child)
+        skip-space = false
+      }
+    }
+    title
+  }
+}
+
 #let slide(
   config: (:),
   repeat: auto,
@@ -178,7 +227,10 @@
     header-right: "",
     footer-columns: resolved.at("footer-columns"),
     footer-a: self => {
-      sym.section + " " + utils.display-current-heading(level: 1)
+      sym.section + " " + utils.display-current-heading(
+        level: 1,
+        setting: _slide-footer-heading-body,
+      )
     },
     footer-b: self => {
       h(1fr)

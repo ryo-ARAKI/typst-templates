@@ -1,4 +1,4 @@
-#import "@preview/cjk-spacer:0.2.0": cjk-spacer
+#import "@preview/cjk-spacer:0.2.1": cjk-spacer
 #import "../core/config.typ": poster-config
 #import "../core/metadata.typ": render-poster-authors-inline
 #import "../core/journal-abbrev.typ": abbreviate-journal

@@ -56,16 +56,25 @@
   #example-colorbox[Example]
 ]
 
-== 2カラムレイアウト
+== Touying 0.7の設定とlazy columns
 #slide[
-  左カラムには短い箇条書きを置けます。
+  Handout mode: #touying-get-config("handout")
+  #v(0.6em)
+  #cols(columns: (1fr, 1fr), gutter: 1em, lazy-layout: true)[
+    #structure-block(title: [Current config])[
+      `touying-get-config` で現在の設定を参照できます。
 
-  - preset theme
-  - footer metadata
-  - reusable boxes
-][
-  #align(center)[
-    #textbox([再利用できるコールアウト], aqua)
+      #lazy-v(1fr)
+      #structure-colorbox[Config access]
+    ]
+  ][
+    #example-block(title: [Equal-height columns])[
+      `cols(lazy-layout: true)` と `lazy-v(1fr)` を組み合わせると、
+      内容量が異なるカラムでも下端の要素を揃えられます。
+
+      #lazy-v(1fr)
+      #example-colorbox[Aligned bottoms]
+    ]
   ]
 ]
 

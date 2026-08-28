@@ -132,25 +132,33 @@
 
   #v(2em)
   #pinit-highlight-equation-from(
-    "Delta1",
-    "Delta2",
-    height: 18pt,
-    dy: -6pt,
+    "sl:numerator-start",
+    "sl:numerator-end",
+    height: 26pt,
+    dy: 3pt,
     pos: "top",
     fill: orange,
     arrow-length: 16pt,
+    // arrow-dx: 10pt,
   )[#text(20pt)[Final threshold]]
   #pinit-highlight-equation-from(
-    "delta01",
-    "delta02",
-    height: 18pt,
-    dy: 6pt,
+    "sl:denominator-start",
+    "sl:denominator-end",
+    height: 26pt,
+    dy: 1pt,
     pos: "bottom",
     fill: teal,
     arrow-length: 16pt,
+    // arrow-dx: 10pt,
   )[#text(20pt)[Initial perturbation]]
-  // #v(1em)
-  $ T_p approx 1/lambda ln(#pin("Delta1")Delta#pin("Delta2") / #pin("delta01")delta_0#pin("delta02")) $
+  $
+    T_p approx 1/lambda ln(
+      frac(
+        #pin("sl:numerator-start"); Delta #pin("sl:numerator-end"),
+        #pin("sl:denominator-start"); delta_0 #pin("sl:denominator-end"),
+      )
+    )
+  $
 ]
 
 == Palette and code

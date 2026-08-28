@@ -107,16 +107,50 @@
 #slide[
   #let annot(color) = (fill: color, height: 24pt, arrow-length: 18pt)
   #v(3em)
-  #pinit-highlight-equation-from("sl:lhs1", "sl:lhs2", ..annot(red), height: 30pt, dy: 4pt, pos: "top", arrow-length: 25pt)[
-    左辺の項
-  ]
-  #pinit-highlight-equation-from("sl:rhs1", "sl:rhs2", ..annot(green), height: 30pt, dy: 4pt, pos: "bottom", arrow-length: 15pt)[
-    右辺の拡散項
-  ]
+  #pinit-highlight-equation-from(
+    "sl:lhs1",
+    "sl:lhs2",
+    fill: red,
+    height: 30pt,
+    dy: 4pt,
+    pos: "top",
+    arrow-length: 25pt,
+  )[左辺の項]
+  #pinit-highlight-equation-from(
+    "sl:rhs1",
+    "sl:rhs2",
+    fill: green,
+    height: 30pt,
+    dy: 4pt,
+    pos: "bottom",
+    arrow-length: 15pt,
+  )[右辺の拡散項]
   $
     #pin("sl:lhs1"); partial_t u #pin("sl:lhs2")
     = - grad p + #pin("sl:rhs1"); nu laplacian u #pin("sl:rhs2")
   $
+
+  #v(2em)
+  #pinit-highlight-equation-from(
+    "Delta1",
+    "Delta2",
+    height: 18pt,
+    dy: -6pt,
+    pos: "top",
+    fill: orange,
+    arrow-length: 16pt,
+  )[#text(20pt)[Final threshold]]
+  #pinit-highlight-equation-from(
+    "delta01",
+    "delta02",
+    height: 18pt,
+    dy: 6pt,
+    pos: "bottom",
+    fill: teal,
+    arrow-length: 16pt,
+  )[#text(20pt)[Initial perturbation]]
+  // #v(1em)
+  $ T_p approx 1/lambda ln(#pin("Delta1")Delta#pin("Delta2") / #pin("delta01")delta_0#pin("delta02")) $
 ]
 
 == Palette and code

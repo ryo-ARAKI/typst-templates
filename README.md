@@ -59,8 +59,7 @@ title slide では複数著者の `metadata.authors` が氏名・所属・メー
 数式番号を参照された表示式だけに付けたい場合は，slide metadata に
 `equation-numbering: "referenced-only"` と `equation-numbering-pattern: "(1)"` を追加する．
 この設定は slide preset だけに効き，未ラベルの表示式は番号なし，ラベル付き表示式と `@eq` 参照は同じ番号へリンクされる．
-slide で通常の引用と参考文献スライドを使う最小例は `examples/slide-bibliography.typ` にある．
-この例では `metadata.bibliography` に `examples/biblio.bib` を指定し，citation section ごとに reference slide を置いて Typst 0.15 の multiple bibliographies を示す．
+引用と参考文献を使う際は `metadata.bibliography` に `examples/biblio.bib` を指定し，citation section ごとに reference slide を置いて Typst 0.15 の multiple bibliographies を示す．
 各 reference slide では Typst 標準の `#bibliography(...)` を明示的に呼び出す．
 
 `slide-theme` は `receive-body-for-new-section-slide-fn: false` を明示しているため，

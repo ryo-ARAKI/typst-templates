@@ -23,9 +23,11 @@
   venue: [],
   logo: [],
   logo-position: "right-bottom",
-  bibliography: none,
   equation-numbering: "referenced-only",
   equation-numbering-pattern: "(1)",
+  // Slides do not enable bibliography output by default. Set the BibTeX path
+  // here and call Typst's standard bibliography function on a reference slide.
+  bibliography: "/examples/biblio.bib",
 )
 
 #show: slide-theme.with(config: metadata + (date-locale: "ja"))
@@ -56,25 +58,16 @@
   #example-colorbox[Example]
 ]
 
-== Touying 0.7の設定とlazy columns
+== 2カラムレイアウト
 #slide[
-  Handout mode: #touying-get-config("handout")
-  #v(0.6em)
-  #cols(columns: (1fr, 1fr), gutter: 1em, lazy-layout: true)[
-    #structure-block(title: [Current config])[
-      `touying-get-config` で現在の設定を参照できます。
+  左カラムには短い箇条書きを置けます。
 
-      #lazy-v(1fr)
-      #structure-colorbox[Config access]
-    ]
-  ][
-    #example-block(title: [Equal-height columns])[
-      `cols(lazy-layout: true)` と `lazy-v(1fr)` を組み合わせると、
-      内容量が異なるカラムでも下端の要素を揃えられます。
-
-      #lazy-v(1fr)
-      #example-colorbox[Aligned bottoms]
-    ]
+  - preset theme
+  - footer metadata
+  - reusable boxes
+][
+  #align(center)[
+    #textbox([再利用できるコールアウト], aqua)
   ]
 ]
 
@@ -144,6 +137,7 @@
     swatch("orange", slide-palette.orange),
     swatch("green", slide-palette.green),
     swatch("red", slide-palette.red),
+
     swatch("cyan", slide-palette.cyan),
     swatch("purple", slide-palette.purple),
     swatch("brown", slide-palette.brown),
@@ -173,4 +167,16 @@
     line((-6.0, -2.0), (1.0, 1.0), stroke: (paint: red, thickness: 0.2), mark: (end: "stealth"))
     circle((-6.0, -2.0), radius: 0.3, fill: red, stroke: none)
   })]
+]
+
+== Cited Claim
+
+#slide[
+  The turbulent cascade has been studied from both physical and information-thermodynamic viewpoints~@Frisch1995_turbulence; @Tanogami2024_information.
+]
+
+== References
+
+#slide[
+  #bibliography(metadata.at("bibliography"), title: none)
 ]

@@ -97,9 +97,14 @@
   $
 
   $
+    F = m a
+  $ <eq:unused-force>
+
+  $
     e = m c^2
   $ <eq:mass-energy>
 
+  ラベルなしの式と未参照のラベル付き式には番号が付きません。
   参照した式 @eq:mass-energy だけに番号が付きます。
 ]
 

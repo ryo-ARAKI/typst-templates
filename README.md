@@ -145,7 +145,9 @@ authors: (
 title slide では複数著者の `metadata.authors` が氏名・所属・メールアドレスの3列形式で表示され，列の先頭が著者間で揃う．`authors[].email` が空ならメールアドレス列のそのセルは空になる．
 数式番号を参照された表示式だけに付けたい場合は，slide metadata に
 `equation-numbering: "referenced-only"` と `equation-numbering-pattern: "(1)"` を追加する．
-この設定は slide preset だけに効き，未ラベルの表示式は番号なし，ラベル付き表示式と `@eq` 参照は同じ番号へリンクされる．
+この設定は slide preset だけに効き，未ラベルの式と未参照のラベル付き式には番号を付けず，実際に `@eq` で参照した表示式だけを表示順に連番にする．
+前方・後方参照や同じ式への複数回の参照は同じ番号へリンクされ，pause による再表示でも番号を維持する．
+複数 subslide に現れる式への参照リンクは最後の subslide に移動する．
 引用と参考文献を使う際は `metadata.bibliography` に `examples/biblio.bib` を指定し，citation section ごとに reference slide を置いて Typst 0.15 の multiple bibliographies を示す．
 各 reference slide では Typst 標準の `#bibliography(...)` を明示的に呼び出す．
 

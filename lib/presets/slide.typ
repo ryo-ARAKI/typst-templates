@@ -184,6 +184,11 @@
     show: setting
     body
   }
+  // Keep equation identities on each subslide for referenced-only numbering.
+  // Its reference renderer resolves these repeated labels to the final copy.
+  if self.at("equation-numbering", default: none) == "referenced-only" {
+    self.label-only-on-last-subslide = self.label-only-on-last-subslide.filter(it => it != math.equation)
+  }
   let slide-bodies = if self.at("equation-numbering", default: none) == "referenced-only" {
     bodies.pos().map(body => {
       show: apply-referenced-only-equation-numbering(

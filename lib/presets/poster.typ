@@ -158,15 +158,92 @@
   if key == none { none } else { key.trim() }
 }
 
+// Locate entry boundaries without treating nested field braces as entry endings.
+// This reads literal BibTeX fields for short citations, not macros or crossrefs.
 #let poster-entry-blocks(text) = {
-  let matches = text.matches(regex("(?ms)^\\s*@[A-Za-z]+\\s*\\{.*?^\\s*\\}\\s*$"))
-  matches.map(match => match.text)
+  let blocks = ()
+  let start = none
+  let offset = 0
+  let depth = 0
+  let quoted = false
+  let escaped = false
+  let comment = false
+  for char in text.clusters() {
+    if start == none {
+      if char.contains("\n") or char == "\r" { comment = false }
+      if char == "%" { comment = true }
+      if not comment and char == "@" and text.slice(offset).match(regex("^@[A-Za-z]+\\s*\\{")) != none {
+        start = offset
+      }
+    } else if comment {
+      if char.contains("\n") or char == "\r" { comment = false }
+    } else if escaped {
+      escaped = false
+    } else if char == "%" and depth == 1 and not quoted {
+      comment = true
+    } else if char == "\\" {
+      escaped = true
+    } else if char == "\"" and depth == 1 {
+      quoted = not quoted
+    } else if char == "{" {
+      depth += 1
+    } else if char == "}" {
+      if depth > 1 or not quoted { depth -= 1 }
+      if depth == 0 {
+        blocks.push(text.slice(start, offset + char.len()))
+        start = none
+      }
+    }
+    offset += char.len()
+  }
+  blocks
 }
 
-#let poster-field(block, name) = {
-  let value = poster-capture-first(block, regex("(?im)^\\s*" + name + "\\s*=\\s*(.+?)\\s*,?\\s*$"))
-  if value == none { none } else { poster-strip-field-value(value) }
+// Only commas outside braced or quoted values separate fields.
+#let poster-entry-fields(block) = {
+  let header = block.match(regex("^@[A-Za-z]+\\s*\\{[^,]+,"))
+  if header == none { return (:) }
+  let body = block.slice(header.end, block.len() - 1)
+  let fields = (:)
+  let buffer = ""
+  let depth = 0
+  let quoted = false
+  let escaped = false
+  let comment = false
+  for char in (body + ",").clusters() {
+    if comment {
+      if char.contains("\n") or char == "\r" { comment = false }
+      continue
+    }
+    if escaped {
+      escaped = false
+    } else if char == "%" and depth == 0 and not quoted {
+      comment = true
+      buffer += " "
+      continue
+    } else if char == "\\" {
+      escaped = true
+    } else if char == "\"" and depth == 0 {
+      quoted = not quoted
+    } else if char == "{" {
+      depth += 1
+    } else if char == "}" and depth > 0 {
+      depth -= 1
+    } else if char == "," and depth == 0 and not quoted {
+      let field = buffer.match(regex("(?s)^\\s*([A-Za-z]+)\\s*=\\s*(.*?)\\s*$"))
+      if field != none {
+        let value = poster-strip-field-value(field.captures.at(1))
+        fields.insert(lower(field.captures.at(0)), value.replace(regex("\\s+"), " "))
+      }
+      buffer = ""
+      continue
+    }
+    buffer += char
+  }
+  fields
 }
+
+#let poster-field(block, name) = poster-entry-fields(block).at(lower(name), default: none)
 
 #let poster-entry-kind(block) = {
   let kind = poster-capture-first(block, regex("(?im)^\\s*@([A-Za-z]+)\\s*\\{"))
@@ -227,13 +304,14 @@
   if target == none {
     poster-cite-error("entry not found for key `" + key + "` in `" + path + "`")
   }
+  let fields = poster-entry-fields(target)
   (
     kind: poster-entry-kind(target),
-    author: poster-field(target, "author"),
-    title: poster-field(target, "title"),
-    journal: poster-field(target, "journal"),
-    volume: poster-field(target, "volume"),
-    year: poster-field(target, "year"),
+    author: fields.at("author", default: none),
+    title: fields.at("title", default: none),
+    journal: fields.at("journal", default: none),
+    volume: fields.at("volume", default: none),
+    year: fields.at("year", default: none),
   )
 }
 

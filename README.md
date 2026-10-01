@@ -25,7 +25,7 @@
     (
       name: [Ryo Araki],
       affiliation: [Typst Templates],
-      email: [ryo@example.com],
+      email: "ryo@example.com",
     ),
   ),
   date: datetime.today(),
@@ -38,6 +38,33 @@
 ```
 
 用途ごとに使わない key は空のままでよい。
+
+`authors` の正式形式は著者辞書の配列で，各辞書は `name`，`affiliation`，`email` を持つ．
+各フィールドには content または文字列を指定でき，省略したフィールドは空になる．
+1人でも `authors: ((name: [Alice],),)` のように辞書を配列で囲み，複数人なら辞書を追加する．
+`authors: ()` は著者なしを表す．
+`authors` 自体を省略すると，各 preset の既定の著者を使う．
+
+| preset | `authors` 未指定時の既定値 |
+| --- | --- |
+| `document` | 荒木亮，東京理科大学，`araki.ryo@rs.tus.ac.jp` の1人 |
+| `slide` | Presenter name と Co-author name の2人，所属はどちらも Institution，メールなし |
+| `poster` | Presenter name，Institution，`email@address` の1人 |
+
+旧 `author` と非構造化 `authors` は受け付けない破壊的変更で，指定すると移行案内の診断を出す．
+旧 `author: [Alice]` は次のように書き換える．
+
+```typ
+authors: ((name: [Alice],),),
+```
+
+旧 `authors: [Alice]`，`authors: ([Alice], [Institute], [alice@example.com])`，単一の著者辞書も，次の正式形式に書き換える．
+
+```typ
+authors: (
+  (name: [Alice], affiliation: [Institute], email: "alice@example.com"),
+),
+```
 
 - `document`: 主に `title`, `authors`, `date`, `abstract`, `bibliography`
 - `slide`: 主に `title`, `subtitle`, `authors`, `date`, `summary`, `logo`

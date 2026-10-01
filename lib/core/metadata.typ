@@ -1,37 +1,16 @@
-#let empty-author = (
-  name: [],
-  affiliation: [],
-  email: [],
-)
-
 #let normalize-author-entry(entry) = {
-  if type(entry) == dictionary {
-    (
-      name: entry.at("name", default: []),
-      affiliation: entry.at("affiliation", default: []),
-      email: entry.at("email", default: []),
-    )
-  } else {
-    (empty-author + (name: entry,))
-  }
+  (
+    name: entry.at("name", default: []),
+    affiliation: entry.at("affiliation", default: []),
+    email: entry.at("email", default: []),
+  )
 }
 
-#let normalize-authors(authors: none, author: none) = {
-  if authors != none {
-    if type(authors) == array and authors.len() > 0 and type(authors.at(0)) == dictionary {
-      authors.map(normalize-author-entry)
-    } else if type(authors) == array and authors.len() == 3 and type(authors.at(0)) != dictionary {
-      ((name: authors.at(0), affiliation: authors.at(1), email: authors.at(2)),)
-    } else if type(authors) == content {
-      ((name: authors,),)
-    } else {
-      (normalize-author-entry(authors),)
-    }
-  } else if author != none {
-    ((name: author,),)
-  } else {
-    ()
+#let normalize-authors(authors: ()) = {
+  if type(authors) != array or not authors.all(entry => type(entry) == dictionary) {
+    panic("metadata.authors must be an array of author dictionaries; replace content or tuple input with authors: ((name: [Alice], affiliation: [Institute], email: \"alice@example.com\"),), or use authors: () for no authors")
   }
+  authors.map(normalize-author-entry)
 }
 
 #let render-author-inline(entry) = {
@@ -149,7 +128,9 @@
     author.at("affiliation", default: []),
     author.at("email", default: []),
   ))
-  if mapped.len() == 1 {
+  if mapped.len() == 0 {
+    ""
+  } else if mapped.len() == 1 {
     mapped.at(0)
   } else {
     mapped
@@ -157,9 +138,11 @@
 }
 
 #let normalize-metadata(config) = {
+  if "author" in config {
+    panic("metadata.author is no longer supported; replace author: [Alice] with authors: ((name: [Alice],),); add affiliation and email to the dictionary if needed")
+  }
   let authors = normalize-authors(
-    authors: config.at("authors", default: none),
-    author: config.at("author", default: none),
+    authors: config.at("authors", default: ()),
   )
 
   (

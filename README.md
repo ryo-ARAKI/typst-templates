@@ -192,6 +192,28 @@ PDF/UA では document title，semantic heading，math/image の `alt:` text が
 
 新規作成には `starters/poster-portrait-takeaway.typ`，3系統の使い分けには `examples/poster-portrait-takeaway.typ` を参照する．
 
+図の寸法は利用側で調整する．preset は図を割り当てられた領域の中央に配置するため，図の幅と高さの両方を，見出しと余白を除いた領域に収める必要がある．
+固定座標の CeTZ 図や画像をそのまま渡した場合も，row の高さに合わせて自動縮小されるわけではない．
+画像には `image("figure.pdf", width: ..., height: ..., fit: "contain")` で配置先に合う寸法を指定し，CeTZ 図などの content は必要に応じて次のように明示的に縮小する．
+`reflow: true` は縮小後の寸法をレイアウトに反映する．
+縮小率は図の縦横比と割当領域に合わせて選び，図中の文字も縮小されるため出力サイズで読みやすさを確認する．
+
+```typ
+figure: scale(70%, reflow: true)[
+  #my-figure()
+],
+```
+
+`figure-heights`，section 数，見出しや band の高さ，図・caption 列の幅を変更したら，図の寸法を再確認する．
+コンパイル成功だけでは図の収まりを保証しない．PDF の全ページを表示し，図全体が見えること，headline band・図見出し・隣接パネルに重ならないこと，図中の文字が読めることを確認する．
+既存 example を修正するときは，全3ページと starter を確認し，変更前後の該当ページを比較する．
+検証用 PDF は一時領域へ出力できる．
+
+```sh
+typst compile --root . examples/poster-portrait-takeaway.typ /tmp/poster-portrait-example.pdf
+typst compile --root . starters/poster-portrait-takeaway.typ /tmp/poster-portrait-starter.pdf
+```
+
 ### Poster logo strip
 
 `poster` では `logo:` に `poster-logo-strip(..logos, gap:, widths:)` を渡すと，

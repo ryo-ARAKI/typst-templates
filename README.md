@@ -246,19 +246,19 @@ touch sample.typ
 #import "@preview/physica:0.9.8": *
 #import "typst-templates/lib/components/math.typ": *
 
-#pinit-highlight-equation-from(1, 2, height: 30pt, dx: -12pt, dy: 0pt, pos: bottom, fill: red, arrow-length: 0pt)[
+#pinit-highlight-equation-from(1, 2, height: 30pt, dx: -12pt, dy: 0pt, pos: "bottom", fill: red, arrow-length: 0pt)[
   Time derivative
 ]
-#pinit-highlight-equation-from(3, 4, height: 15pt, dx: -5pt, dy: -8pt, pos: top, fill: blue, arrow-length: 10pt)[
+#pinit-highlight-equation-from(3, 4, height: 15pt, dx: -5pt, dy: -8pt, pos: "top", fill: blue, arrow-length: 10pt)[
   Advect
 ]
-#pinit-highlight-equation-from(5, 6, height: 30pt, dx: -8pt, dy: 0pt, pos: bottom, fill: green, arrow-length: 0pt)[
+#pinit-highlight-equation-from(5, 6, height: 30pt, dx: -8pt, dy: 0pt, pos: "bottom", fill: green, arrow-length: 0pt)[
   Pressure gradient
 ]
-#pinit-highlight-equation-from(7, 8, height: 15pt, dx: -5pt, dy: -8pt, pos: top, fill: orange, arrow-length: 30pt)[
+#pinit-highlight-equation-from(7, 8, height: 15pt, dx: -5pt, dy: -8pt, pos: "top", fill: orange, arrow-length: 30pt)[
   Viscous
 ]
-#pinit-highlight-equation-from(9, 10, height: 15pt, dx: 0pt, dy: -8pt, pos: right, fill: aqua, arrow-length: 10pt)[
+#pinit-highlight-equation-from(9, 10, height: 15pt, dx: 0pt, dy: -8pt, pos: "right", fill: aqua, arrow-length: 10pt)[
   Force
 ]
 $
@@ -271,4 +271,4 @@ $
 $
 ```
 
-※よりきれいな出力を得るためには`pinit-highlight-equation-from`関数中の`dy-line`パラメータを調整する必要がある．
+※注釈ラベルの縦位置は`pinit-highlight-equation-from`関数の`line-offset-y`パラメータで調整できる．

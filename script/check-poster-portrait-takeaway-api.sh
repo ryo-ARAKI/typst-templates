@@ -33,11 +33,14 @@ expect_fail() {
 
   if compile_tmp_case "$input" "$output" 2> "$stderr"; then
     printf 'expected %s to fail, but it compiled\n' "$name" >&2
+    printf '%s stderr:\n' "$name" >&2
+    cat "$stderr" >&2
     exit 1
   fi
 
-  if ! rg -n -F "$expected" "$stderr" > /dev/null; then
-    printf 'expected %s stderr to contain: %s\n' "$name" "$expected" >&2
+  # Match the actual diagnostic, not source excerpts or stack frames.
+  if ! rg '^error:' "$stderr" | rg -- "$expected" > /dev/null; then
+    printf 'expected %s error diagnostic to match: %s\n' "$name" "$expected" >&2
     printf '%s stderr:\n' "$name" >&2
     cat "$stderr" >&2
     exit 1
@@ -287,7 +290,7 @@ compile_tmp_case "$tmp_dir/valid-palette.typ" "$tmp_dir/valid-palette.pdf"
 expect_fail "invalid-theme-palette" "$tmp_dir/invalid-theme-palette.typ" "specify either theme or palette"
 expect_fail "invalid-one-section" "$tmp_dir/invalid-one-section.typ" "sections must contain at least two items"
 expect_fail "invalid-figure-heights-length" "$tmp_dir/invalid-figure-heights-length.typ" "figure-heights length must match sections length"
-expect_fail "invalid-missing-figure" "$tmp_dir/invalid-missing-figure.typ" "sections.at(0).figure is required"
+expect_fail "invalid-missing-figure" "$tmp_dir/invalid-missing-figure.typ" "sections.*figure is required"
 expect_fail "invalid-figure-side" "$tmp_dir/invalid-figure-side.typ" 'figure-side must be `left` or `right`'
 expect_fail "invalid-title-style-key" "$tmp_dir/invalid-title-style-key.typ" "unknown title-style key"
-expect_fail "invalid-section-caption-style-key" "$tmp_dir/invalid-section-caption-style-key.typ" "unknown sections.at(0).caption-style key"
+expect_fail "invalid-section-caption-style-key" "$tmp_dir/invalid-section-caption-style-key.typ" "unknown sections.*caption-style key"

@@ -276,9 +276,65 @@ write_case "$tmp_dir/invalid-section-caption-style-key.typ" "$common_prefix
 )
 "
 
+# One citation fixture combines equivalent formatting, multiline values and nesting.
+cat > "$tmp_dir/citation-formats.bib" <<'BIB'
+% Leading comments must not become entries: @article{ignored, year={2000}}
+@article{lines,
+  author = {Jane Smith and John Doe},
+  % Field comments do not end the entry: }
+  title = {A {Nested {Title}}, with punctuation},
+  journal = {Journal of Fluid Mechanics},
+  volume = {42},
+  year = {2024}
+}
+@article{compact, author={Jane Smith and John Doe}, title={A {Nested {Title}}, with punctuation}, journal={Journal of Fluid Mechanics}, volume={42}, year={2024}}
+@article{multiline,
+  author = {Jane Smith
+    and John Doe},
+  title = {A {Nested
+    {Title}}, with punctuation},
+  journal = "Journal of
+    Fluid Mechanics",
+  volume = 42, year = {2024}}
+@article{no-volume, author={Jane Smith}, title={Test}, journal={Journal of Fluid Mechanics}, year={2024}}
+BIB
+
 write_case "$tmp_dir/valid-bibliography-comments.typ" "
-#import \"$repo_root/lib/presets/poster.typ\": poster-has-citation-entry
-#assert(poster-has-citation-entry(\"Tanogami2024_information\", \"$repo_root/examples/biblio.bib\"))
+#import \"$repo_root/lib/presets/poster.typ\": *
+#let existing = \"$repo_root/examples/biblio.bib\"
+#let formats = \"$tmp_dir/citation-formats.bib\"
+#assert(poster-has-citation-entry(\"Tanogami2024_information\", existing))
+#assert(not poster-has-citation-entry(\"ignored\", formats))
+#let expected = (
+  kind: \"article\", author: \"Jane Smith and John Doe\",
+  title: \"A {Nested {Title}}, with punctuation\",
+  journal: \"Journal of Fluid Mechanics\", volume: \"42\", year: \"2024\",
+)
+#for key in (\"lines\", \"compact\", \"multiline\") {
+  assert(poster-has-citation-entry(key, formats))
+  assert.eq(poster-citation-entry(key, formats), expected)
+}
+#let config = (bibliography: formats,)
+#show ref: poster-citation-ref.with(config: config)
+#set heading(numbering: \"1\")
+= Citation formats <ordinary-label>
+#assert(not poster-has-citation-entry(\"ordinary-label\", formats))
+@ordinary-label
+
+@lines / #poster-cite(\"lines\", config: config)
+
+@compact / #poster-cite(\"compact\", config: config)
+
+@multiline / #poster-cite(\"multiline\", config: config)
+
+@no-volume
+
+#poster-cite(\"Frisch1995_turbulence\", config: (bibliography: existing,))
+
+#poster-cite(\"Araki2023_temporal\", config: (bibliography: existing,))
+
+// Native bibliography validates the same input independently of short citations.
+#bibliography(formats, full: true)
 "
 
 compile_repo_doc "examples/poster-portrait-takeaway.typ" "$tmp_dir/example.pdf"

@@ -13,6 +13,25 @@
 - `starters`: 新しい文書を始める最小テンプレート
 - `examples`: starter を参照する簡単な例
 
+## フォント
+
+テンプレートは利用環境に以下のフォントがインストールされていることを前提にします．フォントは配布・自動インストールしません．
+
+| 用途 | 既定フォント |
+| --- | --- |
+| document の欧文セリフ／日本語セリフ | Libertinus Serif / IPAexMincho |
+| document の欧文サンセリフ／日本語サンセリフ | Liberation Sans / IPAexGothic |
+| slide・poster の本文／日本語 | Cabin / Noto Sans CJK JP |
+| slide・poster の数式 | Latin Modern Math |
+| slide のコード | Noto Sans Mono |
+| inline 数式まわりの日本語 spacing | Adobe Blank |
+
+設定は [`lib/core/tokens.typ`](lib/core/tokens.typ) にあり，inline 数式の spacing では [`lib/core/locale.typ`](lib/core/locale.typ) が Adobe Blank を使います．`poster-portrait-takeaway` starter は本文フォントと日本語フォントを Noto Sans CJK JP に明示的に上書きしています．利用中の環境で Typst から見えるフォントは次のコマンドで確認できます．一覧に上記の名前がなければ，その環境でのコンパイル結果は保証されません．
+
+```bash
+typst fonts
+```
+
 ## 共通 metadata API
 
 `document / slide / poster` は共通の `metadata` 辞書を受け取る。
@@ -236,7 +255,39 @@ PDF/UA では document title，semantic heading，math/image の `alt:` text が
 新しく文書を始めるときは `starters/document-jp.typ` `starters/slide.typ` `starters/poster-column.typ` `starters/poster-portrait-takeaway.typ` を入口にする．
 機能カタログは `examples/document-jp.typ` `examples/slide.typ` `examples/poster-column.typ` `examples/poster-portrait-takeaway.typ` を見る．
 
-`starters/<name>.typ` はリポジトリ root で `typst compile --root . starters/<name>.typ` を使ってコンパイルする．
+`starters/<name>.typ` はリポジトリ root を compile root にして実行する．`/starters/biblio.bib` のような先頭 `/` から始まるパスは compile root を基準に解決される．
+
+```bash
+typst compile --root . starters/document-jp.typ /tmp/document-jp.pdf
+```
+
+サブモジュールとして使う場合，文書側の compile root は親リポジトリの root にする．テンプレートの import は文書ファイルからサブモジュール内のファイルへ相対指定できる．例えば親リポジトリ直下の `sample.typ` から document preset を使う場合は次のようにする．
+
+```typ
+#import "typst-templates/lib/presets/document.typ": *
+
+#let metadata = (
+  title: [Title],
+  authors: (
+    (name: "Author", affiliation: "Institution", email: "author@example.org"),
+  ),
+  bibliography: "/refs/biblio.bib",
+)
+
+#show: setup-document.with(config: metadata)
+#document-title(config: metadata)
+
+引用~#citep(<Tanogami2024_information>)．
+#bibliography-list-from(path: metadata.at("bibliography"))
+```
+
+この例では文献ファイルを親リポジトリの `refs/biblio.bib` に置き，`bibliography` をその絶対パスに合わせている．サブモジュールを親側へ追加しただけでは，starter の `"/starters/biblio.bib"` は親側にある文献ファイルを指さない．自分の文書へ starter の設定を移すときは，`bibliography` を親リポジトリ root 基準のパス（例えば `"/refs/biblio.bib"`）に書き換える．`sample.typ` が親リポジトリ直下にある場合のコンパイル例は次の通り．
+
+```bash
+typst compile --root . sample.typ /tmp/sample.pdf
+```
+
+ここで示した import と文献パスは，親リポジトリ内に `typst-templates/` と `refs/biblio.bib` がある配置を前提にします．パスは実際の配置に合わせて変更してください．
 
 ### Aligned list helpers
 
@@ -273,19 +324,19 @@ touch sample.typ
 #import "@preview/physica:0.9.8": *
 #import "typst-templates/lib/components/math.typ": *
 
-#pinit-highlight-equation-from(1, 2, height: 30pt, dx: -12pt, dy: 0pt, pos: bottom, fill: red, arrow-length: 0pt)[
+#pinit-highlight-equation-from(1, 2, height: 30pt, dx: -12pt, dy: 0pt, pos: "bottom", fill: red, arrow-length: 0pt)[
   Time derivative
 ]
-#pinit-highlight-equation-from(3, 4, height: 15pt, dx: -5pt, dy: -8pt, pos: top, fill: blue, arrow-length: 10pt)[
+#pinit-highlight-equation-from(3, 4, height: 15pt, dx: -5pt, dy: -8pt, pos: "top", fill: blue, arrow-length: 10pt)[
   Advect
 ]
-#pinit-highlight-equation-from(5, 6, height: 30pt, dx: -8pt, dy: 0pt, pos: bottom, fill: green, arrow-length: 0pt)[
+#pinit-highlight-equation-from(5, 6, height: 30pt, dx: -8pt, dy: 0pt, pos: "bottom", fill: green, arrow-length: 0pt)[
   Pressure gradient
 ]
-#pinit-highlight-equation-from(7, 8, height: 15pt, dx: -5pt, dy: -8pt, pos: top, fill: orange, arrow-length: 30pt)[
+#pinit-highlight-equation-from(7, 8, height: 15pt, dx: -5pt, dy: -8pt, pos: "top", fill: orange, arrow-length: 30pt)[
   Viscous
 ]
-#pinit-highlight-equation-from(9, 10, height: 15pt, dx: 0pt, dy: -8pt, pos: right, fill: aqua, arrow-length: 10pt)[
+#pinit-highlight-equation-from(9, 10, height: 15pt, dx: 0pt, dy: -8pt, pos: "right", fill: aqua, arrow-length: 10pt)[
   Force
 ]
 $
@@ -298,4 +349,4 @@ $
 $
 ```
 
-※よりきれいな出力を得るためには`pinit-highlight-equation-from`関数中の`dy-line`パラメータを調整する必要がある．
+※注釈ラベルの縦位置は`pinit-highlight-equation-from`関数の`line-offset-y`パラメータで調整できる．

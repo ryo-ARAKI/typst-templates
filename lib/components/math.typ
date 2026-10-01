@@ -11,26 +11,37 @@
   show math.equation.where(block: true): set block(spacing: spacing)
 }
 
+// Query the original labeled equations, not the unlabelled rendered copies.
+// Touying repeats equations across subslides, so each label occupies one slot.
+#let _referenced-equation-labels() = {
+  let targets = query(ref).map(it => it.target)
+  query(math.equation.where(block: true))
+    .filter(it => it.has("label") and it.label in targets)
+    .map(it => it.label)
+    .dedup()
+}
+
 #let apply-referenced-only-equation-numbering(numbering: "(1)") = body => {
-  show math.equation: it => {
-    if it.block and it.has("label") and it.numbering == none {
-      math.equation(it.body, block: true, numbering: numbering)
-    } else {
+  set math.equation(numbering: none)
+  show math.equation.where(block: true): it => context {
+    if not it.has("label") {
       it
+    } else {
+      let index = _referenced-equation-labels().position(label => label == it.label)
+      let fields = it.fields()
+      let _ = fields.remove("label")
+      fields.numbering = if index != none { (..nums) => std.numbering(numbering, index + 1) }
+      math.equation(fields.remove("body"), ..fields)
     }
   }
-  show ref: it => {
-    let el = it.element
-    if el == none or el.func() != math.equation {
+  show ref: it => context {
+    let equations = query(it.target).filter(el => el.func() == math.equation and el.block)
+    if equations.len() == 0 {
       it
     } else {
-      {
-        let nums = counter(math.equation).at(el.location())
-        let last-index = nums.len() - 1
-        let current = nums.at(last-index) + 1
-        let display-nums = nums.slice(0, last-index) + (current,)
-        link(el.location(), std.numbering(numbering, ..display-nums))
-      }
+      let index = _referenced-equation-labels().position(label => label == it.target)
+      // Link to the final subslide, where the entire equation is visible.
+      link(equations.last().location(), std.numbering(numbering, index + 1))
     }
   }
   body

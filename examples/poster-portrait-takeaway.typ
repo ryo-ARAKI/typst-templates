@@ -296,7 +296,10 @@
   sections: (
     (
       title: [Main figure],
-      figure: trend-figure([Main result], solarized_magenta_palette, solarized_magenta_palette.at("structure")),
+      // This three-row layout needs a smaller drawing in both dimensions.
+      figure: scale(70%, reflow: true)[
+        #trend-figure([Main result], solarized_magenta_palette, solarized_magenta_palette.at("structure"))
+      ],
       caption: [
         #question[Which result should viewers read first?]
         - Put the central evidence in the large slot.

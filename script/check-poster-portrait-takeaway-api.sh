@@ -122,61 +122,6 @@ write_case "$tmp_dir/valid-palette.typ" "$common_prefix
   ),
   headline-takeaway: [Headline],
   headline-detail: [Detail],
-  sections: (
-    (
-      title: [Upper],
-      figure: [Upper figure],
-      caption: [Upper caption],
-      figure-side: left,
-      figure-width: 1fr,
-      caption-width: 1fr,
-    ),
-    (
-      title: [Lower],
-      figure: [Lower figure],
-      caption: [Lower caption],
-      figure-side: right,
-      figure-width: 1.2fr,
-      caption-width: 0.8fr,
-    ),
-  ),
-  conclusion-takeaway: [Conclusion],
-  conclusion-detail: [Detail],
-)
-"
-
-write_case "$tmp_dir/valid-three-sections.typ" "$common_prefix
-#poster-portrait-takeaway(
-  theme: \"brewer-dark2-magenta\",
-  headline-takeaway: [Headline],
-  headline-detail: [Detail],
-  sections: (
-    (
-      title: [First],
-      figure: [First figure],
-      caption: [First caption],
-    ),
-    (
-      title: [Second],
-      figure: [Second figure],
-      caption: [Second caption],
-    ),
-    (
-      title: [Third],
-      figure: [Third figure],
-      caption: [Third caption],
-    ),
-  ),
-  figure-heights: (1fr, 1.2fr, 0.8fr),
-  conclusion-takeaway: [Conclusion],
-  conclusion-detail: [Detail],
-)
-"
-
-write_case "$tmp_dir/valid-caption-style.typ" "$common_prefix
-#poster-portrait-takeaway(
-  headline-takeaway: [Headline],
-  headline-detail: [Detail],
   caption-style: (
     text-size: 34pt,
     leading: 0.72em,
@@ -185,23 +130,36 @@ write_case "$tmp_dir/valid-caption-style.typ" "$common_prefix
   ),
   sections: (
     (
-      title: [Upper],
-      figure: [Upper figure],
+      title: [First],
+      figure: [First figure],
       caption: [
-        - Upper list item wraps safely across lines.
-        - Upper list item uses top-level caption spacing.
+        - First list item wraps safely across lines.
+        - First list item uses section-level caption spacing.
       ],
       caption-style: (list-spacing: 0.70em,),
+      figure-width: 1fr,
+      caption-width: 1fr,
     ),
     (
-      title: [Lower],
-      figure: [Lower figure],
+      title: [Second],
+      figure: [Second figure],
       caption: [
-        - Lower list item wraps safely across lines.
-        - Lower list item uses top-level caption spacing.
+        - Second list item wraps safely across lines.
+        - Second list item uses top-level caption spacing.
+      ],
+      figure-width: 1.2fr,
+      caption-width: 0.8fr,
+    ),
+    (
+      title: [Third],
+      figure: [Third figure],
+      caption: [
+        - Third list item wraps safely across lines.
+        - Third list item uses top-level caption spacing.
       ],
     ),
   ),
+  figure-heights: (1fr, 1.2fr, 0.8fr),
   conclusion-takeaway: [Conclusion],
   conclusion-detail: [Detail],
 )
@@ -212,28 +170,6 @@ write_case "$tmp_dir/invalid-theme-palette.typ" "$common_prefix
   theme: \"wine\",
   palette: (structure: red),
   $valid_args
-)
-"
-
-write_case "$tmp_dir/invalid-missing-sections.typ" "$common_prefix
-#poster-portrait-takeaway(
-  headline-takeaway: [Headline],
-  headline-detail: [Detail],
-  conclusion-takeaway: [Conclusion],
-  conclusion-detail: [Detail],
-)
-"
-
-write_case "$tmp_dir/invalid-sections-type.typ" "$common_prefix
-#poster-portrait-takeaway(
-  headline-takeaway: [Headline],
-  headline-detail: [Detail],
-  sections: (
-    figure: [Upper figure],
-    caption: [Upper caption],
-  ),
-  conclusion-takeaway: [Conclusion],
-  conclusion-detail: [Detail],
 )
 "
 
@@ -279,26 +215,6 @@ write_case "$tmp_dir/invalid-missing-figure.typ" "$common_prefix
   sections: (
     (
       caption: [Upper caption],
-    ),
-    (
-      figure: [Lower figure],
-      caption: [Lower caption],
-    ),
-  ),
-  conclusion-takeaway: [Conclusion],
-  conclusion-detail: [Detail],
-)
-"
-
-write_case "$tmp_dir/invalid-widths.typ" "$common_prefix
-#poster-portrait-takeaway(
-  headline-takeaway: [Headline],
-  headline-detail: [Detail],
-  sections: (
-    (
-      figure: [Upper figure],
-      caption: [Upper caption],
-      widths: (1fr, 1fr),
     ),
     (
       figure: [Lower figure],
@@ -367,16 +283,11 @@ compile_repo_doc "starters/poster-portrait-takeaway.typ" "$tmp_dir/starter.pdf"
 compile_tmp_case "$tmp_dir/valid-bibliography-comments.typ" "$tmp_dir/valid-bibliography-comments.pdf"
 compile_tmp_case "$tmp_dir/valid-theme.typ" "$tmp_dir/valid-theme.pdf"
 compile_tmp_case "$tmp_dir/valid-palette.typ" "$tmp_dir/valid-palette.pdf"
-compile_tmp_case "$tmp_dir/valid-three-sections.typ" "$tmp_dir/valid-three-sections.pdf"
-compile_tmp_case "$tmp_dir/valid-caption-style.typ" "$tmp_dir/valid-caption-style.pdf"
 
 expect_fail "invalid-theme-palette" "$tmp_dir/invalid-theme-palette.typ" "specify either theme or palette"
-expect_fail "invalid-missing-sections" "$tmp_dir/invalid-missing-sections.typ" "sections is required"
-expect_fail "invalid-sections-type" "$tmp_dir/invalid-sections-type.typ" "sections must be an array"
 expect_fail "invalid-one-section" "$tmp_dir/invalid-one-section.typ" "sections must contain at least two items"
 expect_fail "invalid-figure-heights-length" "$tmp_dir/invalid-figure-heights-length.typ" "figure-heights length must match sections length"
 expect_fail "invalid-missing-figure" "$tmp_dir/invalid-missing-figure.typ" "sections.at(0).figure is required"
-expect_fail "invalid-widths" "$tmp_dir/invalid-widths.typ" "sections.at(0).widths is no longer supported"
 expect_fail "invalid-figure-side" "$tmp_dir/invalid-figure-side.typ" 'figure-side must be `left` or `right`'
 expect_fail "invalid-title-style-key" "$tmp_dir/invalid-title-style-key.typ" "unknown title-style key"
 expect_fail "invalid-section-caption-style-key" "$tmp_dir/invalid-section-caption-style-key.typ" "unknown sections.at(0).caption-style key"

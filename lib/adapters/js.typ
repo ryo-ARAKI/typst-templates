@@ -37,15 +37,66 @@
   style: style,
 )
 
+#let _document-author-name-text(value) = {
+  if type(value) == str {
+    value
+  } else if type(value) == content {
+    if value.func() == linebreak {
+      " "
+    } else if value.has("text") {
+      value.text
+    } else if value.has("children") {
+      value.children.fold("", (result, child) => result + _document-author-name-text(child))
+    } else if value.has("body") {
+      _document-author-name-text(value.body)
+    } else if value.has("child") {
+      _document-author-name-text(value.child)
+    } else {
+      ""
+    }
+  } else {
+    ""
+  }
+}
+
 #let document-title(config: none) = {
   let resolved = document-config(overrides: config)
   let metadata = resolved.at("metadata")
-  maketitle(
+  let authors = metadata.at("authors-js")
+  // js.maketitle couples visible author content to the string-only PDF field.
+  // Keep its title layout and boxtable while passing plain names to the PDF.
+  set document(
     title: metadata.at("title"),
-    authors: metadata.at("authors-js"),
-    date: metadata.at("date"),
-    abstract: metadata.at("abstract"),
+    author: metadata.at("authors")
+      .map(author => _document-author-name-text(author.name))
+      .filter(name => name != ""),
+    keywords: (),
   )
+  place(top + center, scope: "parent", float: true)[
+    #set align(center)
+    #v(2em)
+    #text(1.7em, metadata.at("title"))
+    #v(1.5em)
+    #pad(
+      x: 2em,
+      if type(authors) == array {
+        authors.map(boxtable).join("      ")
+      } else {
+        authors
+      },
+    )
+    #v(1em)
+    #metadata.at("date")
+    #v(1.5em)
+    #if metadata.at("abstract") != [] {
+      block(width: 90%)[
+        #set text(0.9em)
+        _概要_
+        #align(left)[#metadata.at("abstract")]
+      ]
+      v(1.5em)
+    }
+  ]
 }
 
 #let bibliography-list-from(

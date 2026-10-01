@@ -243,7 +243,7 @@
     config-info(
       title: metadata.at("title"),
       subtitle: metadata.at("subtitle"),
-      author: metadata.at("author-names"),
+      author: if metadata.at("author-names") == [] { "" } else { metadata.at("author-names") },
       authors: metadata.at("slide-title-authors"),
       title-author-entries: metadata.at("authors"),
       date: metadata.at("date"),

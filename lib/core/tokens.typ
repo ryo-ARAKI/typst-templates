@@ -48,7 +48,7 @@
   justify: false,
   equation-numbering: "(1)",
   title: "文書のタイトル",
-  authors: ("荒木亮", "東京理科大学", "araki.ryo@rs.tus.ac.jp"),
+  authors: ((name: "荒木亮", affiliation: "東京理科大学", email: "araki.ryo@rs.tus.ac.jp"),),
   subtitle: [],
   summary: [],
   abstract: [文書の要旨．],
@@ -65,11 +65,10 @@
   code-font: fonts.at("code"),
   title: [Presentation title\ ...continued to the second line],
   subtitle: [Subtitle],
-  author: [
-    *Presenter name*#sym.at#("Institution")\
-    #("Co-author name")#sym.at#("Institution")
-  ],
-  authors: (),
+  authors: (
+    (name: [*Presenter name*], affiliation: [Institution], email: []),
+    (name: [Co-author name], affiliation: [Institution], email: []),
+  ),
   date: datetime.today(),
   date-locale: "en",
   institution: [],
@@ -92,7 +91,7 @@
   math-font: fonts.at("math"),
   box-spacing: spacing.at("block-gap"),
   title: [*Title of the poster*],
-  authors: [#("Presenter name")#sym.at#("Institution") #h(4.5cm) `email@address`],
+  authors: ((name: [Presenter name], affiliation: [Institution], email: [`email@address`]),),
   subtitle: [],
   date: [],
   summary: [],

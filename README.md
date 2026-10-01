@@ -32,6 +32,47 @@
 typst fonts
 ```
 
+## ローカル検証
+
+リポジトリ直下で次を実行する．Typst 0.15.0 以降，上記フォント，Bash，`rg`，`awk` が必要で，フォントや依存パッケージのインストールは行わない．
+通常の package import は Typst により解決されるため，初回は package cache またはダウンロード可能な環境も必要になる．
+
+```sh
+bash script/check-local.sh
+```
+
+[`script/check-local.sh`](script/check-local.sh) は全4 starter・全5 example を対象にする．
+portrait の starter・example は既存の [`script/check-poster-portrait-takeaway-api.sh`](script/check-poster-portrait-takeaway-api.sh) に任せ，残る7件を共通側で一度ずつコンパイルする．
+リポジトリの文書はこの checkout を `--root` にする．
+README の数式注釈コードを本文から抽出した入力と，著者・式番号の境界を確認する入力は一時領域に生成し，その入力の絶対 import を解決するため `--root /` でコンパイルする．
+普段の文書をコンパイルするときの root・文献パスは下の starter・サブモジュール利用手順を参照する．
+
+PDF・入力・ログは `TMPDIR`（未指定なら `/tmp`）内の実行ごとに異なるディレクトリへ出力し，最後に場所を表示する．
+目視にはその PDF を再利用でき，checkout に生成物は残らない．
+各対象の `PASS [compile]` と，assertion・実際の診断を確認した `PASS [semantic]` は別に表示される．
+不足コマンド・フォントや既知のネットワーク／権限不足は `FAIL [environment]`，それ以外のコンパイル失敗は対象とログを伴う `FAIL [compile]` として報告する．
+runner がスクリプト開始前に失敗した場合は，テンプレートについての検証結果は得られていない．
+
+| 対象 | 自動確認の所在 | PDF で確認すること |
+| --- | --- | --- |
+| README の数式注釈（#32） | 掲載コードを抽出してコンパイル | 注釈，矢印，数式が重ならず，対応する項を指す |
+| poster 引用（#33） | 既存 poster API チェックで複数行・1行・入れ子・コメント付き BibTeX の値と通常ラベルの参照を確認 | 短い引用の著者・雑誌略称・巻・年が読み取れる |
+| portrait の図寸法（#34） | starter・example のコンパイル | example **全3ページ**と starter で図全体が見え，headline band・見出し・隣接パネルに重ならず，図中の文字が読める |
+| 構造化 authors（#35） | 既存の title，省略・空・1人・複数人・content／文字列・メール省略の grouped assertion，空／content 著者の title 接続，旧 `author`・scalar／positional `authors` の診断 | slide の著者列が揃い，空のメールセルと著者なしの title，document の content 著者が正しく表示される |
+| slide の式と参照（#36） | 1つの集約入力で未ラベル・未参照ラベル・前方／後方／繰り返し参照・pause／repeat を確認．番号付きの式の内容・表示順・連番・numbering pattern を Typst の公開 query／counter／numbering API で assert | 参照された表示式だけに番号が付き，表示順の番号と式参照が一致する．未参照ラベル・未ラベル式は番号なし，通常の番号設定・通常ラベル・引用の表示とリンク先が正しい |
+
+コンパイル成功はレイアウトや番号・引用の正しさを保証しない．
+共通実行のログ，semantic 確認の結果，PDF の目視結果をそれぞれ記録し，未実施の項目を成功扱いにしない．
+特に slide の title・数式・式参照・通常参照・参考文献と，上表の portrait 全ページを確認する．
+式番号の集約 PDF は `equation-numbering.pdf`（6ページ，表示番号は `(1), (2), (3), (3), (4), (4)`）と，`equation-numbering-pattern.pdf`（`[A]`〜`[D]`）に残る．
+各式参照を PDF viewer でクリックし，対応する式へ移動することを確認する．
+page 1 の前方参照は page 2，page 2 の後方参照は page 1，page 4 の参照は page 4／1，page 5・6 の参照は page 6／4 を指す．
+pause／repeat の式へのリンク先は，その式が表示される最後の subslide になる．
+必要なら Poppler の `pdftotext -layout` で参照の表示文字列を，`qpdf --json` で PDF の link annotation と destination を調べる．
+これらの PDF ツールは共通ドライバーの必須依存ではなく，Typst assertion だけでは実際の PDF link destination まで検証したことにはならない．
+同じ tree・入力・環境で成功した結果は再利用できる．
+README だけの説明変更や検証手順への接続だけを理由に，同じ PDF を作り直す必要はない．
+
 ## 共通 metadata API
 
 `document / slide / poster` は共通の `metadata` 辞書を受け取る。

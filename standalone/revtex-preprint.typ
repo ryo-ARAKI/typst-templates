@@ -274,6 +274,38 @@
 /// Short alias for `revtex-preprint`, with the same parameters and defaults.
 #let draft = revtex-preprint
 
+// A common frame keeps both authoring notes distinct from manuscript prose.
+#let _authoring-note(label, fill: luma(245), rule: luma(170), body) = block(
+  width: 100%,
+  fill: fill,
+  stroke: (left: 1.5pt + rule),
+  inset: 8pt,
+  breakable: true,
+)[
+  #set par(justify: false, first-line-indent: 0pt, leading: 0.5em, spacing: 0.4em)
+  #set list(spacing: 0.9em)
+  #set par.line(numbering: none)
+  #set text(size: 10pt, fill: luma(80), style: "normal")
+  #text(size: 8pt, weight: "bold", style: "normal", label)
+  #parbreak()
+  #body
+]
+
+/// Outline/placement notes, matching the original manuscript's gray frame.
+/// `visible: false` removes the note without reserving space.
+#let outline-note(visible: true, body) = {
+  if visible { _authoring-note([OUTLINE NOTE], body) }
+}
+
+/// TODO notes support Japanese locally; install the default CJK font or
+/// override `font`. Use `.with(visible: false)` to hide all notes of this kind.
+#let todo-note(visible: true, font: "Noto Sans CJK JP", body) = {
+  if visible {
+    set text(font: font, lang: "ja")
+    _authoring-note([TODO], fill: rgb("fff4df"), rule: rgb("d18a26"), body)
+  }
+}
+
 /// Start the appendices with `#show: appendices` after the main text, once per document.
 /// Headings restart at A; the enclosing `revtex-preprint` rule controls equation
 /// numbering, while figure and table sequences continue through the appendices.

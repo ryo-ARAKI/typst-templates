@@ -17,11 +17,13 @@ base = [*template_base, '--package-path', str(root/'packages'),
 def run(*args):
     return subprocess.run(args, check=True, capture_output=True, text=True).stdout
 
-def compile(name, source=None, error=None, packages=False):
+def compile(name, source=None, error=None, packages=False, system_fonts=False):
     path = root / (name + '.typ')
     if source is not None:
         path.write_text(source)
     options = template_base if packages else base
+    if system_fonts:
+        options = [option for option in options if option != '--ignore-system-fonts']
     result = subprocess.run(['typst', 'compile', *options, '--deps', str(root/(name+'.deps.json')),
                              str(path), str(root/(name+'.pdf'))], capture_output=True, text=True)
     (root/(name+'.err')).write_text(result.stderr)
@@ -288,6 +290,100 @@ def gap(name):
 assert gap('review-gap') > gap('read-gap') + 3
 assert abs(gap('override-gap')-gap('read-gap')) < 0.01
 print('PASS: mode overrides, leading, continuous prose-only line numbers')
+
+# Notes must hide independently, leave no layout/counter effects when hidden,
+# and keep their local typography and line-number exclusions inside the frame.
+note_prefix = prefix + '#import "revtex-preprint.typ": outline-note, todo-note\n'
+for outline, todo in ((True, True), (True, False), (False, True), (False, False)):
+    name = f'notes-{int(outline)}-{int(todo)}'
+    text = compile(name, note_prefix + '''#show: revtex-preprint.with(mode: "review")
+= FirstSection
+BeforeNotes
+#outline-note(visible: ''' + str(outline).lower() + ''')[OutlineMarker]
+#todo-note(visible: ''' + str(todo).lower() + ''', font: "New Computer Modern")[TodoMarker]
+AfterNotes
+$ x = 1 $ <note-eq>
+= SecondSection
+NoteRefs: @note-eq.
+''')
+    assert ('OutlineMarker' in text) == outline and ('OUTLINE NOTE' in text) == outline, text
+    assert ('TodoMarker' in text) == todo and ('TODO' in text) == todo, text
+    assert 'NoteRefs: Equation (1)' in text and '2 SecondSection' in text, text
+    pages = words(name)
+    numbers = margin_numbers(pages)
+    assert numbers == list(range(1, len(numbers)+1)), (name, numbers)
+    for marker, numbered in (('BeforeNotes', True), ('AfterNotes', True),
+                              ('OutlineMarker', False), ('TodoMarker', False)):
+        for p in pages:
+            for t, mb in p:
+                if t == marker:
+                    has_number = any(n.isdigit() and b['xMax'] < 69 and
+                                     abs((b['yMin']+b['yMax'])/2-(mb['yMin']+mb['yMax'])/2) < 5
+                                     for n, b in p)
+                    assert has_number == numbered, (name, marker)
+
+hidden = '''#outline-note(visible: false)[
+= HiddenHeading
+#counter(math.equation).update(99)
+HiddenOutline
+]
+#todo-note(visible: false, font: "Unavailable Hidden Font")[HiddenTodo]
+'''
+for name, notes in (('notes-hidden', hidden), ('notes-control', '')):
+    compile(name, note_prefix + '#show: revtex-preprint\nBeforeGap\n#parbreak()\n' + notes + '''
+AfterGap
+= VisibleHeading
+$ x = 1 $ <visible-eq>
+VisibleRef: @visible-eq.
+''')
+assert (root/'notes-hidden.txt').read_text() == (root/'notes-control.txt').read_text()
+assert position('notes-hidden', 'AfterGap') == position('notes-control', 'AfterGap')
+
+# Binding defaults with .with allows one kind to be hidden throughout a document;
+# a call-site override can still show an individual note of that kind.
+text = compile('notes-bound', note_prefix + '''#show: revtex-preprint
+#let outline-note = outline-note.with(visible: false)
+#let todo-note = todo-note.with(visible: false, font: "New Computer Modern")
+#outline-note[HiddenOutline]
+#todo-note[HiddenTodo]
+#outline-note(visible: true)[ExplicitOutline]
+#todo-note(visible: true)[ExplicitTodo]
+''')
+assert 'Hidden' not in text and 'ExplicitOutline' in text and 'ExplicitTodo' in text, text
+
+for kind in ('outline-note', 'todo-note'):
+    args = '(font: "New Computer Modern")' if kind == 'todo-note' else ''
+    name = 'long-' + kind
+    compile(name, note_prefix + '#show: revtex-preprint\n#set page(height: 125mm)\n#' + kind + args + '''[
+NoteStart
+#for n in range(32) { par[Row #n: Keep this paragraph inside the note.] }
+NoteEnd
+]
+OutsideNote
+''')
+    assert position(name, 'NoteStart')[0] < position(name, 'NoteEnd')[0]
+    assert position(name, 'OutsideNote')[0] >= position(name, 'NoteEnd')[0]
+print('PASS: independent note visibility, hidden layout/counters, line numbers and page breaks')
+
+# Only this case enables system fonts: Japanese notes require a CJK font.
+assert 'Noto Sans CJK JP' in run('typst', 'fonts').splitlines(), 'Japanese note checks require Noto Sans CJK JP'
+text = compile('notes-japanese', note_prefix + '''#show: revtex-preprint.with(mode: "review")
+BeforeJapanese
+#todo-note[
+日本語と English の混在を確認する。
+- 比較対象の文献を追加する。
+- 数式 $x = 1$ の説明を見直す。
+#context [NoteLanguage: #text.lang]
+]
+#context [BodyLanguage: #text.lang]
+AfterJapanese
+''', system_fonts=True)
+compact = re.sub(r'\s+', '', text)
+assert '日本語とEnglishの混在を確認する。' in compact, text
+assert '比較対象の文献を追加する。' in compact and 'の説明を見直す。' in compact, text
+assert 'NoteLanguage: ja' in text and 'BodyLanguage: en' in text, text
+assert 'NotoSansCJK' in run('qpdf', '--json', str(root/'notes-japanese.pdf'))
+print('PASS: Japanese TODO text, mixed content, embedded CJK font and language scope')
 
 # Shared affiliation numbers disappear; multiple affiliations resolve to 1,2.
 shared = prefix+'''#show: draft.with(title: "Plain title", authors: (

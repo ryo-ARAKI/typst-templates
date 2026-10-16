@@ -136,6 +136,44 @@ See @fig-model and @tab-measurements.
 
 表記や配置は標準の `set` / `show` ルールや要素の引数で変更できます．
 
+## 構成メモ・ToDo
+
+`outline-note` は節の役割や配置案を灰色の枠で，`todo-note` は作業メモを淡い橙色の枠で表示します．
+どちらも既定では表示し，段落・箇条書き・数式を含むcontentを受け取ります．
+枠内は10ptで字下げ・両端揃え・行番号を解除し，長い注記はページをまたげます．
+
+```typst
+#import "revtex-preprint.typ": outline-note, todo-note
+
+#outline-note[
+  Explain the purpose of this section.
+]
+
+#todo-note[
+  - 比較対象の文献を追加する．
+  - 数式 $x = 1$ の説明を見直す．
+]
+```
+
+`todo-note` 内だけ `lang: "ja"` と `font: "Noto Sans CJK JP"` を設定し，枠外の本文設定は保ちます．
+日本語の表示には，既定のフォントを実行環境に用意してください．
+別の日本語フォントを使う場合は，例えば `#todo-note(font: "IPAexGothic")[図を見直す．]` と指定します．
+`outline-note` のフォント・言語は本文の設定を継承します．
+
+個々の注記は `#todo-note(visible: false)[...]` のように隠せます．
+種類ごとにまとめて隠す場合は，本文の前で次のように設定します．
+非表示の注記は内容も余白も出力せず，枠内の見出しや数式も番号に影響しません．
+
+```typst
+// outline-note は表示したまま，todo-note をすべて隠す．
+#let todo-note = todo-note.with(visible: false)
+
+// 個別の指定を優先して，この注記だけ表示する．
+#todo-note(visible: true)[この作業だけ共有する．]
+```
+
+`outline-note` も同じ方法で個別・種類別に表示を切り替えられます．
+
 ## 引用・参考文献
 
 テンプレートには，同梱の [`references.bib`](references.bib) にある架空の文献1件を引用する例を含めています．
@@ -145,7 +183,7 @@ See @fig-model and @tab-measurements.
 
 ## 検証
 
-Bash，Python 3.9以降，Typst 0.15.0以降，`pdftotext`，`qpdf` を用意し，リポジトリルートで実行します．
+Bash，Python 3.9以降，Typst 0.15.0以降，`pdftotext`，`qpdf`，日本語検証用のNoto Sans CJK JPを用意し，リポジトリルートで実行します．
 
 ```sh
 bash script/check-revtex-preprint.sh
@@ -154,7 +192,8 @@ bash script/check-revtex-preprint.sh
 配布するスタイル・ひな形・文献ファイルを一時ディレクトリへコピーし，ひな形の数式参照と引用を含めてコンパイルします．
 ひな形は通常のパッケージ検索先・キャッシュを使います．
 スタイル本体の検証では，外部パッケージの検索先・キャッシュを空にし，依存先が一時ディレクトリ内のファイルに収まることを確認します．
-いずれもシステムフォントを無効にして，同梱フォントだけを使います．
+日本語ToDoの検証だけシステムフォントを有効にし，CJKフォントの埋め込みと日本語・英語混在を確認します．
+それ以外はシステムフォントを無効にして，同梱フォントだけを使います．
 同じ条件で，番号・参照，図表の配置，設定，PDF構造，行番号と入力診断も検証します．
 入力・PDF・診断は，実行時に表示される一時ディレクトリで確認できます．
 

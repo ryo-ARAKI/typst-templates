@@ -4,6 +4,21 @@
 この1ファイルを原稿の隣へコピーして利用できます．
 Typst 0.15.0以降に対応し，同梱のNew Computer Modern / New Computer Modern Mathを既定のフォントにします．
 
+## 目的と構成
+
+原稿と参照ファイルを別のディレクトリへ持ち出しても，同じ書式・番号・参照で閲覧用・査読用のPDFを生成することを目的にします．
+組版・相互参照・引用にはTypst標準の機能を使います．
+
+| ファイル | 責務 | コンパイル時の依存先 |
+| --- | --- | --- |
+| [`revtex-preprint.typ`](revtex-preprint.typ) | 入力の検証，書式と番号の設定，タイトル欄の生成 | Typst標準機能・同梱フォント・CSL |
+| [`revtex-preprint-template.typ`](revtex-preprint-template.typ) | 著者が編集する原稿の入口 | スタイル本体と文献ファイル |
+| [`references.bib`](references.bib) | 原稿の `bibliography` が読み込む文献データ | なし |
+| このREADME | 使い方・API・検証方法の説明 | コンパイル対象外 |
+
+原稿の引数と本文をスタイルへ渡し，文献データとともにTypstがPDFへ組版します．
+リポジトリの検証スクリプトは開発時に使い，原稿を持ち出す際は下記の3ファイルをコピーします．
+
 ## 使い方
 
 [`revtex-preprint-template.typ`](revtex-preprint-template.typ) を原稿のひな形として使います．
@@ -122,7 +137,9 @@ Bash，Python 3.9以降，Typst 0.15.0以降，`pdftotext`，`qpdf` を用意し
 bash script/check-revtex-preprint.sh
 ```
 
-番号・参照，図表の配置，設定，PDF構造，行番号と単体での利用を検証します．
+配布するスタイル・ひな形・文献ファイルを一時ディレクトリへコピーし，ひな形の数式参照と引用を含めてコンパイルします．
+外部パッケージの検索先・キャッシュを空にし，システムフォントを無効にした条件で，依存先がコピーした3ファイルに収まることを確認します．
+同じ条件で，番号・参照，図表の配置，設定，PDF構造，行番号と入力診断も検証します．
 入力・PDF・診断は，実行時に表示される一時ディレクトリで確認できます．
 
 [リポジトリ全体のREADME](../README.md)

@@ -110,6 +110,9 @@
   show figure.caption: set text(size: 0.9em)
   show figure.caption: set par(first-line-indent: 0pt, justify: false)
   show figure.where(kind: table): set figure.caption(position: top)
+  // Open tables. Authors place semantic header and horizontal-rule boundaries.
+  set table(stroke: none, inset: (x: 0.7em, y: 0.4em))
+  set table.hline(stroke: 0.6pt)
   show footnote.entry: set par.line(numbering: none)
   set bibliography(style: "american-physics-society", title: [References])
 

@@ -113,6 +113,11 @@ $ x = 1 $ <eq-check>
 
 図表はnativeの `figure` と `table` を使い，別々のアラビア数字連番を付録でも継続します．
 本文配置を既定とし，図キャプションは下，表キャプションは上です．
+表は既定の格子罫線を省きます．
+上下端と見出し下の横罫線は，次の例のように標準の `table.hline` で指定します（既定の太さ `0.6pt`）．
+セル余白は左右 `0.7em`，上下 `0.4em` です．
+列見出しは `table.header` で指定し，数値列は `align` で揃えます．
+`#set table(inset: ..., align: ..., stroke: ...)` でセル書式，`#set table.hline(stroke: ...)` で横罫線を変更できます．
 標準の `set` ルールや要素の引数で表記・配置・参照接頭辞を変更できます．
 表キャプションを下へ移す場合は `#show figure.where(kind: table): set figure.caption(position: bottom)` と指定します．
 
@@ -121,7 +126,13 @@ $ x = 1 $ <eq-check>
 #figure(rect(width: 30mm, height: 10mm), caption: [A schematic.],
         alt: "A rectangular schematic", placement: top) <fig-model>
 // tableを別要素で包む場合はkindを明示する
-#figure(block(table(columns: 2, [A], [B])), kind: table,
+#figure(block(table(columns: 2, align: (left, right),
+  table.hline(),
+  table.header([Quantity], [Value]),
+  table.hline(),
+  [Sample count], [1000],
+  table.hline(),
+)), kind: table,
         supplement: [Table], caption: [Measurements.])
 See @fig-model and #ref(<fig-model>, supplement: [Diagram]).
 ```

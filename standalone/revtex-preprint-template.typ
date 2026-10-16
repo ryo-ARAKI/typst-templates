@@ -35,11 +35,17 @@ $ E = m c^2 $ <eq-energy>
 Refer to @eq-energy when discussing the result.
 
 #figure(
-  enum(
-    [Set $s arrow.l 0$.],
-    [For $i = 1, dots, N$: $s arrow.l s + x_i$.],
-    [Return $s / N$.],
-  ),
+  [
+    ```
+    function mean(x, N)
+        s ← 0
+        for i ← 1 to N do
+            s ← s + x[i]
+        end for
+        return s / N
+    end function
+    ```
+  ],
   kind: "algorithm",
   supplement: [Algorithm],
   caption: [Compute the sample mean.],

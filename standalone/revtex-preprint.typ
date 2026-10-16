@@ -106,8 +106,36 @@
     }
     it
   }
-  set figure(numbering: "1")
+  set figure(numbering: "1", placement: auto)
   show figure: set par.line(numbering: none)
+  show figure: it => {
+    if it.placement == none { return it }
+    // Change only native floating layout, retaining the original figure, its
+    // counter, labels, caption and semantic tags. In-flow figures stay native.
+    show place.where(float: true): floating => context {
+      let marker = (revtex-preprint-float: it.location())
+      // A marker also identifies our replacement and prevents recursive shows.
+      if floating.body.has("children") and floating.body.children.len() > 0 {
+        let first = floating.body.children.first()
+        if first.func() == metadata and first.value == marker { return floating }
+      }
+      // The source anchor may still be on page 1 when the float is on page 2.
+      // Inspect a marker inside the floated body, using physical page numbers.
+      let anchors = query(metadata.where(value: marker))
+      let first-page = anchors.len() == 0 or anchors.first().location().page() == 1
+      let args = floating.fields()
+      let alignment = args.remove("alignment")
+      let body = args.remove("body")
+      if first-page and (alignment == auto or alignment.y == top) {
+        let horizontal = if alignment == auto or alignment.x == none {
+          align.alignment.x
+        } else { alignment.x }
+        alignment = bottom + horizontal
+      }
+      place(alignment, ..args, [#metadata(marker)#body])
+    }
+    it
+  }
   show figure.caption: set text(size: 0.9em)
   show figure.caption: set par(first-line-indent: 0pt, justify: false)
   show figure.where(kind: table): set figure.caption(position: top)

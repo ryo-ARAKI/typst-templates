@@ -113,7 +113,11 @@ Abstractのラベルは本文と同じ文字サイズの太字・中央揃えと
 本文・付録をまたぐ前方参照・後方参照も標準の `@label` / `ref` で扱います．
 
 図表はnativeの `figure` と `table` を使い，別々のアラビア数字連番を付録でも継続します．
-本文配置を既定とし，図キャプションは下，表キャプションは上です．
+図表の配置は `auto` を既定とし，1ページ目の上端だけを避けます．
+1ページ目に載る浮動図表は下端へ配置し，2ページ目以降は通常の `auto`・`top`・`bottom` を使います．
+この判定はページ番号の表示を変更しても物理的なページ順に従い，`placement: top` の明示指定にも適用します．
+`placement: none` を指定すれば本文中に配置できます．
+図キャプションは下，表キャプションは上です．
 表は既定の格子罫線を省きます．
 上下端と見出し下の横罫線は，次の例のように標準の `table.hline` で指定します（既定の太さ `0.6pt`）．
 セル余白は左右 `0.7em`，上下 `0.4em` です．
@@ -125,7 +129,7 @@ Abstractのラベルは本文と同じ文字サイズの太字・中央揃えと
 ```typst
 #set figure(supplement: [Fig.])
 #figure(rect(width: 30mm, height: 10mm), caption: [A schematic.],
-        alt: "A rectangular schematic", placement: top) <fig-model>
+        alt: "A rectangular schematic") <fig-model>
 // tableを別要素で包む場合はkindを明示する
 #figure(block(table(columns: 2, align: (left, right),
   table.hline(),
@@ -152,7 +156,7 @@ Bash，Python 3.9以降，Typst 0.15.0以降，`pdftotext`，`qpdf` が必要で
 bash script/check-revtex-preprint.sh
 ```
 
-スクリプトは番号・参照，設定上書き，著者所属，日付，CSL，PDF構造・リンク，行番号の対象・除外を確認します．
+スクリプトは番号・参照，図表の配置と1ページ目上端の除外，設定上書き，著者所属，日付，CSL，PDF構造・リンク，行番号の対象・除外を確認します．
 表示された一時ディレクトリに入力・PDF・診断を残し，リポジトリ外の持ち出し先で，空のpackage/cacheと `--ignore-system-fonts` を使って依存も確認します．
 これは既存の `script/check-local.sh` とは独立して実行します．
 

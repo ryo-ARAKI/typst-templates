@@ -171,6 +171,78 @@ def words(name):
     return [[(w.text or '', {k:float(v) for k,v in w.attrib.items()}) for w in p.findall('.//x:word', ns)]
             for p in tree.findall('.//x:page', ns)]
 
+# Inspect physical PDF pages, independently of the printed page counter and
+# the figure's source anchor (which can precede its eventual float page).
+def position(name, marker):
+    hits = [(i+1,b) for i,p in enumerate(words(name)) for t,b in p if t == marker]
+    assert len(hits) == 1, (name,marker,hits)
+    return hits[0]
+
+for kind, graphic in [('figure','rect(width: 30mm, height: 15mm)[FloatMarker]'),
+                      ('table','table(columns: 1, [FloatMarker])')]:
+    for placement in ('auto', 'top'):
+        name = f'first-{kind}-{placement}'
+        option = ', alt: "A test rectangle"' if kind == 'figure' else ''
+        if placement == 'top': option += ', placement: top'
+        compile(name, prefix+'''#show: revtex-preprint.with(title: [TitleMarker])
+BodyMarker before the float.
+#figure('''+graphic+', caption: [CaptionMarker]'+option+''') <f>
+AfterMarker follows the float. Ref: @f.
+''')
+        page, floated = position(name, 'FloatMarker')
+        assert page == 1 and floated['yMin'] > 600, (name,page,floated)
+        assert position(name,'TitleMarker')[1]['yMax'] < floated['yMin'], name
+        if placement == 'auto':
+            placements = json.loads(run('typst','query',*base,str(root/(name+'.typ')),
+                                        'figure','--field','placement'))
+            assert placements == ['auto'], (name,placements)
+        # Keeping the original figure/table must not duplicate native PDF tags.
+        objects = json.loads(run('qpdf','--json',str(root/(name+'.pdf'))))['qpdf'][1]
+        role = '/Figure' if kind == 'figure' else '/Table'
+        assert sum(v.get('value',{}).get('/S') == role for v in objects.values()
+                   if isinstance(v.get('value'),dict)) == 1, (name,role)
+
+        name = f'later-{kind}-{placement}'
+        compile(name, prefix+'''#show: revtex-preprint
+FirstPageMarker
+#pagebreak()
+#counter(page).update(1)
+LaterBodyMarker before the float.
+#figure('''+graphic+', caption: [CaptionMarker]'+option+''')
+''')
+        page, floated = position(name,'FloatMarker')
+        assert page == 2 and floated['yMin'] < position(name,'LaterBodyMarker')[1]['yMin'], (name,page,floated)
+
+    name = f'deferred-{kind}'
+    large = ('rect(width: 30mm, height: 100mm)[FloatMarker]' if kind == 'figure' else
+             'table(columns: 1, [#block(height: 100mm)[FloatMarker]])')
+    compile(name,prefix+'''#show: revtex-preprint
+FirstPageMarker
+#v(180mm)
+#figure('''+large+''', caption: [CaptionMarker])
+FollowingMarker
+''')
+    page, floated = position(name,'FloatMarker')
+    assert page == 2 and floated['yMin'] < 120, (name,page,floated)
+
+compile('auto-bottom',prefix+'''#show: revtex-preprint
+FirstPageMarker
+#pagebreak()
+#v(150mm)
+BottomBodyMarker
+#figure(rect(width: 30mm, height: 10mm)[FloatMarker], caption: [CaptionMarker])
+''')
+page, floated = position('auto-bottom','FloatMarker')
+assert page == 2 and floated['yMin'] > position('auto-bottom','BottomBodyMarker')[1]['yMax']+80
+compile('inline-placement',prefix+'''#show: revtex-preprint
+BeforeMarker
+#figure(rect(width: 30mm, height: 10mm)[InlineMarker], caption: [CaptionMarker], placement: none)
+AfterMarker
+''')
+assert position('inline-placement','BeforeMarker')[1]['yMax'] < position('inline-placement','InlineMarker')[1]['yMin']
+assert position('inline-placement','InlineMarker')[1]['yMax'] < position('inline-placement','AfterMarker')[1]['yMin']
+print('PASS: auto floats, first-page top exclusion, later top/bottom, deferral, explicit in-flow placement')
+
 # Abstract has its own centered, body-sized label, separate from section style.
 front_words = words('global-full')[0]
 abstract_label = next(b for t,b in front_words if t == 'Abstract')

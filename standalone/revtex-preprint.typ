@@ -76,9 +76,10 @@
   show math.equation: set text(font: math-font)
   set page(paper: paper, margin: margin, columns: 1, numbering: "1", number-align: center + bottom)
   set par(justify: true, leading: line-leading, first-line-indent: 1em, spacing: 0.8em)
-  set par.line(numbering: if numbered-lines { "1" } else { none },
+  set par.line(numbering: if numbered-lines {
+    n => text(size: 6pt, fill: luma(160), str(n))
+  } else { none },
     numbering-scope: "document", number-align: right, number-clearance: 8pt)
-  show par.line: set text(size: 7pt, fill: luma(100))
 
   set heading(numbering: section-numbering)
   show heading: set par.line(numbering: none)

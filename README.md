@@ -12,6 +12,12 @@
 - `lib/presets`: `document / slide / poster` ごとの既定値
 - `starters`: 新しい文書を始める最小テンプレート
 - `examples`: starter を参照する簡単な例
+- `standalone`: 他のライブラリやスクリプトから独立した単一ファイルのスタイル
+
+## Standalone RevTeX preprint
+
+A4・1段組の研究原稿用スタイルです．
+使い方・API・検証方法は[専用README](standalone/README.md)を参照してください．
 
 ## フォント
 

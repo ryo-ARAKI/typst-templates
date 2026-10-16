@@ -143,7 +143,7 @@
   set table(stroke: none, inset: (x: 0.7em, y: 0.4em))
   set table.hline(stroke: 0.6pt)
   show footnote.entry: set par.line(numbering: none)
-  set bibliography(style: "american-physics-society", title: [References])
+  set bibliography(style: "annual-reviews-author-date", title: [References])
 
   show native-title: set text(size: 1.5 * font-size, weight: "bold")
   show native-title: set align(center)

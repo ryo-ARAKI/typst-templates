@@ -122,6 +122,7 @@ for mode in ('global', 'section'):
     assert f'CustomRef: Formula ({expected[0]})' in text, text
     assert 'PageRef: page ' in text, text
     assert 'Transport and information' in text, text
+    assert 'with a citation (Example 2025).' in text, text
     query = json.loads(run('typst', 'query', *base, str(root/(mode+'-full.typ')), 'title'))
     assert len(query) == 1, query
 print('PASS: numbering, forward/back refs, native title, figures/tables, bibliography')
@@ -264,7 +265,7 @@ def check_lines(name, enabled):
     # Margin numbers must stay visually subordinate to the 12pt prose.
     assert all(7.5 < b['yMax']-b['yMin'] < 8.5 for p in pages for t,b in p
                if t.isdigit() and b['xMax'] < 69), name
-    for marker in ('AbstractMarker','BodyMarker','AfterMarker','AppendixMarker','Example,'):
+    for marker in ('AbstractMarker','BodyMarker','AfterMarker','AppendixMarker','Transport'):
         hits = [(p,b) for p in pages for t,b in p if t == marker]
         assert hits, (name,marker)
         assert any(any(t.isdigit() and b['xMax'] < 69 and abs((b['yMin']+b['yMax'])/2-(mb['yMin']+mb['yMax'])/2)<5 for t,b in p) for p,mb in hits), (name,marker)

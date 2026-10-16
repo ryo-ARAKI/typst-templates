@@ -128,7 +128,8 @@ See @fig-model and #ref(<fig-model>, supplement: [Diagram]).
 ```
 
 引用は `@BibKey`，参考文献は `#bibliography("references.bib")` と書きます．
-bibファイルのパスは原稿からの相対パスで，既定CSLはTypst組み込みの `american-physics-society` です．
+bibファイルのパスは原稿からの相対パスで，既定CSLはTypst組み込みの `annual-reviews-author-date` です．
+本文では著者名と出版年による引用を表示します．
 `#set bibliography(style: "apa")` や `bibliography` の `style` 引数で交換できます．
 nativeのタイトル・見出し・数式・図表・参照を保ち，PDF文書情報，しおり，リンク，タグを出力します．
 図や数式の `alt`，`table.header` も標準の書き方で指定してください．

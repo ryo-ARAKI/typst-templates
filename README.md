@@ -12,6 +12,79 @@
 - `lib/presets`: `document / slide / poster` ごとの既定値
 - `starters`: 新しい文書を始める最小テンプレート
 - `examples`: starter を参照する簡単な例
+- `standalone`: 他のライブラリやスクリプトから独立した単一ファイルのスタイル
+
+## Standalone RevTeX preprint
+
+[`standalone/revtex-preprint.typ`](standalone/revtex-preprint.typ) は APS RevTeX 4.2 の `preprint` を再現する英語論文用スタイルです．
+[参照PR](https://github.com/t2lab-it/hashimoto2026_information-flow/pull/1) の `style.typ`（`ff812f27fe9a665d98e9afa3abbbe9bb38cb850a`）を基にしています．
+この `.typ` ファイルだけを原稿の隣へコピーして使えます．
+`lib/`，`script/`，外部Typstパッケージ，LaTeX，CSLファイルは不要です．
+既存スクリプトの検証対象には接続していません．
+Typst 0.15.0 以降と，Typstに同梱される New Computer Modern / New Computer Modern Math を使います．
+
+```typ
+#import "revtex-preprint.typ": revtex-preprint, appendices
+
+#show: revtex-preprint.with(
+  title: [Information flow with $k$ nearest neighbors],
+  pdf-title: "Information flow with k nearest neighbors",
+  authors: ((name: "Alice Example",), (name: "Bob Example",)),
+  affiliations: [Department of Physics, Example University],
+  date: datetime(year: 2026, month: 10, day: 16),
+  line-numbers: true,
+)
+
+= Introduction <sec-intro>
+
+See @eq-energy and @app-check.
+
+$ E = m c^2 $ <eq-energy>
+
+#show: appendices
+
+= Consistency check <app-check>
+
+The main result is @eq-energy in @sec-intro.
+
+$ x = 1 $ <eq-check>
+```
+
+この入力を `main.typ` に保存し，同じディレクトリで `typst compile main.typ` を実行します．
+文献を使う場合は本文に `@BibKey` を書き，末尾に `#bibliography("references.bib")` を追加します．
+文献ファイルのパスは原稿からの相対パスです．
+引用・文献はTypst組み込みの `american-physics-society` スタイルを使い，番号なしの References 見出しを出します．
+
+| 項目 | 書式・設定 |
+| --- | --- |
+| 用紙・本文 | US Letter，1段組，左上1 inch，幅468 TeX pt，高さ665.5 TeX pt |
+| 文字・行送り | 本文12 TeX pt，通常本文の基線間隔21 TeX pt，段落字下げ15 TeX pt |
+| タイトル・所属 | 中央寄せ，共通所属の上付き番号なし，日付は既定で当日 |
+| 見出し | I / A / 1，各上位見出しで下位番号をリセット，節タイトルの文字部分を大文字化 |
+| 数式 | 本文 `(1)`，付録ごとに `(A1)` / `(B1)` から開始 |
+| 図表 | 図は `FIG. 1`，表は上側に `TABLE I`，別々の連番で付録でも継続 |
+| 行番号 | 本文・文献を通して連続，タイトル・見出し・独立数式・図表とキャプションを除外 |
+| ページ番号 | 下部中央，基線は本文下端から30 TeX pt下 |
+
+TeX pt は `1/72.27 inch` なので，Typst/PDFのptへ `72 / 72.27` 倍して設定しています．
+背の高いインライン数式では，重なりを避けるため行高が広がります．
+
+`title` はcontentまたは文字列で指定します．
+数式を含むタイトルのPDF文書情報には，文字列の `pdf-title` を別途指定します．
+`title` が文字列なら，省略時の `pdf-title` にもその値を使います．
+`authors` は文字列の `name` を持つ辞書の配列で，`()` は著者なしです．
+共通所属は `affiliations` にcontentまたは文字列で渡します．
+参照PRの整数 `affiliation` IDも受け付けますが，異なるIDを使う場合の所属側の番号は `affiliations` 内に自分で記述します．
+既存の共通metadata APIは使いません．
+`date: none` は日付表示とPDF作成日時を省略し，`line-numbers: false` は行番号を外します．
+参照PRからの移行用に `draft` という別名も公開しています．
+
+`#show: appendices` は本文の後に1回置き，それ以降を付録として扱います．
+各付録はレベル1見出しで開始し，題名がない場合は `#heading[]` と書きます．
+前方参照と，付録から本文への参照にも対応します．
+再現範囲は参照PRと同じ1段組・共通所属・3階層の見出しです．
+Abstract専用API，メール・著者脚注，複数所属の自動配置，`reprint` / 2段組は対象外です．
+改行・改ページ・浮動体配置，書体の版，CSLとBibTeXの句読点，LaTeX `lineno` の行番号値は完全一致しません．
 
 ## フォント
 

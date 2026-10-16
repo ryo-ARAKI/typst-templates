@@ -170,6 +170,15 @@ def words(name):
     ns = {'x':'http://www.w3.org/1999/xhtml'}
     return [[(w.text or '', {k:float(v) for k,v in w.attrib.items()}) for w in p.findall('.//x:word', ns)]
             for p in tree.findall('.//x:page', ns)]
+
+# Abstract has its own centered, body-sized label, separate from section style.
+front_words = words('global-full')[0]
+abstract_label = next(b for t,b in front_words if t == 'Abstract')
+abstract_prose = next(b for t,b in front_words if t == 'AbstractMarker')
+assert abs((abstract_label['xMin']+abstract_label['xMax'])/2 - 595.276/2) < 1
+assert abs((abstract_label['yMax']-abstract_label['yMin']) -
+           (abstract_prose['yMax']-abstract_prose['yMin'])) < 0.05
+
 def margin_numbers(pages):
     return [int(t) for p in pages for t,b in sorted(p, key=lambda word: word[1]['yMin'])
             if t.isdigit() and b['xMax'] < 69]

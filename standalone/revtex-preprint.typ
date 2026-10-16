@@ -147,7 +147,12 @@
     if date != none { align(center, par(date.display("[year]-[month]-[day]"))) }
   }
   if abstract != none {
-    heading(level: 1, numbering: none, outlined: false)[Abstract]
+    {
+      show heading: set text(size: font-size, weight: "bold")
+      show heading: set align(center)
+      show heading: set block(above: 1.2em, below: 0.6em)
+      heading(level: 1, numbering: none, outlined: false)[Abstract]
+    }
     {
       set math.equation(numbering: none)
       abstract

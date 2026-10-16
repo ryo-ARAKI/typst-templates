@@ -68,6 +68,7 @@ $ x = 1 $ <eq-check>
 
 本文は両端揃え，連続段落の字下げは1em，ページ番号は下部中央です．
 `read` は行番号なし・`leading: 0.65em`，`review` は行番号あり・`leading: 1em`です．
+行番号は8pt・灰色（`#808080`）で表示します．
 `leading` は `par.leading` の行間の隙間であり，固定の基線間隔ではありません．
 例えば `mode: "review", line-numbers: false` で広い行送りだけを使えます．
 `font: "Libertinus Serif"` などで本文書体を変更できます．

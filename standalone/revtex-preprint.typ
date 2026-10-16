@@ -77,7 +77,7 @@
   set page(paper: paper, margin: margin, columns: 1, numbering: "1", number-align: center + bottom)
   set par(justify: true, leading: line-leading, first-line-indent: 1em, spacing: 0.8em)
   set par.line(numbering: if numbered-lines {
-    n => text(size: 6pt, fill: luma(160), str(n))
+    n => text(size: 8pt, fill: luma(128), str(n))
   } else { none },
     numbering-scope: "document", number-align: right, number-clearance: 8pt)
 

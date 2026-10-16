@@ -262,7 +262,7 @@ def check_lines(name, enabled):
     if not enabled: return
     assert numbers == list(range(1,len(numbers)+1)), (name,numbers)
     # Margin numbers must stay visually subordinate to the 12pt prose.
-    assert all(b['yMax']-b['yMin'] < 7 for p in pages for t,b in p
+    assert all(7.5 < b['yMax']-b['yMin'] < 8.5 for p in pages for t,b in p
                if t.isdigit() and b['xMax'] < 69), name
     for marker in ('AbstractMarker','BodyMarker','AfterMarker','AppendixMarker','Example,'):
         hits = [(p,b) for p in pages for t,b in p if t == marker]
@@ -291,7 +291,7 @@ for name, args, enabled in [('read','',False), ('review','mode: "review",',True)
 compile('line-style', prefix+'#show: revtex-preprint.with(mode: "review")\nLineMarker\n')
 run('typst','compile',*base,'--format','svg',str(root/'line-style.typ'),str(root/'line-style.svg'))
 svg = ET.parse(root/'line-style.svg')
-assert any(e.attrib.get('fill') == '#a0a0a0' for e in svg.iter()), 'missing gray line number'
+assert any(e.attrib.get('fill') == '#808080' for e in svg.iter()), 'missing gray line number'
 # Explicit leading overrides both presets; compare actual line separations.
 for name,args in [('read-gap',''), ('review-gap','mode: "review",'),
                   ('override-gap','mode: "review", leading: 0.65em,')]:

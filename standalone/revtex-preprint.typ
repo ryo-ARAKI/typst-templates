@@ -14,6 +14,8 @@
 /// Layout: `mode: "read"` uses compact leading; `"review"` widens leading and
 /// enables line numbers. Explicit `leading` and `line-numbers` take precedence.
 /// Font, language, paper and margin parameters set the document typography.
+/// With `font: auto`, Japanese uses Noto Sans CJK JP; other languages use
+/// New Computer Modern. An explicit `font` overrides this language default.
 ///
 /// Numbering: `section-numbering` is a heading pattern; `equation-numbering`
 /// selects a continuous `"global"` sequence or a per-section `"section"` sequence.
@@ -30,7 +32,7 @@
   mode: "read",
   line-numbers: auto,
   leading: auto,
-  font: "New Computer Modern",
+  font: auto,
   math-font: "New Computer Modern Math",
   font-size: 12pt,
   lang: "en",
@@ -117,7 +119,8 @@
   // Document metadata and base typography.
   set document(title: if pdf-title == auto { title } else { pdf-title },
     author: authors.map(author => author.name), keywords: keywords, date: date)
-  set text(font: font, size: font-size, lang: lang)
+  let body-font = if font != auto { font } else if lang == "ja" { "Noto Sans CJK JP" } else { "New Computer Modern" }
+  set text(font: body-font, size: font-size, lang: lang)
   show math.equation: set text(font: math-font)
   set page(paper: paper, margin: margin, columns: 1, numbering: "1", number-align: center + bottom)
   set par(justify: true, leading: line-leading, first-line-indent: 1em, spacing: 0.8em)
@@ -295,21 +298,29 @@
 ]
 
 /// Outline/placement notes, matching the original manuscript's gray frame.
-/// Japanese uses the same local CJK font as TODO notes; override `font` as needed.
+/// Inherit the document language unless `lang` is specified on the note.
+/// Japanese defaults to a local CJK font, other languages
+/// inherit the surrounding font. An explicit `font` overrides either default.
 /// `visible: false` removes the note without reserving space or loading its font.
-#let outline-note(visible: true, font: "Noto Sans CJK JP", body) = {
+#let outline-note(visible: true, lang: auto, font: auto, body) = {
   if visible {
-    set text(font: font, lang: "ja")
-    _authoring-note([OUTLINE NOTE], body)
+    context {
+      let lang = if lang == auto { text.lang } else { lang }
+      set text(font: if font != auto { font } else if lang == "ja" { "Noto Sans CJK JP" } else { text.font }, lang: lang)
+      _authoring-note([OUTLINE NOTE], body)
+    }
   }
 }
 
-/// TODO notes support Japanese locally; install the default CJK font or
-/// override `font`. Use `.with(visible: false)` to hide all notes of this kind.
-#let todo-note(visible: true, font: "Noto Sans CJK JP", body) = {
+/// Language and font defaults match `outline-note`.
+/// Use `.with(visible: false)` to hide all notes of this kind.
+#let todo-note(visible: true, lang: auto, font: auto, body) = {
   if visible {
-    set text(font: font, lang: "ja")
-    _authoring-note([TODO], fill: rgb("fff0ee"), rule: rgb("c65b50"), body)
+    context {
+      let lang = if lang == auto { text.lang } else { lang }
+      set text(font: if font != auto { font } else if lang == "ja" { "Noto Sans CJK JP" } else { text.font }, lang: lang)
+      _authoring-note([TODO], fill: rgb("fff0ee"), rule: rgb("c65b50"), body)
+    }
   }
 }
 

@@ -2,7 +2,7 @@
 
 [`revtex-preprint.typ`](revtex-preprint.typ) は，RevTeX preprintを参考にした，読みやすいA4・1段組の研究原稿スタイルです．
 この1ファイルを原稿の隣へコピーして利用できます．
-Typst 0.15.0以降に対応し，同梱のNew Computer Modern / New Computer Modern Mathを既定のフォントにします．
+Typst 0.15.0以降に対応し，本文は英語でNew Computer Modern，日本語でNoto Sans CJK JP，数式はNew Computer Modern Mathを既定のフォントにします．
 
 ## 目的と構成
 
@@ -56,7 +56,7 @@ $ physica.pdv(f, x) = physica.dv(g, t) $
 | `date` | `none` | 日付をISO形式で表示し，PDF文書情報にも設定 |
 | `mode` | `"read"` | 閲覧用 `"read"`／査読用 `"review"` |
 | `line-numbers` / `leading` | `auto` / `auto` | 行番号の有無・行送り．個別指定がmodeより優先 |
-| `font` / `math-font` | `"New Computer Modern"` / `"New Computer Modern Math"` | 本文・数式のフォント |
+| `font` / `math-font` | `auto` / `"New Computer Modern Math"` | 本文・数式のフォント |
 | `font-size` / `lang` | `12pt` / `"en"` | 基本文字サイズ・文書言語 |
 | `paper` / `margin` | `"a4"` / `25mm` | 用紙・余白 |
 | `section-numbering` | `"1.1"` | 見出し番号．例：`"I.1"`でローマ数字の最上位節 |
@@ -68,6 +68,8 @@ $ physica.pdv(f, x) = physica.dv(g, t) $
 `leading` は `par.leading` の行間の隙間を指定します．
 例えば `mode: "review", line-numbers: false` で広い行送りだけを使えます．
 `font: "Libertinus Serif"` などで本文書体を変更できます．
+`font: auto`（既定）では，`lang: "ja"` の本文は `"Noto Sans CJK JP"`，それ以外は `"New Computer Modern"` を使います．
+日本語の本文を表示する際は，実行環境に Noto Sans CJK JP が必要です．
 `date` は `datetime(year: 2026, month: 10, day: 16)` のように指定します．
 
 ## 著者・所属
@@ -174,19 +176,35 @@ See @alg-mean.
 ```typst
 #import "revtex-preprint.typ": outline-note, todo-note
 
-#outline-note[
+#outline-note(lang: "ja")[
   この節の役割と，先行研究とのつながりを整理する．
 ]
 
-#todo-note[
+#todo-note(lang: "ja")[
   - 比較対象の文献を追加する．
   - 数式 $x = 1$ の説明を見直す．
 ]
 ```
 
-両方の注記内だけ `lang: "ja"` と `font: "Noto Sans CJK JP"` を設定し，枠外の本文設定は保ちます．
+両方の注記は `lang: auto`（既定）で文書全体の言語設定を引き継ぎ，個別の `lang` 引数で上書きできます．
+文書全体の言語は `revtex-preprint.with(lang: "en", ...)` や `#set text(lang: "en")` で指定します．
+`font: auto`（既定）では，日本語は `"Noto Sans CJK JP"`，それ以外の言語は周囲の本文フォントを使います．
 ひな形の日本語注記の例を表示する際も，実行環境にこのフォントが必要です．
 どちらも `font` 引数で変更でき，例えば `#outline-note(font: "IPAexGothic")[この節の役割を整理する．]` と指定します．
+
+英語の文書に日本語の注記を混在させる場合は次のように指定します．
+言語・フォントの変更は注記内だけに適用されます．
+
+```typst
+#set text(lang: "en")
+#outline-note[Explain the role of this section.]
+#todo-note(lang: "en")[Add a comparison with previous studies.]
+#todo-note(lang: "ja")[先行研究との比較を追加する．]
+
+// 本文は英語のまま，両方の注記をまとめて日本語にする場合．
+#let outline-note = outline-note.with(lang: "ja")
+#let todo-note = todo-note.with(lang: "ja")
+```
 
 個々の注記は `#todo-note(visible: false)[...]` のように隠せます．
 種類ごとにまとめて隠す場合は，本文の前で次のように設定します．

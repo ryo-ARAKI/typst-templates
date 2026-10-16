@@ -46,8 +46,9 @@ assert 'Manuscript title' in text and 'Equation (1)' in text, text
 assert text.count('(1)') == 2, text  # Displayed equation number and its reference.
 assert '(Example 2025)' in text and 'A minimal research example' in text, text
 assert 'OUTLINE NOTE' in text and 'TODO' in text, text
+assert '研究課題を示し，先行研究との関係を整理する．' in re.sub(r'\s+', '', text), text
 assert '結果を示す図を追加する．' in re.sub(r'\s+', '', text), text
-print('PASS: copied manuscript template, outline/Japanese TODO examples, equation reference and bibliography')
+print('PASS: copied manuscript template, Japanese outline/TODO examples, equation reference and bibliography')
 
 prefix = '#import "revtex-preprint.typ": revtex-preprint, appendices, draft\n'
 (root/'refs.bib').write_text('''@article{sample, author={Jane Example}, title={Transport and information},
@@ -302,7 +303,7 @@ for outline, todo in ((True, True), (True, False), (False, True), (False, False)
     text = compile(name, note_prefix + '''#show: revtex-preprint.with(mode: "review")
 = FirstSection
 BeforeNotes
-#outline-note(visible: ''' + str(outline).lower() + ''')[OutlineMarker]
+#outline-note(visible: ''' + str(outline).lower() + ''', font: "New Computer Modern")[OutlineMarker]
 #todo-note(visible: ''' + str(todo).lower() + ''', font: "New Computer Modern")[TodoMarker]
 AfterNotes
 $ x = 1 $ <note-eq>
@@ -325,7 +326,7 @@ NoteRefs: @note-eq.
                                      for n, b in p)
                     assert has_number == numbered, (name, marker)
 
-hidden = '''#outline-note(visible: false)[
+hidden = '''#outline-note(visible: false, font: "Unavailable Hidden Font")[
 = HiddenHeading
 #counter(math.equation).update(99)
 HiddenOutline
@@ -345,7 +346,7 @@ assert position('notes-hidden', 'AfterGap') == position('notes-control', 'AfterG
 # Binding defaults with .with allows one kind to be hidden throughout a document;
 # a call-site override can still show an individual note of that kind.
 text = compile('notes-bound', note_prefix + '''#show: revtex-preprint
-#let outline-note = outline-note.with(visible: false)
+#let outline-note = outline-note.with(visible: false, font: "New Computer Modern")
 #let todo-note = todo-note.with(visible: false, font: "New Computer Modern")
 #outline-note[HiddenOutline]
 #todo-note[HiddenTodo]
@@ -355,7 +356,7 @@ text = compile('notes-bound', note_prefix + '''#show: revtex-preprint
 assert 'Hidden' not in text and 'ExplicitOutline' in text and 'ExplicitTodo' in text, text
 
 for kind in ('outline-note', 'todo-note'):
-    args = '(font: "New Computer Modern")' if kind == 'todo-note' else ''
+    args = '(font: "New Computer Modern")'
     name = 'long-' + kind
     compile(name, note_prefix + '#show: revtex-preprint\n#set page(height: 125mm)\n#' + kind + args + '''[
 NoteStart
@@ -369,9 +370,11 @@ OutsideNote
 print('PASS: independent note visibility, hidden layout/counters, line numbers and page breaks')
 
 # Japanese cases, including the copied template, enable system fonts for CJK text.
-text = compile('notes-japanese', note_prefix + '''#show: revtex-preprint.with(mode: "review")
+for kind in ('outline-note', 'todo-note'):
+    name = 'japanese-' + kind
+    text = compile(name, note_prefix + '''#show: revtex-preprint.with(mode: "review")
 BeforeJapanese
-#todo-note[
+#''' + kind + '''[
 日本語と English の混在を確認する。
 - 比較対象の文献を追加する。
 - 数式 $x = 1$ の説明を見直す。
@@ -380,12 +383,12 @@ BeforeJapanese
 #context [BodyLanguage: #text.lang]
 AfterJapanese
 ''', system_fonts=True)
-compact = re.sub(r'\s+', '', text)
-assert '日本語とEnglishの混在を確認する。' in compact, text
-assert '比較対象の文献を追加する。' in compact and 'の説明を見直す。' in compact, text
-assert 'NoteLanguage: ja' in text and 'BodyLanguage: en' in text, text
-assert 'NotoSansCJK' in run('qpdf', '--json', str(root/'notes-japanese.pdf'))
-print('PASS: Japanese TODO text, mixed content, embedded CJK font and language scope')
+    compact = re.sub(r'\s+', '', text)
+    assert '日本語とEnglishの混在を確認する。' in compact, (kind, text)
+    assert '比較対象の文献を追加する。' in compact and 'の説明を見直す。' in compact, (kind, text)
+    assert 'NoteLanguage: ja' in text and 'BodyLanguage: en' in text, (kind, text)
+    assert 'NotoSansCJK' in run('qpdf', '--json', str(root/(name+'.pdf'))), kind
+print('PASS: Japanese outline/TODO text, mixed content, embedded CJK font and language scope')
 
 # Shared affiliation numbers disappear; multiple affiliations resolve to 1,2.
 shared = prefix+'''#show: draft.with(title: "Plain title", authors: (

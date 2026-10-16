@@ -292,9 +292,13 @@
 ]
 
 /// Outline/placement notes, matching the original manuscript's gray frame.
-/// `visible: false` removes the note without reserving space.
-#let outline-note(visible: true, body) = {
-  if visible { _authoring-note([OUTLINE NOTE], body) }
+/// Japanese uses the same local CJK font as TODO notes; override `font` as needed.
+/// `visible: false` removes the note without reserving space or loading its font.
+#let outline-note(visible: true, font: "Noto Sans CJK JP", body) = {
+  if visible {
+    set text(font: font, lang: "ja")
+    _authoring-note([OUTLINE NOTE], body)
+  }
 }
 
 /// TODO notes support Japanese locally; install the default CJK font or

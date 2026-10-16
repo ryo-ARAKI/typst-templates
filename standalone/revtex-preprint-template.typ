@@ -15,7 +15,7 @@
 = Introduction
 
 #outline-note[
-  Establish the research question, then explain how it connects to prior work.
+  研究課題を示し，先行研究との関係を整理する．
 ]
 
 Introduce the research question and its motivation.

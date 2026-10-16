@@ -199,6 +199,9 @@
   show figure.caption: set text(size: 0.9em)
   show figure.caption: set par(first-line-indent: 0pt, justify: false)
   show figure.where(kind: table): set figure.caption(position: top)
+  // Pseudocode captions belong above the left-aligned algorithm body.
+  show figure.where(kind: "algorithm"): set figure.caption(position: top)
+  show figure.where(kind: "algorithm"): set align(left)
   // Open tables. Authors place semantic header and horizontal-rule boundaries.
   set table(stroke: none, inset: (x: 0.7em, y: 0.4em))
   set table.hline(stroke: 0.6pt)

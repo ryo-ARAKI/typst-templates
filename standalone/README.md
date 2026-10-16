@@ -137,6 +137,27 @@ See @fig-model and @tab-measurements.
 
 表記や配置は標準の `set` / `show` ルールや要素の引数で変更できます．
 
+## 疑似プログラム
+
+標準の `figure` に `kind: "algorithm"` と `supplement: [Algorithm]` を指定します．
+表題は上，表題と本体は左揃えになり，査読用の本文行番号は付きません．
+番号は図・表と独立した連番になり，ラベルへの参照は `Algorithm 1` と表示します．
+本体には標準の `enum` などを使え，外部パッケージは不要です．
+
+```typst
+#figure(
+  enum(
+    [Set $s arrow.l 0$.],
+    [For $i = 1, dots, N$: $s arrow.l s + x_i$.],
+    [Return $s / N$.],
+  ),
+  kind: "algorithm",
+  supplement: [Algorithm],
+  caption: [Compute the sample mean.],
+) <alg-mean>
+See @alg-mean.
+```
+
 ## 構成メモ・ToDo
 
 `outline-note` は節の役割や配置案を灰色の枠で，`todo-note` は作業メモを淡い橙色の枠で表示します．

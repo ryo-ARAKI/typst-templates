@@ -48,7 +48,8 @@ assert '(Example 2025)' in text and 'A minimal research example' in text, text
 assert 'OUTLINE NOTE' in text and 'TODO' in text, text
 assert '研究課題を示し，先行研究との関係を整理する．' in re.sub(r'\s+', '', text), text
 assert '結果を示す図を追加する．' in re.sub(r'\s+', '', text), text
-print('PASS: copied manuscript template, Japanese outline/TODO examples, equation reference and bibliography')
+assert 'Algorithm 1: Compute the sample mean.' in text and 'Refer to Algorithm 1' in text, text
+print('PASS: copied manuscript template, Japanese notes, algorithm/equation references and bibliography')
 
 prefix = '#import "revtex-preprint.typ": revtex-preprint, appendices, draft\n'
 (root/'refs.bib').write_text('''@article{sample, author={Jane Example}, title={Transport and information},
@@ -234,6 +235,41 @@ AfterMarker
 assert position('inline-placement','BeforeMarker')[1]['yMax'] < position('inline-placement','InlineMarker')[1]['yMin']
 assert position('inline-placement','InlineMarker')[1]['yMax'] < position('inline-placement','AfterMarker')[1]['yMin']
 print('PASS: auto floats, first-page top exclusion, later top/bottom, deferral, explicit in-flow placement')
+
+# Algorithms use native figures, with top captions and left-aligned contents.
+# A centered surrounding context must not move the algorithm away from the margin.
+for mode in ('read', 'review'):
+    name = mode + '-algorithms'
+    text = compile(name, prefix + '#show: revtex-preprint.with(mode: "' + mode + '''")
+#set align(center)
+#align(left)[LeftEdge]
+#figure(box(width: 50mm)[
+  #set par(first-line-indent: 0pt)
+  AlgorithmBody
+], kind: "algorithm", supplement: [Algorithm], caption: [AlgorithmCaption],
+   placement: none) <alg-one>
+#figure([SecondAlgorithm], kind: "algorithm", supplement: [Algorithm],
+        caption: [SecondAlgorithmCaption], placement: none) <alg-two>
+#figure(rect(width: 10mm, height: 3mm), caption: [FigureCaption], placement: none) <fig>
+#figure(table(columns: 1, [Cell]), caption: [TableCaption], placement: none) <tab>
+AlgorithmRefs: @alg-one; @alg-two. FigureRef: @fig. TableRef: @tab.
+''')
+    assert 'AlgorithmRefs: Algorithm 1; Algorithm 2' in text, (name, text)
+    assert 'FigureRef: Figure 1' in text and 'TableRef: Table 1' in text, (name, text)
+    left = position(name, 'LeftEdge')[1]['xMin']
+    caption = position(name, 'AlgorithmCaption')[1]
+    body = position(name, 'AlgorithmBody')[1]
+    assert caption['yMax'] < body['yMin'], (name, caption, body)
+    caption_prefix = next(b for page in words(name) for t, b in page
+                          if t == 'Algorithm' and abs(b['yMin'] - caption['yMin']) < 1)
+    assert abs(caption_prefix['xMin'] - left) < 0.1 and abs(body['xMin'] - left) < 0.1, (name, left, caption_prefix, body)
+    for page in words(name):
+        for marker, bounds in page:
+            if marker in ('AlgorithmBody', 'AlgorithmCaption'):
+                assert not any(n.isdigit() and b['xMax'] < 69 and
+                               abs((b['yMin']+b['yMax'])/2-(bounds['yMin']+bounds['yMax'])/2) < 5
+                               for n, b in page), (name, marker)
+print('PASS: top/left algorithm captions and bodies, independent counters/references and no review line numbers')
 
 # Abstract has its own centered, body-sized label, separate from section style.
 front_words = words('global-full')[0]

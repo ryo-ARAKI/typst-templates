@@ -34,6 +34,19 @@ $ E = m c^2 $ <eq-energy>
 
 Refer to @eq-energy when discussing the result.
 
+#figure(
+  enum(
+    [Set $s arrow.l 0$.],
+    [For $i = 1, dots, N$: $s arrow.l s + x_i$.],
+    [Return $s / N$.],
+  ),
+  kind: "algorithm",
+  supplement: [Algorithm],
+  caption: [Compute the sample mean.],
+) <alg-mean>
+
+Refer to @alg-mean when describing the computation.
+
 = Conclusion
 
 Summarize the findings and their implications.

@@ -12,7 +12,7 @@ Typst 0.15.0以降に対応し，同梱のNew Computer Modern / New Computer Mod
 | ファイル | 責務 | コンパイル時の依存先 |
 | --- | --- | --- |
 | [`revtex-preprint.typ`](revtex-preprint.typ) | 入力の検証，書式と番号の設定，タイトル欄の生成 | Typst標準機能・同梱フォント・CSL |
-| [`revtex-preprint-template.typ`](revtex-preprint-template.typ) | 著者が編集する原稿の入口 | スタイル本体と文献ファイル |
+| [`revtex-preprint-template.typ`](revtex-preprint-template.typ) | 著者が編集する原稿の入口 | スタイル本体・文献ファイル・`unify 0.8.1`・`physica 0.9.8` |
 | [`references.bib`](references.bib) | 原稿の `bibliography` が読み込む文献データ | なし |
 | このREADME | 使い方・API・検証方法の説明 | コンパイル対象外 |
 
@@ -30,6 +30,20 @@ typst compile revtex-preprint-template.typ
 ```
 
 `draft` は `revtex-preprint` の別名で，同じ既定値を使います．
+
+## 執筆補助パッケージ
+
+原稿ひな形は [`unify 0.8.1`](https://typst.app/universe/package/unify/) と [`physica 0.9.8`](https://typst.app/universe/package/physica/) を読み込みます．
+初回コンパイルには，これらのパッケージのキャッシュ，またはダウンロード可能な環境が必要です．
+スタイル本体の `revtex-preprint.typ` は外部パッケージに依存しません．
+
+`unify` の `num`・`unit`・`qty`・`numrange`・`qtyrange` で数値・単位・不確かさ・範囲を表記できます．
+`physica` は名前空間付きで使い，標準の数式記号との名前の衝突を避けます．
+
+```typst
+$ qty("1.23+-0.04", "m/s") $
+$ physica.pdv(f, x) = physica.dv(g, t) $
+```
 
 ## 設定
 
@@ -138,7 +152,9 @@ bash script/check-revtex-preprint.sh
 ```
 
 配布するスタイル・ひな形・文献ファイルを一時ディレクトリへコピーし，ひな形の数式参照と引用を含めてコンパイルします．
-外部パッケージの検索先・キャッシュを空にし，システムフォントを無効にした条件で，依存先がコピーした3ファイルに収まることを確認します．
+ひな形は通常のパッケージ検索先・キャッシュを使います．
+スタイル本体の検証では，外部パッケージの検索先・キャッシュを空にし，依存先が一時ディレクトリ内のファイルに収まることを確認します．
+いずれもシステムフォントを無効にして，同梱フォントだけを使います．
 同じ条件で，番号・参照，図表の配置，設定，PDF構造，行番号と入力診断も検証します．
 入力・PDF・診断は，実行時に表示される一時ディレクトリで確認できます．
 

@@ -1,4 +1,8 @@
 #import "revtex-preprint.typ": revtex-preprint
+// Numbers, units, uncertainties, and ranges.
+#import "@preview/unify:0.8.1": num, unit, qty, numrange, qtyrange
+// Use physica.dv / physica.pdv, etc. without shadowing native math symbols.
+#import "@preview/physica:0.9.8"
 
 #show: revtex-preprint.with(
   title: [Manuscript title],

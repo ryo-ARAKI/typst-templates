@@ -10,31 +10,35 @@ mkdir "$tmp_dir/packages" "$tmp_dir/cache"
 python3 - "$tmp_dir" <<'PY'
 import json, pathlib, re, subprocess, sys, xml.etree.ElementTree as ET
 root = pathlib.Path(sys.argv[1])
-base = ['--root', str(root), '--ignore-system-fonts', '--package-path', str(root/'packages'),
+template_base = ['--root', str(root), '--ignore-system-fonts']
+base = [*template_base, '--package-path', str(root/'packages'),
         '--package-cache-path', str(root/'cache')]
 
 def run(*args):
     return subprocess.run(args, check=True, capture_output=True, text=True).stdout
 
-def compile(name, source=None, error=None):
+def compile(name, source=None, error=None, packages=False):
     path = root / (name + '.typ')
     if source is not None:
         path.write_text(source)
-    result = subprocess.run(['typst', 'compile', *base, '--deps', str(root/(name+'.deps.json')),
+    options = template_base if packages else base
+    result = subprocess.run(['typst', 'compile', *options, '--deps', str(root/(name+'.deps.json')),
                              str(path), str(root/(name+'.pdf'))], capture_output=True, text=True)
     (root/(name+'.err')).write_text(result.stderr)
     if error:
         diagnostics = '\n'.join(l for l in result.stderr.splitlines() if l.startswith('error:'))
         assert result.returncode != 0 and error in diagnostics, (name, result.stderr)
         return
-    assert result.returncode == 0 and not result.stderr, (name, result.stderr)
+    # Package downloads may report progress; compiler warnings remain failures.
+    diagnostics = re.search(r'(?m)^(error|warning):', result.stderr) if packages else result.stderr
+    assert result.returncode == 0 and not diagnostics, (name, result.stderr)
     run('qpdf', '--check', str(root/(name+'.pdf')))
     text = run('pdftotext', '-layout', str(root/(name+'.pdf')), '-')
     (root/(name+'.txt')).write_text(text)
     return re.sub(r'\s+', ' ', re.sub(r'\xad\s*', '', text))
 
 # Compile the actual files users copy, including their local bibliography.
-text = compile('revtex-preprint-template')
+text = compile('revtex-preprint-template', packages=True)
 assert 'Manuscript title' in text and 'Equation (1)' in text, text
 assert text.count('(1)') == 2, text  # Displayed equation number and its reference.
 assert '(Example 2025)' in text and 'A minimal research example' in text, text
@@ -342,10 +346,9 @@ text=compile('caption-override',prefix+'''#show: revtex-preprint
 #figure(table(columns: 1, [CellMarker]), caption: [CaptionMarker])
 ''')
 assert text.index('CellMarker') < text.index('CaptionMarker') and 'Table 1 — CaptionMarker' in text, text
-# Every dependency must belong to the copied manuscript bundle; no repo files,
-# packages or system fonts may be needed. The package directories stay empty.
+# Style-only inputs stay isolated from packages and system fonts.
+# Their empty package search/cache directories must remain empty.
 for name, expected in (
-    ('revtex-preprint-template', {'revtex-preprint-template.typ','revtex-preprint.typ','references.bib'}),
     ('global-full', {'global-full.typ','revtex-preprint.typ','refs.bib'}),
 ):
     deps=json.loads((root/(name+'.deps.json')).read_text())['inputs']

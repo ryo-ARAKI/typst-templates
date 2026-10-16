@@ -1,38 +1,11 @@
 #!/usr/bin/env bash
-# Exercise the standalone public API with disposable manuscripts, never repo fixtures.
+# Validate the copied manuscript bundle and public API outside the repository.
 set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/revtex-preprint-check.XXXXXX")"
 printf 'Validation artifacts: %s\n' "$tmp_dir"
-cp "$repo_root/standalone/revtex-preprint.typ" "$tmp_dir/"
+cp "$repo_root"/standalone/{revtex-preprint.typ,revtex-preprint-template.typ,references.bib} "$tmp_dir/"
 mkdir "$tmp_dir/packages" "$tmp_dir/cache"
-compile() {
-  typst compile --root "$tmp_dir" --ignore-system-fonts \
-    --package-path "$tmp_dir/packages" --package-cache-path "$tmp_dir/cache" \
-    "$tmp_dir/$1.typ" "$tmp_dir/$1.pdf" 2> "$tmp_dir/$1.err"
-  if [[ -s "$tmp_dir/$1.err" ]]; then cat "$tmp_dir/$1.err" >&2; return 1; fi
-  pdftotext -layout "$tmp_dir/$1.pdf" "$tmp_dir/$1.txt"
-}
-
-# Removing continuity at the appendix boundary must fail this contract.
-cat > "$tmp_dir/global.typ" <<'TYP'
-#import "revtex-preprint.typ": revtex-preprint, appendices
-#show: revtex-preprint
-= Mixed case heading <main>
-$ x = 1 $ <eq-main>
-#show: appendices
-= Supplement <app>
-$ y = 2 $ <eq-app>
-MainRef: @eq-main. AppendixRef: @eq-app.
-TYP
-if ! compile global; then cat "$tmp_dir/global.err" >&2; exit 1; fi
-python3 - "$tmp_dir" <<'PY'
-import pathlib, re, sys
-root = pathlib.Path(sys.argv[1])
-text = re.sub(r'\s+', ' ', (root / 'global.txt').read_text())
-assert re.search(r'AppendixRef:.*?\(2\)', text), text
-print('PASS: global equations continue into appendices')
-PY
 
 python3 - "$tmp_dir" <<'PY'
 import json, pathlib, re, subprocess, sys, xml.etree.ElementTree as ET
@@ -43,9 +16,10 @@ base = ['--root', str(root), '--ignore-system-fonts', '--package-path', str(root
 def run(*args):
     return subprocess.run(args, check=True, capture_output=True, text=True).stdout
 
-def compile(name, source, error=None):
+def compile(name, source=None, error=None):
     path = root / (name + '.typ')
-    path.write_text(source)
+    if source is not None:
+        path.write_text(source)
     result = subprocess.run(['typst', 'compile', *base, '--deps', str(root/(name+'.deps.json')),
                              str(path), str(root/(name+'.pdf'))], capture_output=True, text=True)
     (root/(name+'.err')).write_text(result.stderr)
@@ -58,6 +32,13 @@ def compile(name, source, error=None):
     text = run('pdftotext', '-layout', str(root/(name+'.pdf')), '-')
     (root/(name+'.txt')).write_text(text)
     return re.sub(r'\s+', ' ', re.sub(r'\xad\s*', '', text))
+
+# Compile the actual files users copy, including their local bibliography.
+text = compile('revtex-preprint-template')
+assert 'Manuscript title' in text and 'Equation (1)' in text, text
+assert text.count('(1)') == 2, text  # Displayed equation number and its reference.
+assert '(Example 2025)' in text and 'A minimal research example' in text, text
+print('PASS: copied manuscript template, equation reference and bibliography')
 
 prefix = '#import "revtex-preprint.typ": revtex-preprint, appendices, draft\n'
 (root/'refs.bib').write_text('''@article{sample, author={Jane Example}, title={Transport and information},
@@ -363,9 +344,13 @@ text=compile('caption-override',prefix+'''#show: revtex-preprint
 assert text.index('CellMarker') < text.index('CaptionMarker') and 'Table 1 — CaptionMarker' in text, text
 # Every dependency must belong to the copied manuscript bundle; no repo files,
 # packages or system fonts may be needed. The package directories stay empty.
-deps=json.loads((root/'global-full.deps.json').read_text())['inputs']
-assert {pathlib.Path(p).name for p in deps} == {'global-full.typ','revtex-preprint.typ','refs.bib'}, deps
-assert all(pathlib.Path(p).resolve().is_relative_to(root) for p in deps),deps
+for name, expected in (
+    ('revtex-preprint-template', {'revtex-preprint-template.typ','revtex-preprint.typ','references.bib'}),
+    ('global-full', {'global-full.typ','revtex-preprint.typ','refs.bib'}),
+):
+    deps=json.loads((root/(name+'.deps.json')).read_text())['inputs']
+    assert {pathlib.Path(p).name for p in deps} == expected, (name,deps)
+    assert all(pathlib.Path(p).resolve().is_relative_to(root) for p in deps),(name,deps)
 assert not list((root/'packages').iterdir()) and not list((root/'cache').iterdir())
 print('PASS: native configuration/CSL and isolated standalone dependencies')
 print('All RevTeX preprint contracts passed.')

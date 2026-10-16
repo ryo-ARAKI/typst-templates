@@ -49,6 +49,7 @@ bash script/check-local.sh
 
 [`script/check-local.sh`](script/check-local.sh) は全4 starter・全5 example を対象にする．
 portrait の starter・example は既存の [`script/check-poster-portrait-takeaway-api.sh`](script/check-poster-portrait-takeaway-api.sh) に任せ，残る7件を共通側で一度ずつコンパイルする．
+共通プリセットから独立した standalone 研究原稿は，[専用チェック](script/check-revtex-preprint.sh)を[専用READMEの条件](standalone/README.md#検証)で実行する．
 リポジトリの文書はこの checkout を `--root` にする．
 README の数式注釈コードを本文から抽出した入力と，著者・式番号の境界を確認する入力は一時領域に生成し，その入力の絶対 import を解決するため `--root /` でコンパイルする．
 普段の文書をコンパイルするときの root・文献パスは下の starter・サブモジュール利用手順を参照する．

@@ -148,6 +148,8 @@ line_body = '''
 = HeadingMarker
 BodyMarker describes this model.\n\n
 AfterMarker continues the argument.#footnote[FootnoteMarker]
+GapOne \\
+GapTwo
 $ x = 1 $ <eq-one>
 #figure(rect(width: 20mm, height: 5mm), caption: [CaptionMarker])
 #figure(table(columns: 1, [CellMarker]), caption: [TableCaptionMarker])
@@ -174,13 +176,17 @@ def position(name, marker):
 for kind, graphic in [('figure','rect(width: 30mm, height: 15mm)[FloatMarker]'),
                       ('table','table(columns: 1, [FloatMarker])')]:
     for placement in ('auto', 'top'):
-        name = f'first-{kind}-{placement}'
+        name = f'floats-{kind}-{placement}'
         option = ', alt: "A test rectangle"' if kind == 'figure' else ''
         if placement == 'top': option += ', placement: top'
         compile(name, prefix+'''#show: revtex-preprint.with(title: [TitleMarker])
 BodyMarker before the float.
 #figure('''+graphic+', caption: [CaptionMarker]'+option+''') <f>
 AfterMarker follows the float. Ref: @f.
+#pagebreak()
+#counter(page).update(1)
+LaterBodyMarker before the float.
+#figure('''+graphic.replace('FloatMarker', 'LaterFloat')+', caption: [LaterCaptionMarker]'+option+''')
 ''')
         page, floated = position(name, 'FloatMarker')
         assert page == 1 and floated['yMin'] > 600, (name,page,floated)
@@ -188,22 +194,14 @@ AfterMarker follows the float. Ref: @f.
         if placement == 'auto':
             placements = json.loads(run('typst','query',*base,str(root/(name+'.typ')),
                                         'figure','--field','placement'))
-            assert placements == ['auto'], (name,placements)
+            assert placements == ['auto', 'auto'], (name,placements)
         # Keeping the original figure/table must not duplicate native PDF tags.
         objects = json.loads(run('qpdf','--json',str(root/(name+'.pdf'))))['qpdf'][1]
         role = '/Figure' if kind == 'figure' else '/Table'
         assert sum(v.get('value',{}).get('/S') == role for v in objects.values()
-                   if isinstance(v.get('value'),dict)) == 1, (name,role)
+                   if isinstance(v.get('value'),dict)) == 2, (name,role)
 
-        name = f'later-{kind}-{placement}'
-        compile(name, prefix+'''#show: revtex-preprint
-FirstPageMarker
-#pagebreak()
-#counter(page).update(1)
-LaterBodyMarker before the float.
-#figure('''+graphic+', caption: [CaptionMarker]'+option+''')
-''')
-        page, floated = position(name,'FloatMarker')
+        page, floated = position(name,'LaterFloat')
         assert page == 2 and floated['yMin'] < position(name,'LaterBodyMarker')[1]['yMin'], (name,page,floated)
 
     name = f'deferred-{kind}'
@@ -236,11 +234,9 @@ assert position('inline-placement','BeforeMarker')[1]['yMax'] < position('inline
 assert position('inline-placement','InlineMarker')[1]['yMax'] < position('inline-placement','AfterMarker')[1]['yMin']
 print('PASS: auto floats, first-page top exclusion, later top/bottom, deferral, explicit in-flow placement')
 
-# Algorithms use native figures, with top captions and left-aligned contents.
-# A centered surrounding context must not move the algorithm away from the margin.
-for mode in ('read', 'review'):
-    name = mode + '-algorithms'
-    text = compile(name, prefix + '#show: revtex-preprint.with(mode: "' + mode + '''")
+# Review mode covers the common algorithm layout and its line-number exclusion;
+# the copied template already exercises default read mode.
+text = compile('algorithms', prefix + '''#show: revtex-preprint.with(mode: "review")
 #set align(center)
 #align(left)[LeftEdge]
 #figure(box(width: 50mm)[
@@ -254,21 +250,21 @@ for mode in ('read', 'review'):
 #figure(table(columns: 1, [Cell]), caption: [TableCaption], placement: none) <tab>
 AlgorithmRefs: @alg-one; @alg-two. FigureRef: @fig. TableRef: @tab.
 ''')
-    assert 'AlgorithmRefs: Algorithm 1; Algorithm 2' in text, (name, text)
-    assert 'FigureRef: Figure 1' in text and 'TableRef: Table 1' in text, (name, text)
-    left = position(name, 'LeftEdge')[1]['xMin']
-    caption = position(name, 'AlgorithmCaption')[1]
-    body = position(name, 'AlgorithmBody')[1]
-    assert caption['yMax'] < body['yMin'], (name, caption, body)
-    caption_prefix = next(b for page in words(name) for t, b in page
-                          if t == 'Algorithm' and abs(b['yMin'] - caption['yMin']) < 1)
-    assert abs(caption_prefix['xMin'] - left) < 0.1 and abs(body['xMin'] - left) < 0.1, (name, left, caption_prefix, body)
-    for page in words(name):
-        for marker, bounds in page:
-            if marker in ('AlgorithmBody', 'AlgorithmCaption'):
-                assert not any(n.isdigit() and b['xMax'] < 69 and
-                               abs((b['yMin']+b['yMax'])/2-(bounds['yMin']+bounds['yMax'])/2) < 5
-                               for n, b in page), (name, marker)
+assert 'AlgorithmRefs: Algorithm 1; Algorithm 2' in text, text
+assert 'FigureRef: Figure 1' in text and 'TableRef: Table 1' in text, text
+left = position('algorithms', 'LeftEdge')[1]['xMin']
+caption = position('algorithms', 'AlgorithmCaption')[1]
+body = position('algorithms', 'AlgorithmBody')[1]
+assert caption['yMax'] < body['yMin'], (caption, body)
+caption_prefix = next(b for page in words('algorithms') for t, b in page
+                      if t == 'Algorithm' and abs(b['yMin'] - caption['yMin']) < 1)
+assert abs(caption_prefix['xMin'] - left) < 0.1 and abs(body['xMin'] - left) < 0.1, (left, caption_prefix, body)
+for page in words('algorithms'):
+    for marker, bounds in page:
+        if marker in ('AlgorithmBody', 'AlgorithmCaption'):
+            assert not any(n.isdigit() and b['xMax'] < 69 and
+                           abs((b['yMin']+b['yMax'])/2-(bounds['yMin']+bounds['yMax'])/2) < 5
+                           for n, b in page), marker
 print('PASS: top/left algorithm captions and bodies, independent counters/references and no review line numbers')
 
 # Abstract has its own centered, body-sized label, separate from section style.
@@ -311,30 +307,28 @@ def check_lines(name, enabled):
 
 for name, args, enabled in [('read','',False), ('review','mode: "review",',True),
                             ('read-lines','line-numbers: true,',True),
-                            ('review-no-lines','mode: "review", line-numbers: false,',False)]:
+                            ('review-no-lines','mode: "review", line-numbers: false, leading: 0.65em,',False)]:
     compile(name, prefix+'#show: revtex-preprint.with(\n'+front+args+'\n)\n'+line_body)
     check_lines(name, enabled)
 # Check actual rendered number color; styling par.line itself does not style
 # the numbers generated by its numbering function.
-compile('line-style', prefix+'#show: revtex-preprint.with(mode: "review")\nLineMarker\n')
-run('typst','compile',*base,'--format','svg',str(root/'line-style.typ'),str(root/'line-style.svg'))
-svg = ET.parse(root/'line-style.svg')
+run('typst','compile',*base,'--format','svg','--pages','1',str(root/'review.typ'),str(root/'review.svg'))
+svg = ET.parse(root/'review.svg')
 assert any(e.attrib.get('fill') == '#808080' for e in svg.iter()), 'missing gray line number'
-# Explicit leading overrides both presets; compare actual line separations.
-for name,args in [('read-gap',''), ('review-gap','mode: "review",'),
-                  ('override-gap','mode: "review", leading: 0.65em,')]:
-    compile(name,prefix+'#show: revtex-preprint.with('+args+')\nGapOne \\\nGapTwo\n')
+# Reuse the mode documents for default and explicit leading comparisons.
 def gap(name):
     p = words(name)[0]
     return next(b['yMin'] for t,b in p if t == 'GapTwo') - next(b['yMin'] for t,b in p if t == 'GapOne')
-assert gap('review-gap') > gap('read-gap') + 3
-assert abs(gap('override-gap')-gap('read-gap')) < 0.01
+assert gap('review') > gap('read') + 3
+assert abs(gap('review-no-lines')-gap('read')) < 0.01
 print('PASS: mode overrides, leading, continuous prose-only line numbers')
 
 # Notes must hide independently, leave no layout/counter effects when hidden,
 # and keep their local typography and line-number exclusions inside the frame.
 note_prefix = prefix + '#import "revtex-preprint.typ": outline-note, todo-note\n'
-for outline, todo in ((True, True), (True, False), (False, True), (False, False)):
+# Opposite settings exercise independence; the template covers both visible,
+# and the layout/counter comparison below covers both hidden.
+for outline, todo in ((True, False), (False, True)):
     name = f'notes-{int(outline)}-{int(todo)}'
     text = compile(name, note_prefix + '''#show: revtex-preprint.with(mode: "review")
 = FirstSection
@@ -391,39 +385,42 @@ text = compile('notes-bound', note_prefix + '''#show: revtex-preprint
 ''')
 assert 'Hidden' not in text and 'ExplicitOutline' in text and 'ExplicitTodo' in text, text
 
-for kind in ('outline-note', 'todo-note'):
-    args = '(font: "New Computer Modern")'
-    name = 'long-' + kind
-    compile(name, note_prefix + '#show: revtex-preprint\n#set page(height: 125mm)\n#' + kind + args + '''[
-NoteStart
+long_notes = ''
+for kind, marker in (('outline-note', 'Outline'), ('todo-note', 'Todo')):
+    long_notes += '#' + kind + '(font: "New Computer Modern")[\n' + marker + '''Start
 #for n in range(32) { par[Row #n: Keep this paragraph inside the note.] }
-NoteEnd
+''' + marker + '''End
 ]
-OutsideNote
-''')
-    assert position(name, 'NoteStart')[0] < position(name, 'NoteEnd')[0]
-    assert position(name, 'OutsideNote')[0] >= position(name, 'NoteEnd')[0]
+''' + marker + 'Outside\n'
+compile('long-notes', note_prefix + '#show: revtex-preprint\n#set page(height: 125mm)\n' + long_notes)
+for marker in ('Outline', 'Todo'):
+    assert position('long-notes', marker+'Start')[0] < position('long-notes', marker+'End')[0]
+    assert position('long-notes', marker+'Outside')[0] >= position('long-notes', marker+'End')[0]
 print('PASS: independent note visibility, hidden layout/counters, line numbers and page breaks')
 
-# Japanese cases, including the copied template, enable system fonts for CJK text.
+# Both wrappers keep distinct Japanese/language assertions in one document.
+japanese_notes = ''
 for kind in ('outline-note', 'todo-note'):
-    name = 'japanese-' + kind
-    text = compile(name, note_prefix + '''#show: revtex-preprint.with(mode: "review")
-BeforeJapanese
-#''' + kind + '''[
+    japanese_notes += '#' + kind + '''[
 日本語と English の混在を確認する。
 - 比較対象の文献を追加する。
 - 数式 $x = 1$ の説明を見直す。
-#context [NoteLanguage: #text.lang]
+#context [''' + kind + '''Language: #text.lang]
 ]
+'''
+text = compile('notes-japanese', note_prefix + '''#show: revtex-preprint.with(mode: "review")
+BeforeJapanese
+''' + japanese_notes + '''
 #context [BodyLanguage: #text.lang]
 AfterJapanese
 ''', system_fonts=True)
-    compact = re.sub(r'\s+', '', text)
-    assert '日本語とEnglishの混在を確認する。' in compact, (kind, text)
-    assert '比較対象の文献を追加する。' in compact and 'の説明を見直す。' in compact, (kind, text)
-    assert 'NoteLanguage: ja' in text and 'BodyLanguage: en' in text, (kind, text)
-    assert 'NotoSansCJK' in run('qpdf', '--json', str(root/(name+'.pdf'))), kind
+compact = re.sub(r'\s+', '', text)
+for phrase in ('日本語とEnglishの混在を確認する。', '比較対象の文献を追加する。', 'の説明を見直す。'):
+    assert compact.count(phrase) == 2, text
+for kind in ('outline-note', 'todo-note'):
+    assert kind+'Language: ja' in text, (kind, text)
+assert 'BodyLanguage: en' in text, text
+assert 'NotoSansCJK' in run('qpdf', '--json', str(root/'notes-japanese.pdf'))
 print('PASS: Japanese outline/TODO text, mixed content, embedded CJK font and language scope')
 
 # Shared affiliation numbers disappear; multiple affiliations resolve to 1,2.
@@ -436,10 +433,14 @@ text=compile('shared',shared)
 assert 'Alice and Bob' in text and not re.search(r'[12].*Shared University',text), text
 multi_words=words('global-full')[0]
 assert any(t=='1,2*' for t,b in multi_words), 'missing multiple affiliation superscripts'
-text=compile('dated',prefix+'#show: revtex-preprint.with(date: datetime(year: 2026, month: 10, day: 16))\nDated prose.')
+text=compile('dated-font',prefix+'''#show: revtex-preprint.with(
+  date: datetime(year: 2026, month: 10, day: 16), font: "Libertinus Serif",
+)
+= Font test
+A different font. $ x = 1 $
+''')
 assert '2026-10-16' in text
-assert '20261016' in run('qpdf','--json',str(root/'dated.pdf'))
-compile('font',prefix+'#show: revtex-preprint.with(font: "Libertinus Serif")\n= Font test\nA different font. $ x = 1 $')
+assert '20261016' in run('qpdf','--json',str(root/'dated-font.pdf'))
 print('PASS: shared/multiple/no affiliations, alias, date, alternative font')
 
 # Failures must be actionable diagnostics, not downstream crashes or swallowed errors.
@@ -475,14 +476,13 @@ text=compile('native-overrides',prefix+'''#show: revtex-preprint
 #figure(table(columns: 1, [X]), caption: [Bottom float], placement: bottom, supplement: [Data]) <t>
 NativeRefs: @f; @t. @sample
 #bibliography("refs.bib")
-''')
-assert 'NativeRefs: Diagram 1; Data 1' in text and 'Example, 2025' in text, text
-text=compile('caption-override',prefix+'''#show: revtex-preprint
 #show figure.where(kind: table): set figure.caption(position: bottom)
 #set figure.caption(separator: [ — ])
-#figure(table(columns: 1, [CellMarker]), caption: [CaptionMarker])
+#figure(table(columns: 1, [CellMarker]), caption: [CaptionMarker],
+        supplement: [Table], placement: none)
 ''')
-assert text.index('CellMarker') < text.index('CaptionMarker') and 'Table 1 — CaptionMarker' in text, text
+assert 'NativeRefs: Diagram 1; Data 1' in text and 'Example, 2025' in text, text
+assert text.index('CellMarker') < text.index('CaptionMarker') and 'Table 2 — CaptionMarker' in text, text
 # Style-only inputs stay isolated from packages and system fonts.
 # Their empty package search/cache directories must remain empty.
 for name, expected in (

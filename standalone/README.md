@@ -97,6 +97,16 @@ $ x = 1 $ <eq-check>
 Abstractのラベルは本文と同じ文字サイズの太字・中央揃えとし，本文の節見出しと区別します．
 本文・付録をまたぐ前方参照・後方参照も標準の `@label` / `ref` で扱います．
 
+数式の短い導入文をページ末に取り残さない場合は，その段落を `block(sticky: true)` で包みます．
+直後の数式と同じページに保持し，数式番号・参照と図表の自動配置を維持します．
+
+```typst
+#block(width: 100%, sticky: true)[
+  The directed statistic satisfies
+]
+$ cal(I)_(X arrow.r Y)(Delta t) >= 0. $ <eq-positive>
+```
+
 図表はnativeの `figure` と `table` を使い，別々のアラビア数字連番を付録でも継続します．
 図表の配置は `auto` を既定とし，1ページ目の上端だけを避けます．
 1ページ目に載る浮動図表は下端へ配置し，2ページ目以降は通常の `auto`・`top`・`bottom` を使います．
@@ -145,5 +155,10 @@ bash script/check-revtex-preprint.sh
 スクリプトは番号・参照，図表の配置と1ページ目上端の除外，設定上書き，著者所属，日付，CSL，PDF構造・リンク，行番号の対象・除外を確認します．
 表示された一時ディレクトリに入力・PDF・診断を残し，リポジトリ外の持ち出し先で，空のpackage/cacheと `--ignore-system-fonts` を使って依存も確認します．
 これは既存の `script/check-local.sh` とは独立して実行します．
+
+Poppler 24.02.0の `pdfinfo` は，タグ付きPDF内の正常な `/Suspects false` に対して `Suspects object is wrong type (boolean)` を誤って表示します．
+[Typstの調査記録](https://github.com/typst/typst/issues/7140)でも確認されている閲覧ツール側の問題です．
+この警告はスタイルなしの最小文書でも再現し，`qpdf --check` は成功します．
+この警告を避けるためにPDFのタグを削除する必要はありません．
 
 [リポジトリ全体のREADME](../README.md)

@@ -401,7 +401,7 @@ print('PASS: independent note visibility, hidden layout/counters, line numbers a
 # Both wrappers keep distinct Japanese/language assertions in one document.
 japanese_notes = ''
 for kind in ('outline-note', 'todo-note'):
-    japanese_notes += '#' + kind + '''[
+    japanese_notes += '#' + kind + '''(lang: "ja")[
 日本語と English の混在を確認する。
 - 比較対象の文献を追加する。
 - 数式 $x = 1$ の説明を見直す。
@@ -422,6 +422,25 @@ for kind in ('outline-note', 'todo-note'):
 assert 'BodyLanguage: en' in text, text
 assert 'NotoSansCJK' in run('qpdf', '--json', str(root/'notes-japanese.pdf'))
 print('PASS: Japanese outline/TODO text, mixed content, embedded CJK font and language scope')
+
+# Document language selects the default body font; notes inherit or override it.
+for language, font in (('en', 'new computer modern'), ('ja', 'noto sans cjk jp')):
+    checks = note_prefix + '#show: revtex-preprint.with(lang: "' + language + '")\n'
+    body_check = '#context { assert.eq(text.lang, "' + language + '"); assert.eq(text.font, "' + font + '") }\n'
+    checks += body_check + 'Body marker.\n'
+    for kind in ('outline-note', 'todo-note'):
+        checks += '#' + kind + '[Inherited note.' + body_check + ']\n'
+        checks += '#' + kind + '(lang: "ja")[日本語の注記．#context { assert.eq(text.lang, "ja"); assert.eq(text.font, "noto sans cjk jp") }]\n'
+        checks += '#let ' + kind + ' = ' + kind + '.with(lang: "ja")\n'
+        checks += '#' + kind + '[日本語の共通設定．#context { assert.eq(text.lang, "ja"); assert.eq(text.font, "noto sans cjk jp") }]\n'
+        checks += '#' + kind + '(lang: "en", font: "New Computer Modern")[Override.#context { assert.eq(text.lang, "en"); assert.eq(text.font, "new computer modern") }]\n'
+    checks += body_check
+    compile('language-font-' + language, checks, system_fonts=True)
+compile('japanese-body-explicit-font', prefix + '''#show: revtex-preprint.with(lang: "ja", font: "Libertinus Serif")
+#context { assert.eq(text.lang, "ja"); assert.eq(text.font, "libertinus serif") }
+Explicit body font.
+''')
+print('PASS: language-based body fonts, inherited/local/shared note language and explicit font overrides')
 
 # Shared affiliation numbers disappear; multiple affiliations resolve to 1,2.
 shared = prefix+'''#show: draft.with(title: "Plain title", authors: (

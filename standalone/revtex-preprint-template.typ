@@ -14,7 +14,7 @@
 
 = Introduction
 
-#outline-note[
+#outline-note(lang: "ja")[
   研究課題を示し，先行研究との関係を整理する．
 ]
 
@@ -23,7 +23,7 @@ Discuss related work, for example @example2025.
 
 = Results
 
-#todo-note[
+#todo-note(lang: "ja")[
   - 結果を示す図を追加する．
   - 既存研究との比較を追記する．
 ]

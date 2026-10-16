@@ -1,4 +1,4 @@
-#import "revtex-preprint.typ": revtex-preprint
+#import "revtex-preprint.typ": revtex-preprint, outline-note, todo-note
 // Numbers, units, uncertainties, and ranges.
 #import "@preview/unify:0.8.1": num, unit, qty, numrange, qtyrange
 // Use physica.dv / physica.pdv, etc. without shadowing native math symbols.
@@ -14,10 +14,19 @@
 
 = Introduction
 
+#outline-note[
+  Establish the research question, then explain how it connects to prior work.
+]
+
 Introduce the research question and its motivation.
 Discuss related work, for example @example2025.
 
 = Results
+
+#todo-note[
+  - 結果を示す図を追加する．
+  - 既存研究との比較を追記する．
+]
 
 Present the main result and explain its significance.
 

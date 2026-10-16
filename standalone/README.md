@@ -12,7 +12,7 @@ Typst 0.15.0以降に対応し，同梱のNew Computer Modern / New Computer Mod
 | ファイル | 責務 | コンパイル時の依存先 |
 | --- | --- | --- |
 | [`revtex-preprint.typ`](revtex-preprint.typ) | 入力の検証，書式と番号の設定，タイトル欄の生成 | Typst標準機能・同梱フォント・CSL |
-| [`revtex-preprint-template.typ`](revtex-preprint-template.typ) | 著者が編集する原稿の入口 | スタイル本体・文献ファイル・`unify 0.8.1`・`physica 0.9.8` |
+| [`revtex-preprint-template.typ`](revtex-preprint-template.typ) | 著者が編集する原稿の入口 | スタイル本体・文献ファイル・`unify 0.8.1`・`physica 0.9.8`・Noto Sans CJK JP |
 | [`references.bib`](references.bib) | 原稿の `bibliography` が読み込む文献データ | なし |
 | このREADME | 使い方・API・検証方法の説明 | コンパイル対象外 |
 
@@ -23,6 +23,7 @@ Typst 0.15.0以降に対応し，同梱のNew Computer Modern / New Computer Mod
 
 [`revtex-preprint-template.typ`](revtex-preprint-template.typ) を原稿のひな形として使います．
 `revtex-preprint.typ`，[`references.bib`](references.bib) とともに原稿ディレクトリへコピーし，タイトル・著者・所属・Abstract・本文・文献を書き換えます．
+ひな形には構成メモと日本語ToDoの例を含むため，Noto Sans CJK JPを実行環境に用意します．
 そのディレクトリで次を実行するとPDFを生成できます．
 
 ```sh
@@ -156,7 +157,7 @@ See @fig-model and @tab-measurements.
 ```
 
 `todo-note` 内だけ `lang: "ja"` と `font: "Noto Sans CJK JP"` を設定し，枠外の本文設定は保ちます．
-日本語の表示には，既定のフォントを実行環境に用意してください．
+ひな形の日本語ToDo例を表示する際も，実行環境にこのフォントが必要です．
 別の日本語フォントを使う場合は，例えば `#todo-note(font: "IPAexGothic")[図を見直す．]` と指定します．
 `outline-note` のフォント・言語は本文の設定を継承します．
 
@@ -192,7 +193,7 @@ bash script/check-revtex-preprint.sh
 配布するスタイル・ひな形・文献ファイルを一時ディレクトリへコピーし，ひな形の数式参照と引用を含めてコンパイルします．
 ひな形は通常のパッケージ検索先・キャッシュを使います．
 スタイル本体の検証では，外部パッケージの検索先・キャッシュを空にし，依存先が一時ディレクトリ内のファイルに収まることを確認します．
-日本語ToDoの検証だけシステムフォントを有効にし，CJKフォントの埋め込みと日本語・英語混在を確認します．
+日本語ToDo例を含むひな形と日本語ToDoの検証ではシステムフォントを有効にし，CJKフォントの埋め込みと日本語・英語混在を確認します．
 それ以外はシステムフォントを無効にして，同梱フォントだけを使います．
 同じ条件で，番号・参照，図表の配置，設定，PDF構造，行番号と入力診断も検証します．
 入力・PDF・診断は，実行時に表示される一時ディレクトリで確認できます．

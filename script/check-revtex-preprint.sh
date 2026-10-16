@@ -40,11 +40,14 @@ def compile(name, source=None, error=None, packages=False, system_fonts=False):
     return re.sub(r'\s+', ' ', re.sub(r'\xad\s*', '', text))
 
 # Compile the actual files users copy, including their local bibliography.
-text = compile('revtex-preprint-template', packages=True)
+assert 'Noto Sans CJK JP' in run('typst', 'fonts').splitlines(), 'Japanese note checks require Noto Sans CJK JP'
+text = compile('revtex-preprint-template', packages=True, system_fonts=True)
 assert 'Manuscript title' in text and 'Equation (1)' in text, text
 assert text.count('(1)') == 2, text  # Displayed equation number and its reference.
 assert '(Example 2025)' in text and 'A minimal research example' in text, text
-print('PASS: copied manuscript template, equation reference and bibliography')
+assert 'OUTLINE NOTE' in text and 'TODO' in text, text
+assert '結果を示す図を追加する．' in re.sub(r'\s+', '', text), text
+print('PASS: copied manuscript template, outline/Japanese TODO examples, equation reference and bibliography')
 
 prefix = '#import "revtex-preprint.typ": revtex-preprint, appendices, draft\n'
 (root/'refs.bib').write_text('''@article{sample, author={Jane Example}, title={Transport and information},
@@ -365,8 +368,7 @@ OutsideNote
     assert position(name, 'OutsideNote')[0] >= position(name, 'NoteEnd')[0]
 print('PASS: independent note visibility, hidden layout/counters, line numbers and page breaks')
 
-# Only this case enables system fonts: Japanese notes require a CJK font.
-assert 'Noto Sans CJK JP' in run('typst', 'fonts').splitlines(), 'Japanese note checks require Noto Sans CJK JP'
+# Japanese cases, including the copied template, enable system fonts for CJK text.
 text = compile('notes-japanese', note_prefix + '''#show: revtex-preprint.with(mode: "review")
 BeforeJapanese
 #todo-note[

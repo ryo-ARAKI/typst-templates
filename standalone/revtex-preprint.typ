@@ -1,190 +1,175 @@
-// Standalone APS RevTeX 4.2 preprint style for Typst >= 0.15.0.
-// Copy this file next to a manuscript; no package imports or repository scripts.
-// Requires New Computer Modern and New Computer Modern Math (bundled with Typst).
-// Based on t2lab-it/hashimoto2026_information-flow PR #1, style.typ,
-// revision ff812f27fe9a665d98e9afa3abbbe9bb38cb850a.
-//
-// #import "revtex-preprint.typ": revtex-preprint, appendices
-// #show: revtex-preprint.with(
-//   title: [A manuscript with $k$], pdf-title: "A manuscript with k",
-//   authors: ((name: "Alice Example",), (name: "Bob Example",)),
-//   affiliations: [Department of Physics, Example University],
-// )
-// = Introduction
-// Body text. See @eq-main.
-// $ E = m c^2 $ <eq-main>
-// #show: appendices
-// = Additional derivation
-// $ x = 1 $ <eq-appendix>
-//
-// authors: array of dictionaries with a string name and optional integer
-// affiliation ID (default 1). Shared affiliations have no superscript; when IDs
-// differ, supply the matching superscripts yourself in affiliations content.
-// date: datetime.today() by default; none omits the date and PDF creation date.
-// line-numbers: true by default; counts prose and references across all pages.
-// draft is an alias for compatibility with the source PR.
-// appendices is a terminal show rule: put it after the main text, only once.
-// Bibliography uses Typst's built-in american-physics-society CSL style.
-// Scope: one column, common affiliation, three numbered heading levels.
-// No abstract/author-footnote API or exact LaTeX line/page/float matching.
-
-// TeX pt = 1/72.27 inch; Typst/PDF pt = 1/72 inch.
-#let tex-pt = 72pt / 72.27
+// Standalone research manuscripts for Typst >= 0.15.0, inspired by RevTeX.
+// Copy this single file beside a manuscript. No imports or extra packages.
+// See README.md for the public API; draft is an alias for revtex-preprint.
 #let appendix-mode = state("revtex-preprint-appendix", false)
-
-#let section-number(..values) = {
-  let n = values.pos()
-  numbering(if n.len() == 1 { "I" } else if n.len() == 2 { "A" } else { "1" }, n.last())
-}
-
-// Uppercase prose in section titles without changing mathematical variables.
-#let section-title(body) = {
-  show text: it => upper(it)
-  show math.equation: it => it
-  body
-}
+#let native-title = title
 
 #let revtex-preprint(
-  title: [],
-  pdf-title: none,
-  authors: (),
-  affiliations: [],
-  date: datetime.today(),
-  line-numbers: true,
-  body,
+  title: [], pdf-title: auto, authors: (), affiliations: (),
+  abstract: none, keywords: (), date: none,
+  mode: "read", line-numbers: auto, leading: auto,
+  font: "New Computer Modern", math-font: "New Computer Modern Math",
+  font-size: 12pt, lang: "en", paper: "a4", margin: 25mm,
+  section-numbering: "1.1", equation-numbering: "global", body,
 ) = {
-  assert(type(authors) == array,
-    message: "revtex-preprint: authors must be an array, e.g. ((name: \"Alice\",),)")
+  let check(ok, message) = assert(ok, message: "revtex-preprint: " + message)
+  check(type(title) in (str, content), "title must be a string or content")
+  check(pdf-title == auto or type(pdf-title) == str, "pdf-title must be auto or a string")
+  check(type(authors) == array, "authors must be an array")
+  check(type(affiliations) == array, "affiliations must be an array")
+  check(abstract == none or type(abstract) == content, "abstract must be content or none")
+  check(type(keywords) == array and keywords.all(k => type(k) == str), "keywords must be an array of strings")
+  check(date == none or type(date) == datetime, "date must be a datetime or none")
+  if date != none {
+    check(date.year() != none, "date must include year, month and day (not time only)")
+  }
+  check(mode in ("read", "review"), "mode must be read or review")
+  check(line-numbers == auto or type(line-numbers) == bool, "line-numbers must be auto or a boolean")
+  check(leading == auto or type(leading) == length, "leading must be auto or a length")
+  check(type(font-size) == length, "font-size must be a length")
+  check(type(lang) == str and type(paper) == str, "lang and paper must be strings")
+  check(type(section-numbering) == str, "section-numbering must be a numbering pattern string")
+  check(equation-numbering in ("global", "section"), "equation-numbering must be global or section")
+
+  let ids = ()
+  for affiliation in affiliations {
+    check(type(affiliation) == dictionary, "each affiliation must be a dictionary")
+    check(type(affiliation.at("id", default: none)) == str, "affiliation.id must be a string")
+    check(type(affiliation.at("text", default: none)) == content, "affiliation.text must be content")
+    check(not ids.contains(affiliation.id), "duplicate affiliation id: " + affiliation.id)
+    ids.push(affiliation.id)
+  }
+  let used = ()
   for author in authors {
-    assert(type(author) == dictionary and type(author.at("name", default: none)) == str,
-      message: "revtex-preprint: each author needs a string name")
-    assert(type(author.at("affiliation", default: 1)) == int,
-      message: "revtex-preprint: author.affiliation must be an integer ID")
-  }
-  assert(date == none or type(date) == datetime,
-    message: "revtex-preprint: date must be a datetime or none")
-  assert(type(line-numbers) == bool,
-    message: "revtex-preprint: line-numbers must be true or false")
-
-  set document(
-    title: if pdf-title == none and type(title) == str { title } else { pdf-title },
-    author: authors.map(author => author.name),
-    date: date,
-  )
-  set text(font: "New Computer Modern", size: 12 * tex-pt, lang: "en",
-    top-edge: 0.8em, bottom-edge: -0.2em)
-  show math.equation: set text(font: "New Computer Modern Math")
-
-  // RevTeX: textwidth=468pt, textheight=665.5pt, origin=(1in,1in).
-  set page(
-    paper: "us-letter",
-    margin: (left: 72pt, right: 612pt - 72pt - 468 * tex-pt,
-      top: 72pt, bottom: 792pt - 72pt - 665.5 * tex-pt),
-    columns: 1, numbering: "1", number-align: center + bottom,
-    // Footer baseline is 30 TeX pt below the text area.
-    footer-descent: (30 - 0.8 * 12) * tex-pt,
-  )
-  // Text edges total 12 TeX pt; 9 TeX pt leading gives a 21 TeX pt baseline.
-  // Tall inline equations can expand a line naturally.
-  set par(justify: true, leading: 9 * tex-pt,
-    first-line-indent: (amount: 15 * tex-pt, all: true), spacing: 9 * tex-pt)
-  set par.line(
-    numbering: if line-numbers { n => text(size: 6 * tex-pt, fill: luma(80), str(n)) } else { none },
-    numbering-scope: "document", number-align: right, number-clearance: 8 * tex-pt,
-  )
-
-  set heading(numbering: section-number, supplement: [Sec.])
-  show heading: set par.line(numbering: none)
-  show heading: it => context {
-    let app = appendix-mode.get()
-    let numbers = counter(heading).get()
-    let prefix = if it.numbering == none { [] }
-      else if app and it.level == 1 { [APPENDIX #numbering("A", numbers.first())] }
-      else { [#numbering(it.numbering, ..numbers).] }
-    let title = if it.level == 1 and it.numbering != none { section-title(it.body) } else { it.body }
-    let separator = if it.body == [] or it.numbering == none { [] }
-      else if app and it.level == 1 { [: ] } else { h(0.5em) }
-    block(above: 0.8cm, below: 0.5cm, sticky: true, width: 100%)[
-      #set text(size: 11 * tex-pt, weight: if it.level < 3 { "bold" } else { "regular" },
-        style: if it.level == 3 { "italic" } else { "normal" })
-      #set par(first-line-indent: 0pt, justify: false)
-      #prefix#separator#title
-    ]
-  }
-
-  set math.equation(numbering: "(1)", supplement: [Eq.])
-  show math.equation.where(block: true): set par.line(numbering: none)
-  set figure(numbering: "1", supplement: [Fig.])
-  show figure.where(kind: table): set figure(numbering: "I", supplement: [Table])
-  show figure: set par.line(numbering: none)
-  show figure.caption: set par(first-line-indent: 0pt, justify: false)
-  show figure.caption: it => {
-    let name = if it.kind == table { [TABLE] } else { [FIG.] }
-    [#name #context it.counter.display(it.numbering). #it.body]
-  }
-  show figure.where(kind: table): set figure.caption(position: top)
-
-  // Resolve numbers and appendix mode at the target, including forward refs.
-  show ref: it => context {
-    if it.form != "normal" { return it }
-    let target = it.element
-    if target != none and target.func() == heading and target.numbering != none {
-      let n = counter(heading).at(target.location())
-      let app = appendix-mode.at(target.location())
-      let value = if app {
-        [Appendix #numbering("A", n.first())#if n.len() > 1 { [ #numbering("1", ..n.slice(1))] }]
-      } else {
-        [Sec. #numbering("I", n.first())#if n.len() > 1 { [ #numbering("A", n.at(1))] }#if n.len() > 2 { [ #numbering("1", ..n.slice(2))] }]
+    check(type(author) == dictionary, "each author must be a dictionary")
+    check(type(author.at("name", default: none)) == str, "author.name must be a string")
+    let refs = author.at("affiliations", default: ())
+    check(type(refs) == array and refs.all(id => type(id) == str), "author.affiliations must be an array of string IDs")
+    check(refs.dedup().len() == refs.len(), "duplicate affiliation reference for " + author.name)
+    for id in refs {
+      check(ids.contains(id), "unknown affiliation id: " + id)
+      used.push(id)
+    }
+    check(type(author.at("corresponding", default: false)) == bool, "author.corresponding must be a boolean")
+    for key in ("email", "orcid") {
+      if key in author {
+        check(type(author.at(key)) == str, "author." + key + " must be a string")
       }
-      link(target.location(), value)
-    } else if target != none and target.func() == math.equation and target.numbering != none {
-      let n = counter(math.equation).at(target.location()).first()
-      let prefix = if appendix-mode.at(target.location()) {
-        numbering("A", counter(heading).at(target.location()).first())
-      } else { [] }
-      link(target.location(), [Eq. (#prefix#n)])
-    } else { it }
+    }
+    if "email" in author {
+      check(author.email.match(regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) != none, "invalid author.email")
+    }
+    if "orcid" in author {
+      check(author.orcid.match(regex("^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]$")) != none, "invalid author.orcid (use xxxx-xxxx-xxxx-xxxx)")
+    }
   }
+  for id in ids { check(used.contains(id), "unused affiliation id: " + id) }
+  let shared = authors.len() > 0 and ids.len() == 1 and authors.all(
+    author => author.at("affiliations", default: ()) == (ids.first(),)
+  )
+  let numbered-lines = if line-numbers == auto { mode == "review" } else { line-numbers }
+  let line-leading = if leading == auto { if mode == "review" { 1em } else { 0.65em } } else { leading }
 
+  set document(title: if pdf-title == auto { title } else { pdf-title },
+    author: authors.map(author => author.name), keywords: keywords, date: date)
+  set text(font: font, size: font-size, lang: lang)
+  show math.equation: set text(font: math-font)
+  set page(paper: paper, margin: margin, columns: 1, numbering: "1", number-align: center + bottom)
+  set par(justify: true, leading: line-leading, first-line-indent: 1em, spacing: 0.8em)
+  set par.line(numbering: if numbered-lines { "1" } else { none },
+    numbering-scope: "document", number-align: right, number-clearance: 8pt)
+  show par.line: set text(size: 7pt, fill: luma(100))
+
+  set heading(numbering: section-numbering)
+  show heading: set par.line(numbering: none)
+  // Return the original native element: its structure, labels and refs survive.
+  show heading.where(level: 1): it => {
+    if equation-numbering == "section" and it.numbering != none {
+      counter(math.equation).update(0)
+    }
+    it
+  }
+  set math.equation(numbering: n => {
+    if equation-numbering == "global" { return numbering("(1)", n) }
+    let section = counter(heading).get().first()
+    let prefix = numbering(if appendix-mode.get() { "A" } else { "1" }, section)
+    [(#prefix.#n)]
+  })
+  show math.equation.where(block: true): set par.line(numbering: none)
+  // Numbering is also measured with provisional counters. Validate in the
+  // native element's show context, where errors wait for layout convergence.
+  show math.equation.where(block: true): it => {
+    if equation-numbering == "section" and it.numbering != none {
+      check(counter(heading).get().first() > 0,
+        "section equations require a numbered level-1 heading first (also after appendices)")
+    }
+    it
+  }
+  set figure(numbering: "1")
+  show figure: set par.line(numbering: none)
+  show figure.caption: set text(size: 0.9em)
+  show figure.caption: set par(first-line-indent: 0pt, justify: false)
+  show figure.where(kind: table): set figure.caption(position: top)
+  show footnote.entry: set par.line(numbering: none)
   set bibliography(style: "american-physics-society", title: [References])
 
-  let shared = authors.map(author => author.at("affiliation", default: 1)).dedup().len() <= 1
-  align(center)[
-    #set par(first-line-indent: 0pt, justify: false, leading: 12.6 * tex-pt)
-    #set par.line(numbering: none)
-    #v(6 * tex-pt)
-    #if title != [] and title != "" {
-      text(size: 14.4 * tex-pt, weight: "bold", title)
-      v(12 * tex-pt)
+  show native-title: set text(size: 1.5 * font-size, weight: "bold")
+  show native-title: set align(center)
+  // The local scope suppresses numbering, not just its visible formatting.
+  {
+    set par.line(numbering: none)
+    set math.equation(numbering: none)
+    set par(first-line-indent: 0pt, justify: false)
+    if title != [] and title != "" { native-title([#title]) }
+    if authors.len() > 0 {
+      align(center, par(authors.map(author => {
+        let refs = author.at("affiliations", default: ())
+        [#author.name#if not shared and refs.len() > 0 {
+          super(refs.map(id => link(label("revtex-affiliation-" + id), str(ids.position(candidate => candidate == id) + 1))).join(","))
+        }#if author.at("corresponding", default: false) { super("*") }]
+      }).join(", ", last: " and ")))
     }
-    #set par(leading: 10 * tex-pt)
-    #if authors.len() > 0 {
-      authors.map(author => [#author.name#if not shared { super(str(author.at("affiliation", default: 1))) }]).join(", ", last: " and ")
-      v(3 * tex-pt)
+    for (index, affiliation) in affiliations.enumerate() {
+      align(center, text(size: 0.9em, style: "italic", [#par[
+        #if not shared { super(str(index + 1)) }#affiliation.text
+      ]#label("revtex-affiliation-" + affiliation.id)]))
     }
-    #if affiliations != [] and affiliations != "" {
-      block(width: 80%)[#text(style: "italic", affiliations)]
-      v(3 * tex-pt)
+    let contacts = authors.filter(a => a.at("corresponding", default: false) or "email" in a or "orcid" in a)
+    if contacts.len() > 0 {
+      align(center, text(size: 0.85em, contacts.map(a => par[
+        #a.name#if a.at("corresponding", default: false) { [ (corresponding author)] }#if "email" in a { [: #link("mailto:" + a.email, a.email)] }#if "orcid" in a { [; #link("https://orcid.org/" + a.orcid, [ORCID #a.orcid])] }
+      ]).join()))
     }
-    #if date != none {
-      text(size: 11 * tex-pt)[(Dated: #date.display("[month repr:long] [day], [year]"))]
+    if date != none { align(center, par(date.display("[year]-[month]-[day]"))) }
+  }
+  if abstract != none {
+    heading(level: 1, numbering: none, outlined: false)[Abstract]
+    {
+      set math.equation(numbering: none)
+      abstract
+      parbreak()
     }
-  ]
-  v(12 * tex-pt)
+  }
+  if keywords.len() > 0 {
+    block[
+      #set par.line(numbering: none)
+      #set par(first-line-indent: 0pt, justify: false)
+      #text(size: 0.9em)[*Keywords:* #keywords.join(", ")]
+    ]
+  }
   body
 }
 
 #let draft = revtex-preprint
 
-// Start terminal appendices. Figures/tables continue; equations reset in each.
+// Terminal show rule, once, after the main text. The outer numbering policy
+// controls equation resets; figures and tables continue independently.
 #let appendices(body) = {
-  appendix-mode.update(true)
-  counter(heading).update(0)
-  set heading(numbering: (..n) => numbering(if n.pos().len() == 1 { "A" } else { "1" }, n.pos().last()))
-  show heading.where(level: 1): it => {
-    if it.numbering != none { counter(math.equation).update(0) }
-    it
+  context {
+    assert(not appendix-mode.get(), message: "revtex-preprint: appendices may only be used once")
+    appendix-mode.update(true)
+    counter(heading).update(0)
   }
-  set math.equation(numbering: n => context [(#numbering("A", counter(heading).get().first())#n)])
+  set heading(numbering: "A.1", supplement: [Appendix])
   body
 }

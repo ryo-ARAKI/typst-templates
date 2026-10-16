@@ -16,23 +16,22 @@
 
 ## Standalone RevTeX preprint
 
-[`standalone/revtex-preprint.typ`](standalone/revtex-preprint.typ) は APS RevTeX 4.2 の `preprint` を再現する英語論文用スタイルです．
-[参照PR](https://github.com/t2lab-it/hashimoto2026_information-flow/pull/1) の `style.typ`（`ff812f27fe9a665d98e9afa3abbbe9bb38cb850a`）を基にしています．
-この `.typ` ファイルだけを原稿の隣へコピーして使えます．
-`lib/`，`script/`，外部Typstパッケージ，LaTeX，CSLファイルは不要です．
-既存スクリプトの検証対象には接続していません．
-Typst 0.15.0 以降と，Typstに同梱される New Computer Modern / New Computer Modern Math を使います．
+[`standalone/revtex-preprint.typ`](standalone/revtex-preprint.typ) は，RevTeX preprintを参考にした，読みやすいA4・1段組の研究原稿スタイルです．
+RevTeXの寸法・行数・改ページの一致は目標にせず，通常のTypst単位とフォントメトリクスを使います．
+この1ファイルを原稿の隣へコピーして利用できます．
+`lib/`，リポジトリのスクリプト，追加Typstパッケージ，LaTeX，外部CSLファイルは不要です．
+Typst 0.15.0以降と，同梱のNew Computer Modern / New Computer Modern Mathを既定にします．
 
-```typ
+```typst
 #import "revtex-preprint.typ": revtex-preprint, appendices
 
 #show: revtex-preprint.with(
-  title: [Information flow with $k$ nearest neighbors],
-  pdf-title: "Information flow with k nearest neighbors",
-  authors: ((name: "Alice Example",), (name: "Bob Example",)),
-  affiliations: [Department of Physics, Example University],
-  date: datetime(year: 2026, month: 10, day: 16),
-  line-numbers: true,
+  title: [Information flow with $k$],
+  pdf-title: "Information flow with k",
+  authors: ((name: "Alice Example", affiliations: ("uni",)),),
+  affiliations: ((id: "uni", text: [Department of Physics, Example University]),),
+  abstract: [We study information flow in a simple model.],
+  keywords: ("information flow", "statistical physics"),
 )
 
 = Introduction <sec-intro>
@@ -51,40 +50,99 @@ $ x = 1 $ <eq-check>
 ```
 
 この入力を `main.typ` に保存し，同じディレクトリで `typst compile main.typ` を実行します．
-文献を使う場合は本文に `@BibKey` を書き，末尾に `#bibliography("references.bib")` を追加します．
-文献ファイルのパスは原稿からの相対パスです．
-引用・文献はTypst組み込みの `american-physics-society` スタイルを使い，番号なしの References 見出しを出します．
+`draft` は `revtex-preprint` の別名で，同じ既定値を使います．
 
-| 項目 | 書式・設定 |
-| --- | --- |
-| 用紙・本文 | US Letter，1段組，左上1 inch，幅468 TeX pt，高さ665.5 TeX pt |
-| 文字・行送り | 本文12 TeX pt，通常本文の基線間隔21 TeX pt，段落字下げ15 TeX pt |
-| タイトル・所属 | 中央寄せ，共通所属の上付き番号なし，日付は既定で当日 |
-| 見出し | I / A / 1，各上位見出しで下位番号をリセット，節タイトルの文字部分を大文字化 |
-| 数式 | 本文 `(1)`，付録ごとに `(A1)` / `(B1)` から開始 |
-| 図表 | 図は `FIG. 1`，表は上側に `TABLE I`，別々の連番で付録でも継続 |
-| 行番号 | 本文・文献を通して連続，タイトル・見出し・独立数式・図表とキャプションを除外 |
-| ページ番号 | 下部中央，基線は本文下端から30 TeX pt下 |
+| 引数 | 型・既定値 | 動作 |
+| --- | --- | --- |
+| `title` / `pdf-title` | strまたはcontent，`[]` / `auto`またはstr，`auto` | 表示タイトルとPDF文書情報．`auto`は表示タイトルを利用 |
+| `authors` / `affiliations` | 辞書の配列，`()` / `()` | 下記の構造化した著者・所属 |
+| `abstract` / `keywords` | noneまたはcontent，`none` / strの配列，`()` | Abstractとキーワード．キーワードはPDF文書情報にも設定 |
+| `date` | noneまたは日付成分付きdatetime，`none` | 省略時は日付表示・PDF作成日なし．指定時はISO日付を表示 |
+| `mode` | `"read"` / `"review"`，`"read"` | 閲覧用／行番号と広い行送りを持つ査読用 |
+| `line-numbers` / `leading` | autoまたはbool，`auto` / autoまたはlength，`auto` | 個別指定がmodeより優先 |
+| `font` / `math-font` | `text.font`に渡せる値 | `"New Computer Modern"` / `"New Computer Modern Math"` |
+| `font-size` / `lang` | length，`12pt` / str，`"en"` | 基本文字サイズ・文書言語 |
+| `paper` / `margin` | str，`"a4"` / `page.margin`に渡せる値，`25mm` | 1段組の用紙・余白 |
+| `section-numbering` | str，`"1.1"` | 見出し番号．例：`"I.1"`でローマ数字の最上位節 |
+| `equation-numbering` | `"global"` / `"section"`，`"global"` | 数式の全体連番／最上位節ごとの番号 |
 
-TeX pt は `1/72.27 inch` なので，Typst/PDFのptへ `72 / 72.27` 倍して設定しています．
-背の高いインライン数式では，重なりを避けるため行高が広がります．
+本文は両端揃え，連続段落の字下げは1em，ページ番号は下部中央です．
+`read` は行番号なし・`leading: 0.65em`，`review` は行番号あり・`leading: 1em`です．
+`leading` は `par.leading` の行間の隙間であり，固定の基線間隔ではありません．
+例えば `mode: "review", line-numbers: false` で広い行送りだけを使えます．
+`font: "Libertinus Serif"` などで本文書体を変更できます．
 
-`title` はcontentまたは文字列で指定します．
-数式を含むタイトルのPDF文書情報には，文字列の `pdf-title` を別途指定します．
-`title` が文字列なら，省略時の `pdf-title` にもその値を使います．
-`authors` は文字列の `name` を持つ辞書の配列で，`()` は著者なしです．
-共通所属は `affiliations` にcontentまたは文字列で渡します．
-参照PRの整数 `affiliation` IDも受け付けますが，異なるIDを使う場合の所属側の番号は `affiliations` 内に自分で記述します．
-既存の共通metadata APIは使いません．
-`date: none` は日付表示とPDF作成日時を省略し，`line-numbers: false` は行番号を外します．
-参照PRからの移行用に `draft` という別名も公開しています．
+著者には必須の文字列 `name` と，任意の所属ID配列 `affiliations`（既定 `()`）を指定します．
+所属辞書には文字列 `id` とcontentの `text` を指定します．
+宣言順の所属番号を著者名の上付きに付け，所属段落へリンクします．
+全著者が同じ1所属だけを持つ場合は所属番号を省略します．
+所属なしの著者も指定でき，所属を推測して補いません．
 
-`#show: appendices` は本文の後に1回置き，それ以降を付録として扱います．
-各付録はレベル1見出しで開始し，題名がない場合は `#heading[]` と書きます．
-前方参照と，付録から本文への参照にも対応します．
-再現範囲は参照PRと同じ1段組・共通所属・3階層の見出しです．
-Abstract専用API，メール・著者脚注，複数所属の自動配置，`reprint` / 2段組は対象外です．
-改行・改ページ・浮動体配置，書体の版，CSLとBibTeXの句読点，LaTeX `lineno` の行番号値は完全一致しません．
+```typst
+// revtex-preprint.with(...) の引数例
+  authors: (
+    (name: "Alice Example", affiliations: ("uni", "lab"),
+     corresponding: true, email: "alice@example.org", orcid: "0000-0000-0000-0000"),
+    (name: "Bob Example", affiliations: ("lab",), corresponding: true),
+    (name: "Carol Example",),
+  ),
+  affiliations: (
+    (id: "uni", text: [Example University]),
+    (id: "lab", text: [Example Laboratory]),
+  ),
+```
+
+`corresponding` はbool（既定false），`email` / `orcid` は任意の文字列です．
+責任著者には `*` を付け，氏名付きの連絡先欄にメール・ORCIDのリンクを表示します．
+複数の責任著者や連絡先を省略した責任著者も指定できます．
+この欄は本文の脚注番号を消費しません．
+上記ORCIDは形式を示すダミーであり，オンライン登録やチェックディジットの検証は行いません．
+重複・未知・未使用の所属IDや型違い，メール・ORCIDの形式違反は診断します．
+`date` は `datetime(year: 2026, month: 10, day: 16)` のように日付成分を指定し，時刻だけの値は受け付けません．
+
+見出しの大文字・小文字を保ち，本文は既定で1 / 1.1 / 1.1.1です．
+`#show: appendices` は本文の後に1回置き，以降を末尾の付録として扱います．
+付録見出しはA / A.1 / A.1.1で，題名がない場合は `#heading[]` と書きます．
+`global` の数式番号は本文から付録まで `(1)`, `(2)`, … と続きます．
+`section` は番号付きの最上位節ごとにリセットし，本文 `(2.1)`，付録 `(A.1)` の形式です．
+見出しがローマ数字でも数式の本文prefixはアラビア数字です．
+小見出し・番号なし見出しではリセットせず，番号なし数式はカウンターを消費しません．
+`section` の番号付き数式は，本文・付録とも最初の番号付き最上位見出しの後に置きます．
+タイトル・Abstractのdisplay数式は無番号で，本文の番号を消費しません．
+本文・付録をまたぐ前方参照・後方参照も標準の `@label` / `ref` で扱います．
+
+図表はnativeの `figure` と `table` を使い，別々のアラビア数字連番を付録でも継続します．
+本文配置を既定とし，図キャプションは下，表キャプションは上です．
+標準の `set` ルールや要素の引数で表記・配置・参照接頭辞を変更できます．
+表キャプションを下へ移す場合は `#show figure.where(kind: table): set figure.caption(position: bottom)` と指定します．
+
+```typst
+#set figure(supplement: [Fig.])
+#figure(rect(width: 30mm, height: 10mm), caption: [A schematic.],
+        alt: "A rectangular schematic", placement: top) <fig-model>
+// tableを別要素で包む場合はkindを明示する
+#figure(block(table(columns: 2, [A], [B])), kind: table,
+        supplement: [Table], caption: [Measurements.])
+See @fig-model and #ref(<fig-model>, supplement: [Diagram]).
+```
+
+引用は `@BibKey`，参考文献は `#bibliography("references.bib")` と書きます．
+bibファイルのパスは原稿からの相対パスで，既定CSLはTypst組み込みの `american-physics-society` です．
+`#set bibliography(style: "apa")` や `bibliography` の `style` 引数で交換できます．
+nativeのタイトル・見出し・数式・図表・参照を保ち，PDF文書情報，しおり，リンク，タグを出力します．
+図や数式の `alt`，`table.header` も標準の書き方で指定してください．
+行番号はAbstract・本文・付録・参考文献の段落を通して連番になり，タイトル・著者所属・連絡先・keywords・見出し・display数式・図表・キャプション・脚注を除外します．
+
+恒久的な公開契約の検証は次を実行します．
+Bash，Python 3.9以降，Typst 0.15.0以降，`pdftotext`，`qpdf` が必要です．
+
+```sh
+bash script/check-revtex-preprint.sh
+```
+
+スクリプトは番号・参照，設定上書き，著者所属，日付，CSL，PDF構造・リンク，行番号の対象・除外を確認します．
+表示された一時ディレクトリに入力・PDF・診断を残し，リポジトリ外の持ち出し先で，空のpackage/cacheと `--ignore-system-fonts` を使って依存も確認します．
+これは既存の `script/check-local.sh` とは独立して実行します．
 
 ## フォント
 

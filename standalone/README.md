@@ -6,34 +6,14 @@ Typst 0.15.0以降に対応し，同梱のNew Computer Modern / New Computer Mod
 
 ## 使い方
 
-```typst
-#import "revtex-preprint.typ": revtex-preprint, appendices
+[`revtex-preprint-template.typ`](revtex-preprint-template.typ) を原稿のひな形として使います．
+`revtex-preprint.typ` とともに原稿ディレクトリへコピーし，タイトル・著者・所属・Abstract・本文を書き換えます．
+そのディレクトリで次を実行するとPDFを生成できます．
 
-#show: revtex-preprint.with(
-  title: [Information flow with $k$],
-  pdf-title: "Information flow with k",
-  authors: ((name: "Alice Example", affiliations: ("uni",)),),
-  affiliations: ((id: "uni", text: [Department of Physics, Example University]),),
-  abstract: [We study information flow in a simple model.],
-  keywords: ("information flow", "statistical physics"),
-)
-
-= Introduction <sec-intro>
-
-See @eq-energy and @app-check.
-
-$ E = m c^2 $ <eq-energy>
-
-#show: appendices
-
-= Consistency check <app-check>
-
-The main result is @eq-energy in @sec-intro.
-
-$ x = 1 $ <eq-check>
+```sh
+typst compile revtex-preprint-template.typ
 ```
 
-この入力を `main.typ` に保存し，同じディレクトリで `typst compile main.typ` を実行します．
 `draft` は `revtex-preprint` の別名で，同じ既定値を使います．
 
 ## 設定

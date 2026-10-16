@@ -11,6 +11,7 @@
 = Introduction
 
 Introduce the research question and its motivation.
+Discuss related work, for example @example2025.
 
 = Results
 
@@ -23,3 +24,5 @@ Refer to @eq-energy when discussing the result.
 = Conclusion
 
 Summarize the findings and their implications.
+
+#bibliography("references.bib")

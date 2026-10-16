@@ -7,7 +7,7 @@ Typst 0.15.0以降に対応し，同梱のNew Computer Modern / New Computer Mod
 ## 使い方
 
 [`revtex-preprint-template.typ`](revtex-preprint-template.typ) を原稿のひな形として使います．
-`revtex-preprint.typ` とともに原稿ディレクトリへコピーし，タイトル・著者・所属・Abstract・本文を書き換えます．
+`revtex-preprint.typ`，[`references.bib`](references.bib) とともに原稿ディレクトリへコピーし，タイトル・著者・所属・Abstract・本文・文献を書き換えます．
 そのディレクトリで次を実行するとPDFを生成できます．
 
 ```sh
@@ -109,6 +109,7 @@ See @fig-model and @tab-measurements.
 
 ## 引用・参考文献
 
+テンプレートには，同梱の [`references.bib`](references.bib) にある架空の文献1件を引用する例を含めています．
 引用は `@BibKey`，参考文献は `#bibliography("references.bib")` と書き，bibファイルは原稿からの相対パスで指定します．
 既定のCSLは `annual-reviews-author-date` で，本文では著者名と出版年を表示します．
 `#set bibliography(style: "apa")` や `bibliography` の `style` 引数で交換できます．

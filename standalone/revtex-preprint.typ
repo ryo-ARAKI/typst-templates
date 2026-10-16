@@ -309,7 +309,7 @@
 #let todo-note(visible: true, font: "Noto Sans CJK JP", body) = {
   if visible {
     set text(font: font, lang: "ja")
-    _authoring-note([TODO], fill: rgb("fff4df"), rule: rgb("d18a26"), body)
+    _authoring-note([TODO], fill: rgb("fff0ee"), rule: rgb("c65b50"), body)
   }
 }
 

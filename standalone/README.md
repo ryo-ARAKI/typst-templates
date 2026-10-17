@@ -223,6 +223,18 @@ See @alg-mean.
 
 `outline-note` も同じ方法で個別・種類別に表示を切り替えられます．
 
+## アクノレッジメント
+
+ひな形ではConclusionとReferencesの間に，番号なしのAcknowledgments節を置きます．
+議論・技術支援への謝辞と研究費の情報を書き換えます．
+日本語原稿では見出しを `謝辞` に変更できます．
+
+```typst
+#heading(numbering: none)[Acknowledgments]
+
+Acknowledge helpful discussions, technical assistance, and funding support.
+```
+
 ## 引用・参考文献
 
 テンプレートには，同梱の [`references.bib`](references.bib) にある架空の文献1件を引用する例を含めています．

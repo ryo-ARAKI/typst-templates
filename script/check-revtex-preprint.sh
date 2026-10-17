@@ -49,6 +49,9 @@ assert 'OUTLINE NOTE' in text and 'TODO' in text, text
 assert '研究課題を示し，先行研究との関係を整理する．' in re.sub(r'\s+', '', text), text
 assert '結果を示す図を追加する．' in re.sub(r'\s+', '', text), text
 assert 'Algorithm 1: Compute the sample mean.' in text and 'Refer to Algorithm 1' in text, text
+assert 'Acknowledgments' in text and 'funding support.' in text, text
+assert text.index('3 Conclusion') < text.index('Acknowledgments') < text.index('References'), text
+assert not re.search(r'\d+ Acknowledgments', text), text
 print('PASS: copied manuscript template, Japanese notes, algorithm/equation references and bibliography')
 
 prefix = '#import "revtex-preprint.typ": revtex-preprint, appendices, draft\n'

@@ -63,4 +63,8 @@ Refer to @alg-mean when describing the computation.
 
 Summarize the findings and their implications.
 
+#heading(numbering: none)[Acknowledgments]
+
+Acknowledge helpful discussions, technical assistance, and funding support.
+
 #bibliography("references.bib")

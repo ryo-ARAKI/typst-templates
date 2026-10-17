@@ -40,17 +40,20 @@ typst fonts
 
 ## ローカル検証
 
-リポジトリ直下で次を実行する．Typst 0.15.0 以降，上記フォント，Bash，`rg`，`awk`，Python 3.9 以降，Poppler の `pdftotext`・`pdftoppm`，`qpdf`（JSON 出力対応）が必要で，フォントや依存パッケージのインストールは行わない．
+リポジトリ直下で次を実行する．Typst 0.15.0 以降，上記フォント，Bash，GNU coreutils，`rg`，`awk`，fish，Python 3.9 以降，Poppler の `pdftotext`・`pdftoppm`，`qpdf`（JSON 出力対応）が必要で，フォントや依存パッケージのインストールは行わない．
 通常の package import は Typst により解決されるため，初回は package cache またはダウンロード可能な環境も必要になる．
 
 ```sh
 bash script/check-local.sh
 ```
 
-[`script/check-local.sh`](script/check-local.sh) は全4 starter・全5 example を対象にする．
+[`script/check-local.sh`](script/check-local.sh) は全4 starter・全6 example を対象にする．
 portrait の starter・example は既存の [`script/check-poster-portrait-takeaway-api.sh`](script/check-poster-portrait-takeaway-api.sh) に任せ，残る7件を共通側で一度ずつコンパイルする．
 文献設定は [`script/check-document-bibliography.sh`](script/check-document-bibliography.sh) を一度呼び，二文献の収録範囲・優先順位・CSL・診断・持ち出し・本文引用の PDF 内部リンクと，下の README 掲載例を確認する．
 文献設定だけを検証する場合は `bash script/check-document-bibliography.sh` を実行する．
+slide の3出力は [`script/check-slide-outputs.sh`](script/check-slide-outputs.sh) を一度呼び，mode・ページ・note・式番号と PDF リンク先・ビルドの正常／異常系・fish での掲載手順を確認する．
+新しい `slide-outputs.typ` の両モードは focused checker が担当し，共通側の compile loop では重複実行しない．
+3出力だけを検証する場合は `bash script/check-slide-outputs.sh` を実行する．
 共通プリセットから独立した standalone 研究原稿は，[専用チェック](script/check-revtex-preprint.sh)を[専用READMEの条件](standalone/README.md#検証)で実行する．
 リポジトリの文書はこの checkout を `--root` にする．
 README の数式注釈コードを本文から抽出した入力と，著者・式番号の境界を確認する入力は一時領域に生成し，その入力の絶対 import を解決するため `--root /` でコンパイルする．
@@ -70,6 +73,7 @@ runner がスクリプト開始前に失敗した場合は，テンプレート�
 | 構造化 authors（#35） | 既存の title，省略・空・1人・複数人・content／文字列・メール省略の grouped assertion，空／content 著者の title 接続，旧 `author`・scalar／positional `authors` の診断 | slide の著者列が揃い，空のメールセルと著者なしの title，document の content 著者が正しく表示される |
 | slide の式と参照（#36） | 1つの集約入力で未ラベル・未参照ラベル・前方／後方／繰り返し参照・pause／repeat を確認．番号付きの式の内容・表示順・連番・numbering pattern を Typst の公開 query／counter／numbering API で assert | 参照された表示式だけに番号が付き，表示順の番号と式参照が一致する．未参照ラベル・未ラベル式は番号なし，通常の番号設定・通常ラベル・引用の表示とリンク先が正しい |
 | document の文献設定（#50） | 二文献の著者年／番号方式・full・直接引数／config／既定値，独自 CSL，持ち出し後の入力依存，本文引用の文字位置とリンク先のページ・座標を A の文献位置と照合 | `legacy-*.png`，`config-ieee-True-*.png`，`custom-path-config-*.png` の各2ページで本文と一覧の対応・折返し・欠落・重なりを確認 |
+| slide の3出力（#51） | focused checker で発表5／配布3ページ，物理 idx・overlay・note，式番号と全参照の移動先ページ・式座標，汎用 CLI・既存対象保持・故障注入・掲載手順を確認 | `visual/slide-outputs-presentation-*.png` 全5枚と `visual/slide-outputs-handout-*.png` 全3枚で番号，配布専用補足，見切れ・重なり・可読性を確認．pdfpc UI は任意の別確認 |
 
 コンパイル成功はレイアウトや番号・引用の正しさを保証しない．
 共通実行のログ，semantic 確認の結果，PDF の目視結果をそれぞれ記録し，未実施の項目を成功扱いにしない．
@@ -80,7 +84,8 @@ page 1 の前方参照は page 2，page 2 の後方参照は page 1，page 4 の
 pause／repeat の式へのリンク先は，その式が表示される最後の subslide になる．
 必要なら Poppler の `pdftotext -layout` で参照の表示文字列を，`qpdf --json` で PDF の link annotation と destination を調べる．
 document 文献 checker は上記 PDF ツールを必須とし，リンク数だけで合格にせず，本文の引用から該当文献への移動先を検証する．
-slide の式参照は別途確認し，Typst assertion だけで実際の PDF link destination まで検証したとは扱わない．
+slide の3出力の代表例は focused checker が PDF link destination まで確認する．
+それ以外の slide の式参照は別途確認し，Typst assertion だけで実際の PDF link destination まで検証したとは扱わない．
 同じ tree・入力・環境で成功した結果は再利用できる．
 README だけの説明変更や検証手順への接続だけを理由に，同じ PDF を作り直す必要はない．
 
@@ -194,6 +199,68 @@ PPTX や HTML が必要な場合は，外部コマンドの `touying-exporter` �
 
 PDF/A や PDF/UA の smoke check が必要な場合は `typst compile --root . --pdf-standard a-2a,ua-1 ...` を使える．
 PDF/UA では document title，semantic heading，math/image の `alt:` text が必要になるため，slide/poster の full compliance は文書ごとに確認する．
+
+### 同じ slide 原稿から発表版・配布版・pdfpc を生成する
+
+[`examples/slide-outputs.typ`](examples/slide-outputs.typ) は mode 対応の代表例で，タイトル，pause 付き A，`repeat: 2` の B を持つ．
+mode 未指定と `presentation` は全 subslide を保持する発表版5ページ，`handout` は各 slide の最終 subslide を収録する配布版3ページになる．
+A の `handout-only` 補足は配布版にだけ表示され，speaker notes の本文は両 PDF に表示されない．
+参照された共通の表示式の番号は A が `(1)`，B が `(2)` で，参照先は各出力の最終 subslide 上の式になる．
+配布専用の式や参照を追加した任意の原稿で，両モードの番号が常に同じになる保証はない．
+
+次はリポジトリ直下から fish で実行できる．
+通常の PDF compile に必要なのは Typst と上記フォント・package 環境である．
+この例は日付入力を固定している．
+
+```fish
+set -l slide_output_parent (mktemp -d /tmp/slide-outputs-readme.XXXXXXXXXX)
+env SOURCE_DATE_EPOCH=1792195200 typst compile --root . examples/slide-outputs.typ "$slide_output_parent/slide-outputs-presentation.pdf"
+env SOURCE_DATE_EPOCH=1792195200 typst compile --root . --input mode=handout examples/slide-outputs.typ "$slide_output_parent/slide-outputs-handout.pdf"
+env SOURCE_DATE_EPOCH=1792195200 bash script/build-slide.sh --root . examples/slide-outputs.typ "$slide_output_parent/bundle"
+```
+
+汎用の入口は `bash script/build-slide.sh --root ROOT SOURCE.typ OUTPUT_DIR` で，`--help` で契約を確認できる．
+相対パスは呼び出し元 cwd を基準にし，ROOT を script の配置から推測しない．
+ROOT は既存ディレクトリ，SOURCE はその中の既存 `.typ` ファイル，OUTPUT_DIR の親も既存ディレクトリを指定する．
+空白を含むパスは引用符で囲む．
+この入口は mode 契約に従う外部の実原稿にも使える．
+SOURCE の stem を NAME として，完成先には次の3点だけを置く．
+
+- `NAME-presentation.pdf`：発表版
+- `NAME-handout.pdf`：配布版
+- `NAME-presentation.pdfpc`：同じ basename の発表版 PDF に対応する metadata
+
+原稿側は次のように入力を検証し，既存の metadata 辞書へ `handout: mode == "handout"` を追加して `slide-theme` へ渡す．
+共通 preset は CLI 入力を暗黙に読まないため，既存原稿は明示的に mode へ対応させる．
+空文字・誤記も有効値を示して失敗させる．
+
+```typ
+#let mode = sys.inputs.at("mode", default: "presentation")
+#assert(mode in ("presentation", "handout"),
+  message: "invalid mode " + repr(mode) + "; use presentation or handout")
+// metadata に handout: mode == "handout" を追加する．
+// #show: slide-theme.with(config: metadata)
+```
+
+原稿は Touying の `<pdfpc-file>` をちょうど1件出力する必要がある．
+script は発表版から既存 metadata を取り出し，`pdfpcFormat=2`，非空の `pages`，0から連続する整数 `idx` を検証する．
+`label` はタイトルと最初の本文で重複するため，物理ページの識別には `idx` を使う．
+代表例の発表版では N1 は A の最初から，N2 は pause 後から，N3 は B の両 subslide に対応する．
+`.pdfpc` は配布版と組み合わせない．
+pdfpc 本体は任意の閲覧ツールで，必要なら生成された発表版 PDF を `pdfpc` で開く．
+
+3点生成には Bash，Typst 0.15.0 以降，GNU coreutils（`realpath`，`mv -T -n` など）を使う．
+Python・Poppler・qpdf は checker の検証専用で，pdfpc 本体や touying-exporter とともにビルドには不要である．
+`SOURCE_DATE_EPOCH` は整数秒 `0..253402300799` を受け付け，未指定なら開始時刻を一度取得する．
+両 compile と発表版 metadata eval に同じ `--creation-timestamp` を渡す．
+再現には原稿・依存版・フォント・compiler・root・時刻入力を揃え，実行中は原稿と依存ファイルを変更しない．
+
+OUTPUT_DIR は新しいパスを指定し，再実行時も別の出力先を使う．
+空ディレクトリ・ファイル・symlink（dangling を含む）が既にあれば，内容を保持して失敗する．
+親に専用の一時領域を作り，発表版 compile → 配布版 compile → 発表版 metadata eval の順で生成し，3点が揃ってから確定する．
+入力・依存・各 compile・metadata eval／検証・確定の失敗は段階と原因を stderr に示して非0終了し，部分 bundle を完成先に残さない．
+確定直前の占有も上書きや既存ディレクトリへの包含をせず失敗する．
+確定前の捕捉可能な中断では自分の一時領域だけを cleanup する．
 
 ### Column A0 poster
 

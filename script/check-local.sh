@@ -85,6 +85,15 @@ else
   report_failure 'document bibliography checker' "$tmp_dir/document-bibliography.log"
 fi
 
+if TMPDIR="$tmp_dir" bash "$repo_root/script/check-slide-outputs.sh" \
+  > "$tmp_dir/slide-outputs.log" 2>&1; then
+  printf 'PASS [compile/semantic/link] slide outputs / CLI / README (slide outputs checker)\n'
+  cat "$tmp_dir/slide-outputs.log"
+else
+  cat "$tmp_dir/slide-outputs.log" >&2
+  report_failure 'slide outputs checker' "$tmp_dir/slide-outputs.log"
+fi
+
 for source in starters/document-jp.typ starters/slide.typ starters/poster-column.typ \
   examples/document-jp.typ examples/slide.typ examples/slide-speaker-notes.typ examples/poster-column.typ; do
   output="$tmp_dir/${source//\//-}"

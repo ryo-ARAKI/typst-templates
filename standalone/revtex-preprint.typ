@@ -14,8 +14,9 @@
 /// Layout: `mode: "read"` uses compact leading; `"review"` widens leading and
 /// enables line numbers. Explicit `leading` and `line-numbers` take precedence.
 /// Font, language, paper and margin parameters set the document typography.
-/// With `font: auto`, Japanese uses Noto Sans CJK JP; other languages use
-/// New Computer Modern. An explicit `font` overrides this language default.
+/// With `font: auto`, Japanese uses New Computer Modern with Noto Serif CJK JP
+/// for Japanese glyphs; other languages use New Computer Modern.
+/// An explicit `font` overrides this language default.
 ///
 /// Numbering: `section-numbering` is a heading pattern; `equation-numbering`
 /// selects a continuous `"global"` sequence or a per-section `"section"` sequence.
@@ -119,7 +120,7 @@
   // Document metadata and base typography.
   set document(title: if pdf-title == auto { title } else { pdf-title },
     author: authors.map(author => author.name), keywords: keywords, date: date)
-  let body-font = if font != auto { font } else if lang == "ja" { "Noto Sans CJK JP" } else { "New Computer Modern" }
+  let body-font = if font != auto { font } else if lang == "ja" { ("New Computer Modern", "Noto Serif CJK JP") } else { "New Computer Modern" }
   set text(font: body-font, size: font-size, lang: lang)
   show math.equation: set text(font: math-font)
   set page(paper: paper, margin: margin, columns: 1, numbering: "1", number-align: center + bottom)
@@ -306,7 +307,7 @@
   if visible {
     context {
       let lang = if lang == auto { text.lang } else { lang }
-      set text(font: if font != auto { font } else if lang == "ja" { "Noto Sans CJK JP" } else { text.font }, lang: lang)
+      set text(font: if font != auto { font } else if lang == "ja" { ("New Computer Modern", "Noto Serif CJK JP") } else { text.font }, lang: lang)
       _authoring-note([OUTLINE NOTE], body)
     }
   }
@@ -318,7 +319,7 @@
   if visible {
     context {
       let lang = if lang == auto { text.lang } else { lang }
-      set text(font: if font != auto { font } else if lang == "ja" { "Noto Sans CJK JP" } else { text.font }, lang: lang)
+      set text(font: if font != auto { font } else if lang == "ja" { ("New Computer Modern", "Noto Serif CJK JP") } else { text.font }, lang: lang)
       _authoring-note([TODO], fill: rgb("fff0ee"), rule: rgb("c65b50"), body)
     }
   }

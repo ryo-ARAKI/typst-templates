@@ -2,7 +2,7 @@
 
 [`revtex-preprint.typ`](revtex-preprint.typ) は，RevTeX preprintを参考にした，読みやすいA4・1段組の研究原稿スタイルです．
 この1ファイルを原稿の隣へコピーして利用できます．
-Typst 0.15.0以降に対応し，本文は英語でNew Computer Modern，日本語でNoto Sans CJK JP，数式はNew Computer Modern Mathを既定のフォントにします．
+Typst 0.15.0以降に対応し，本文は英語でNew Computer Modern，日本語でNoto Serif CJK JP，数式はNew Computer Modern Mathを既定のフォントにします．
 
 ## 目的と構成
 
@@ -12,7 +12,7 @@ Typst 0.15.0以降に対応し，本文は英語でNew Computer Modern，日本�
 | ファイル | 責務 | コンパイル時の依存先 |
 | --- | --- | --- |
 | [`revtex-preprint.typ`](revtex-preprint.typ) | 入力の検証，書式と番号の設定，タイトル欄の生成 | Typst標準機能・同梱フォント・CSL |
-| [`revtex-preprint-template.typ`](revtex-preprint-template.typ) | 著者が編集する原稿の入口 | スタイル本体・文献ファイル・`unify 0.8.1`・`physica 0.9.8`・Noto Sans CJK JP |
+| [`revtex-preprint-template.typ`](revtex-preprint-template.typ) | 著者が編集する原稿の入口 | スタイル本体・文献ファイル・`unify 0.8.1`・`physica 0.9.8`・Noto Serif CJK JP |
 | [`references.bib`](references.bib) | 原稿の `bibliography` が読み込む文献データ | なし |
 | このREADME | 使い方・API・検証方法の説明 | コンパイル対象外 |
 
@@ -23,7 +23,7 @@ Typst 0.15.0以降に対応し，本文は英語でNew Computer Modern，日本�
 
 [`revtex-preprint-template.typ`](revtex-preprint-template.typ) を原稿のひな形として使います．
 `revtex-preprint.typ`，[`references.bib`](references.bib) とともに原稿ディレクトリへコピーし，タイトル・著者・所属・Abstract・本文・文献を書き換えます．
-ひな形には日本語の構成メモとToDoの例を含むため，Noto Sans CJK JPを実行環境に用意します．
+ひな形には日本語の構成メモとToDoの例を含むため，Noto Serif CJK JPを実行環境に用意します．
 そのディレクトリで次を実行するとPDFを生成できます．
 
 ```sh
@@ -68,8 +68,9 @@ $ physica.pdv(f, x) = physica.dv(g, t) $
 `leading` は `par.leading` の行間の隙間を指定します．
 例えば `mode: "review", line-numbers: false` で広い行送りだけを使えます．
 `font: "Libertinus Serif"` などで本文書体を変更できます．
-`font: auto`（既定）では，`lang: "ja"` の本文は `"Noto Sans CJK JP"`，それ以外は `"New Computer Modern"` を使います．
-日本語の本文を表示する際は，実行環境に Noto Sans CJK JP が必要です．
+`font: auto`（既定）では，`lang: "ja"` の本文は `("New Computer Modern", "Noto Serif CJK JP")`，それ以外は `"New Computer Modern"` を使います．
+和文の明朝体を欧文のセリフ体に合わせ，日本語本文中の英数字もNew Computer Modernで表示します．
+日本語の本文を表示する際は，実行環境に Noto Serif CJK JP が必要です．
 `date` は `datetime(year: 2026, month: 10, day: 16)` のように指定します．
 
 ## 著者・所属
@@ -188,7 +189,7 @@ See @alg-mean.
 
 両方の注記は `lang: auto`（既定）で文書全体の言語設定を引き継ぎ，個別の `lang` 引数で上書きできます．
 文書全体の言語は `revtex-preprint.with(lang: "en", ...)` や `#set text(lang: "en")` で指定します．
-`font: auto`（既定）では，日本語は `"Noto Sans CJK JP"`，それ以外の言語は周囲の本文フォントを使います．
+`font: auto`（既定）では，日本語は `("New Computer Modern", "Noto Serif CJK JP")`，それ以外の言語は周囲の本文フォントを使います．
 ひな形の日本語注記の例を表示する際も，実行環境にこのフォントが必要です．
 どちらも `font` 引数で変更でき，例えば `#outline-note(font: "IPAexGothic")[この節の役割を整理する．]` と指定します．
 
@@ -229,7 +230,7 @@ See @alg-mean.
 
 ## 検証
 
-Bash，Python 3.9以降，Typst 0.15.0以降，`pdftotext`，`qpdf`，日本語検証用のNoto Sans CJK JPを用意し，リポジトリルートで実行します．
+Bash，Python 3.9以降，Typst 0.15.0以降，`pdftotext`，`qpdf`，日本語検証用のNoto Serif CJK JPを用意し，リポジトリルートで実行します．
 
 ```sh
 bash script/check-revtex-preprint.sh

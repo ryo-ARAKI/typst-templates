@@ -40,7 +40,7 @@ def compile(name, source=None, error=None, packages=False, system_fonts=False):
     return re.sub(r'\s+', ' ', re.sub(r'\xad\s*', '', text))
 
 # Compile the actual files users copy, including their local bibliography.
-assert 'Noto Sans CJK JP' in run('typst', 'fonts').splitlines(), 'Japanese note checks require Noto Sans CJK JP'
+assert 'Noto Serif CJK JP' in run('typst', 'fonts').splitlines(), 'Japanese note checks require Noto Serif CJK JP'
 text = compile('revtex-preprint-template', packages=True, system_fonts=True)
 assert 'Manuscript title' in text and 'Equation (1)' in text, text
 assert text.count('(1)') == 2, text  # Displayed equation number and its reference.
@@ -420,19 +420,20 @@ for phrase in ('日本語とEnglishの混在を確認する。', '比較対象�
 for kind in ('outline-note', 'todo-note'):
     assert kind+'Language: ja' in text, (kind, text)
 assert 'BodyLanguage: en' in text, text
-assert 'NotoSansCJK' in run('qpdf', '--json', str(root/'notes-japanese.pdf'))
+assert 'NotoSerifCJK' in run('qpdf', '--json', str(root/'notes-japanese.pdf'))
 print('PASS: Japanese outline/TODO text, mixed content, embedded CJK font and language scope')
 
 # Document language selects the default body font; notes inherit or override it.
-for language, font in (('en', 'new computer modern'), ('ja', 'noto sans cjk jp')):
+for language, font in (('en', '"new computer modern"'),
+                       ('ja', '("new computer modern", "noto serif cjk jp")')):
     checks = note_prefix + '#show: revtex-preprint.with(lang: "' + language + '")\n'
-    body_check = '#context { assert.eq(text.lang, "' + language + '"); assert.eq(text.font, "' + font + '") }\n'
+    body_check = '#context { assert.eq(text.lang, "' + language + '"); assert.eq(text.font, ' + font + ') }\n'
     checks += body_check + 'Body marker.\n'
     for kind in ('outline-note', 'todo-note'):
         checks += '#' + kind + '[Inherited note.' + body_check + ']\n'
-        checks += '#' + kind + '(lang: "ja")[日本語の注記．#context { assert.eq(text.lang, "ja"); assert.eq(text.font, "noto sans cjk jp") }]\n'
+        checks += '#' + kind + '(lang: "ja")[日本語の注記．#context { assert.eq(text.lang, "ja"); assert.eq(text.font, ("new computer modern", "noto serif cjk jp")) }]\n'
         checks += '#let ' + kind + ' = ' + kind + '.with(lang: "ja")\n'
-        checks += '#' + kind + '[日本語の共通設定．#context { assert.eq(text.lang, "ja"); assert.eq(text.font, "noto sans cjk jp") }]\n'
+        checks += '#' + kind + '[日本語の共通設定．#context { assert.eq(text.lang, "ja"); assert.eq(text.font, ("new computer modern", "noto serif cjk jp")) }]\n'
         checks += '#' + kind + '(lang: "en", font: "New Computer Modern")[Override.#context { assert.eq(text.lang, "en"); assert.eq(text.font, "new computer modern") }]\n'
     checks += body_check
     compile('language-font-' + language, checks, system_fonts=True)

@@ -134,6 +134,8 @@
 
   // Native headings and equations retain their labels, counters and references.
   set heading(numbering: section-numbering)
+  show heading: set text(size: font-size, weight: "bold")
+  show heading.where(level: 1): set text(size: font-size * (7 / 6))
   show heading: set par.line(numbering: none)
 
   // Each numbered top-level heading starts a fresh per-section equation sequence.

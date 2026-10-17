@@ -28,11 +28,17 @@ Discuss related work, for example @example2025.
   - 既存研究との比較を追記する．
 ]
 
+== Main result
+
 Present the main result and explain its significance.
 
 $ E = m c^2 $ <eq-energy>
 
 Refer to @eq-energy when discussing the result.
+
+=== Computational procedure
+
+Describe the procedure used to obtain the result.
 
 #figure(
   [

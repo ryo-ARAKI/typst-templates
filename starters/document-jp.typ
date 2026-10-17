@@ -29,4 +29,4 @@
 
 参考文献の引用~#citep(<Tanogami2024_information>)．
 
-#bibliography-list-from(path: metadata.at("bibliography"))
+#bibliography-list-from(path: metadata.at("bibliography"), config: metadata)

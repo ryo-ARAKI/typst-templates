@@ -101,8 +101,12 @@
 
 #let bibliography-list-from(
   path: "biblio.bib",
-) = bibliography(
-  path,
-  full: true,
-  style: "harvard-cite-them-right",
-)
+  config: none,
+  style: auto,
+  full: auto,
+) = {
+  let resolved = document-config(overrides: config)
+  let effective-style = if style == auto { resolved.at("bibliography-style") } else { style }
+  let effective-full = if full == auto { resolved.at("bibliography-full") } else { full }
+  bibliography(path, style: effective-style, full: effective-full)
+}

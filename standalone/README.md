@@ -32,6 +32,36 @@ typst compile revtex-preprint-template.typ
 
 `draft` は `revtex-preprint` の別名で，同じ既定値を使います．
 
+### ひな形の構成と書き換え
+
+ひな形は機能紹介と論文の書き始めを兼ね，速度の測定値・標本平均・標本標準偏差を共通の題材にします．
+測定値と引用文献は説明用の架空の例です．
+タイトル欄と各節の案内文を自分の研究に合わせて書き換え，模式図・表・数式・疑似プログラムを置き換えます．
+
+| 場所 | 含む例 | 書き換える内容 |
+| --- | --- | --- |
+| Introduction | 構成メモ，文献の引用 | 研究課題・動機・先行研究 |
+| Methods | 微分，模式図，平均値の式，3階層の見出し，疑似プログラム | 測定・理論・計算の手順 |
+| Results | ToDo，三線表，単位・±の表記，表・数式・付録への参照 | 実際の結果とその解釈 |
+| Conclusion / Acknowledgments | 結論，番号なしの謝辞 | 得られた知見，支援・研究費 |
+| 付録 / References | 付録の見出しと数式，参考文献一覧 | 補足説明と文献データ |
+
+不要な例や付録を削るときは，対応する本文中の参照も書き換えます．
+付録全体を使わない場合は，`#show: appendices` から付録末尾までを削り，`#bibliography("references.bib")` は残します．
+
+### 閲覧用・査読用と執筆メモの切り替え
+
+ひな形の `mode: "read"` を `mode: "review"` に変えると，行番号と広い行送りを使えます．
+共有・提出用の原稿で構成メモとToDoを隠すときは，ひな形冒頭の次の2行をコメント解除します．
+
+```typst
+#let outline-note = outline-note.with(visible: false)
+#let todo-note = todo-note.with(visible: false)
+```
+
+`mode` と執筆メモの表示設定は独立しているため，査読用でもメモを非表示にできます．
+全引数と既定値は下の「設定」，個別のメモ設定は「構成メモ・ToDo」を参照します．
+
 ## 執筆補助パッケージ
 
 原稿ひな形は [`unify 0.8.1`](https://typst.app/universe/package/unify/) と [`physica 0.9.8`](https://typst.app/universe/package/physica/) を読み込みます．
@@ -39,11 +69,17 @@ typst compile revtex-preprint-template.typ
 スタイル本体の `revtex-preprint.typ` は外部パッケージに依存しません．
 
 `unify` の `num`・`unit`・`qty`・`numrange`・`qtyrange` で数値・単位・不確かさ・範囲を表記できます．
+ひな形は使用する `qty` だけをimportし，平均速度と標本標準偏差を単位付きで表示します．
+ほかの関数を使う場合はimportへ追加します．
 `physica` は名前空間付きで使い，標準の数式記号との名前の衝突を避けます．
+ひな形では位置の時間微分による速度の定義に使います．
 
 ```typst
+#import "@preview/unify:0.8.1": qty
+#import "@preview/physica:0.9.8"
+
 $ qty("1.23+-0.04", "m/s") $
-$ physica.pdv(f, x) = physica.dv(g, t) $
+$ v(t) = physica.dv(x, t) $
 ```
 
 ## 設定
@@ -105,6 +141,8 @@ level 1の節見出しは本文サイズの7/6倍の太字（既定は14pt），
 `global` の数式番号は本文から付録まで `(1)`, `(2)`, … と続きます．
 `section` は番号付きの最上位節ごとにリセットし，本文 `(2.1)`，付録 `(A.1)` の形式です．
 `section` の番号付き数式は，本文・付録とも最初の番号付き最上位見出しの後に置きます．
+ひな形の付録には標本標準偏差の式を置き，本文から付録見出しと数式を参照します．
+付録も含めて節ごとの数式番号を使う場合は，`revtex-preprint.with(...)` に `equation-numbering: "section"` を追加します．
 Abstractのラベルは本文と同じ文字サイズの太字・中央揃えとし，本文の節見出しと区別します．
 数式や見出しの参照には `@label` / `ref` を使います．
 
@@ -123,7 +161,8 @@ $ cal(I)_(X arrow.r Y)(Delta t) >= 0. $ <eq-positive>
 配置は既定の `auto` で自動調整し，1ページ目の浮動図表は下端に配置します．
 `placement: none` で本文中の配置を指定できます．
 図キャプションは下，表キャプションは上です．
-表は `table.hline`（既定の太さ `0.6pt`）で上下端と見出し下に横罫線を引く三線表を基本にします．
+表は縦罫線やデータ行間の罫線を省き，上下端を `0.8pt`，見出し下を `0.4pt` とする三線表を基本にします．
+`table.hline` の既定の太さは `0.6pt` で，ひな形では各罫線の `stroke` で太さを指定しています．
 列見出しは `table.header` で指定し，数値列は `align` で揃えます．
 セル余白は左右 `0.7em`，上下 `0.4em` です．
 
@@ -131,11 +170,11 @@ $ cal(I)_(X arrow.r Y)(Delta t) >= 0. $ <eq-positive>
 #figure(rect(width: 30mm, height: 10mm), caption: [A schematic.],
         alt: "A rectangular schematic") <fig-model>
 #figure(table(columns: 2, align: (left, right),
-  table.hline(),
+  table.hline(stroke: 0.8pt),
   table.header([Quantity], [Value]),
-  table.hline(),
+  table.hline(stroke: 0.4pt),
   [Sample count], [1000],
-  table.hline(),
+  table.hline(stroke: 0.8pt),
 ), caption: [Measurements.]) <tab-measurements>
 See @fig-model and @tab-measurements.
 ```
@@ -149,15 +188,16 @@ See @fig-model and @tab-measurements.
 番号は図・表と独立した連番になり，ラベルへの参照は `Algorithm 1` と表示します．
 本体には標準のコードブロックを使え，外部パッケージは不要です．
 等幅フォントと字下げで，関数・繰り返し・返り値を表します．
+ひな形ではMethodsの中に計算手順を置き，`placement: none` で説明の直後に表示します．
 
 ````typst
 #figure(
   [
     ```
-    function mean(x, N)
+    function mean(v, N)
         s ← 0
         for i ← 1 to N do
-            s ← s + x[i]
+            s ← s + v[i]
         end for
         return s / N
     end function
@@ -225,7 +265,7 @@ See @alg-mean.
 
 ## アクノレッジメント
 
-ひな形ではConclusionとReferencesの間に，番号なしのAcknowledgments節を置きます．
+ひな形ではConclusionの後，付録の前に番号なしのAcknowledgments節を置きます．
 議論・技術支援への謝辞と研究費の情報を書き換えます．
 日本語原稿では見出しを `謝辞` に変更できます．
 
@@ -250,7 +290,8 @@ Bash，Python 3.9以降，Typst 0.15.0以降，`pdftotext`，`qpdf`，日本語�
 bash script/check-revtex-preprint.sh
 ```
 
-配布するスタイル・ひな形・文献ファイルを一時ディレクトリへコピーし，ひな形の数式参照と引用を含めてコンパイルします．
+配布するスタイル・ひな形・文献ファイルを一時ディレクトリへコピーし，図表・数式・疑似プログラム・付録への参照と引用を含めてコンパイルします．
+同じひな形を査読用へ切り替えた場合と，冒頭の設定で両方のメモを隠した場合もコンパイルし，行番号とメモの表示を確認します．
 ひな形は通常のパッケージ検索先・キャッシュを使います．
 スタイル本体の検証では，外部パッケージの検索先・キャッシュを空にし，依存先が一時ディレクトリ内のファイルに収まることを確認します．
 日本語注記の例を含むひな形と日本語注記の検証ではシステムフォントを有効にし，CJKフォントの埋め込みと日本語・英語混在を確認します．

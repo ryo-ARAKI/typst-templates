@@ -42,17 +42,43 @@ def compile(name, source=None, error=None, packages=False, system_fonts=False):
 # Compile the actual files users copy, including their local bibliography.
 assert 'Noto Serif CJK JP' in run('typst', 'fonts').splitlines(), 'Japanese note checks require Noto Serif CJK JP'
 text = compile('revtex-preprint-template', packages=True, system_fonts=True)
-assert 'Manuscript title' in text and 'Equation (1)' in text, text
-assert text.count('(1)') == 2, text  # Displayed equation number and its reference.
+assert 'Manuscript title' in text, text
+for reference in ('Equation (1)', 'Equation (2)', 'Equation (3)',
+                  'Figure 1', 'Table 1', 'Algorithm 1', 'Appendix A'):
+    assert reference in text, (reference, text)
 assert '(Example 2025)' in text and 'A minimal research example' in text, text
 assert 'OUTLINE NOTE' in text and 'TODO' in text, text
 assert '研究課題を示し，先行研究との関係を整理する．' in re.sub(r'\s+', '', text), text
-assert '結果を示す図を追加する．' in re.sub(r'\s+', '', text), text
+assert '測定値を実際の結果に置き換える．' in re.sub(r'\s+', '', text), text
 assert 'Algorithm 1: Compute the sample mean.' in text and 'Refer to Algorithm 1' in text, text
 assert 'Acknowledgments' in text and 'funding support.' in text, text
-assert text.index('3 Conclusion') < text.index('Acknowledgments') < text.index('References'), text
+assert text.index('2 Methods') < text.index('3 Results') < text.index('4 Conclusion'), text
+assert text.index('4 Conclusion') < text.index('Acknowledgments') < text.index('A Sample standard deviation') < text.index('References'), text
 assert not re.search(r'\d+ Acknowledgments', text), text
-print('PASS: copied manuscript template, Japanese notes, algorithm/equation references and bibliography')
+# Check the published editing controls on the actual manuscript, alongside the
+# style-level mode/visibility contracts below.
+template = (root/'revtex-preprint-template.typ').read_text()
+assert 'physica.dv(' in template and 'qty(' in template
+assert 'm/s' in text and '1.23' in text and '0.04' in text, text
+review = template.replace('mode: "read"', 'mode: "review"')
+assert review != template
+review_text = compile('template-review', review, packages=True, system_fonts=True)
+hidden = review
+for kind in ('outline-note', 'todo-note'):
+    control = '#let ' + kind + ' = ' + kind + '.with(visible: false)'
+    assert '// ' + control in hidden
+    hidden = hidden.replace('// ' + control, control)
+hidden_text = compile('template-review-no-notes', hidden, packages=True, system_fonts=True)
+assert 'OUTLINE NOTE' in review_text and 'TODO' in review_text, review_text
+assert 'OUTLINE NOTE' not in hidden_text and 'TODO' not in hidden_text, hidden_text
+for name, enabled in (('revtex-preprint-template', False),
+                      ('template-review', True), ('template-review-no-notes', True)):
+    pages = ET.fromstring(run('pdftotext', '-bbox', str(root/(name+'.pdf')), '-'))
+    numbers = [int(word.text) for word in pages.iter('{http://www.w3.org/1999/xhtml}word')
+               if float(word.attrib['xMax']) < 69 and (word.text or '').isdigit()]
+    assert bool(numbers) == enabled, (name, numbers)
+    assert numbers == list(range(1, len(numbers)+1)), (name, numbers)
+print('PASS: copied manuscript examples, references, review switch and note visibility')
 
 prefix = '#import "revtex-preprint.typ": revtex-preprint, appendices, draft\n'
 (root/'refs.bib').write_text('''@article{sample, author={Jane Example}, title={Transport and information},

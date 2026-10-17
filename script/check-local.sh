@@ -45,7 +45,8 @@ report_failure() {
   local category="${3:-compile}"
   # Known execution prerequisites are distinct from source/semantic failures.
   # Leave other failures as "compile" rather than inferring their cause.
-  if rg '^error:' "$log" | rg -qi 'failed to download|failed to fetch|network is unreachable|connection refused|certificate|no space left on device|permission denied'; then
+  if rg -q '^FAIL \[environment\]' "$log" ||
+     rg '^error:' "$log" | rg -qi 'failed to download|failed to fetch|network is unreachable|connection refused|certificate|no space left on device|permission denied'; then
     category=environment
   fi
   printf 'FAIL [%s] %s; log: %s\n' "$category" "$target" "$log" >&2
@@ -71,6 +72,17 @@ if TMPDIR="$tmp_dir" bash "$repo_root/script/check-poster-portrait-takeaway-api.
   printf 'PASS [semantic] poster API diagnostics and BibTeX formats\n'
 else
   report_failure 'poster API / portrait sources' "$tmp_dir/poster-api.log"
+fi
+
+if TMPDIR="$tmp_dir" bash "$repo_root/script/check-document-bibliography.sh" \
+  > "$tmp_dir/document-bibliography.log" 2>&1; then
+  printf 'PASS [compile] document bibliography / README examples (bibliography checker)\n'
+  printf 'PASS [semantic] document bibliography config / styles / selection / relocation / diagnostics\n'
+  printf 'PASS [link] document body citations point to the cited bibliography entry\n'
+else
+  # Keep the focused checker's compile / semantic / link / environment labels.
+  cat "$tmp_dir/document-bibliography.log" >&2
+  report_failure 'document bibliography checker' "$tmp_dir/document-bibliography.log"
 fi
 
 for source in starters/document-jp.typ starters/slide.typ starters/poster-column.typ \

@@ -161,7 +161,8 @@ $ cal(I)_(X arrow.r Y)(Delta t) >= 0. $ <eq-positive>
 配置は既定の `auto` で自動調整し，1ページ目の浮動図表は下端に配置します．
 `placement: none` で本文中の配置を指定できます．
 図キャプションは下，表キャプションは上です．
-表は `table.hline`（既定の太さ `0.6pt`）で上下端と見出し下に横罫線を引く三線表を基本にします．
+表は縦罫線やデータ行間の罫線を省き，上下端を `0.8pt`，見出し下を `0.4pt` とする三線表を基本にします．
+`table.hline` の既定の太さは `0.6pt` で，ひな形では各罫線の `stroke` で太さを指定しています．
 列見出しは `table.header` で指定し，数値列は `align` で揃えます．
 セル余白は左右 `0.7em`，上下 `0.4em` です．
 
@@ -169,11 +170,11 @@ $ cal(I)_(X arrow.r Y)(Delta t) >= 0. $ <eq-positive>
 #figure(rect(width: 30mm, height: 10mm), caption: [A schematic.],
         alt: "A rectangular schematic") <fig-model>
 #figure(table(columns: 2, align: (left, right),
-  table.hline(),
+  table.hline(stroke: 0.8pt),
   table.header([Quantity], [Value]),
-  table.hline(),
+  table.hline(stroke: 0.4pt),
   [Sample count], [1000],
-  table.hline(),
+  table.hline(stroke: 0.8pt),
 ), caption: [Measurements.]) <tab-measurements>
 See @fig-model and @tab-measurements.
 ```

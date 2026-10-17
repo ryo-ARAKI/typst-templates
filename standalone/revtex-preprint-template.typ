@@ -91,13 +91,13 @@ The latter is defined by @eq-deviation in @app-statistics.
 
 #figure(
   table(columns: 2, align: (left, right),
-    table.hline(),
+    table.hline(stroke: 0.8pt),
     table.header([Sample], [Velocity (m/s)]),
-    table.hline(),
+    table.hline(stroke: 0.4pt),
     [1], [1.19],
     [2], [1.23],
     [3], [1.27],
-    table.hline(),
+    table.hline(stroke: 0.8pt),
   ),
   caption: [Illustrative velocity measurements.],
 ) <tab-velocities>

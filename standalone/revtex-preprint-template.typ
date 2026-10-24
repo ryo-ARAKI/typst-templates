@@ -10,6 +10,7 @@
   title: [Manuscript title],
   authors: ((name: "Author Name", affiliations: ("uni",)),),
   affiliations: ((id: "uni", text: [Department, University]),),
+  date: datetime.today(),
   abstract: [Summarize the question, approach, main result, and conclusion.],
   keywords: ("keyword",),
   mode: "read", // Use "review" for line numbers and wider leading.

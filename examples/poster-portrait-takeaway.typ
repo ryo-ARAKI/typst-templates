@@ -325,7 +325,7 @@
         #comparison-figure(solarized_magenta_palette)
       ],
       note: [
-        *Third row*: Add a short check when the poster needs more than two figure/caption rows.
+        *Third row*: Add a short check when the poster needs more than two figure/note rows.
       ],
       figure-side: left,
       figure-width: 1.05fr,

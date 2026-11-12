@@ -69,13 +69,13 @@ valid_args='
     (
       title: [Upper],
       figure: [Upper figure],
-      caption: [Upper caption],
+      note: [Upper note],
       figure-side: left,
     ),
     (
       title: [Lower],
       figure: [Lower figure],
-      caption: [Lower caption],
+      note: [Lower note],
       figure-side: right,
     ),
   ),
@@ -92,13 +92,13 @@ write_case "$tmp_dir/valid-theme.typ" "$common_prefix
     (
       title: [Upper],
       figure: [Upper figure],
-      caption: [Upper caption],
+      note: [Upper note],
       figure-side: left,
     ),
     (
       title: [Lower],
       figure: [Lower figure],
-      caption: [Lower caption],
+      note: [Lower note],
       figure-side: right,
     ),
   ),
@@ -125,40 +125,41 @@ write_case "$tmp_dir/valid-palette.typ" "$common_prefix
   ),
   headline-takeaway: [Headline],
   headline-detail: [Detail],
-  caption-style: (
+  note-style: (
     text-size: 34pt,
     leading: 0.72em,
     list-spacing: 0.60em,
-    title-gutter: 0.7cm,
   ),
   sections: (
     (
       title: [First],
       figure: [First figure],
-      caption: [
+      note: [
+        #context { assert.eq(text.size, 42pt); assert.eq(par.leading, 0.72em); assert.eq(list.spacing, 0.70em) }
         - First list item wraps safely across lines.
-        - First list item uses section-level caption spacing.
+        - First list item uses section-level note spacing.
       ],
-      caption-style: (list-spacing: 0.70em,),
+      note-style: (text-size: 42pt, list-spacing: 0.70em,),
       figure-width: 1fr,
-      caption-width: 1fr,
+      note-width: 1fr,
     ),
     (
       title: [Second],
       figure: [Second figure],
-      caption: [
+      note: [
+        #context { assert.eq(text.size, 34pt); assert.eq(par.leading, 0.72em); assert.eq(list.spacing, 0.60em) }
         - Second list item wraps safely across lines.
-        - Second list item uses top-level caption spacing.
+        - Second list item uses top-level note spacing.
       ],
       figure-width: 1.2fr,
-      caption-width: 0.8fr,
+      note-width: 0.8fr,
     ),
     (
       title: [Third],
       figure: [Third figure],
-      caption: [
+      note: [
         - Third list item wraps safely across lines.
-        - Third list item uses top-level caption spacing.
+        - Third list item uses top-level note spacing.
       ],
     ),
   ),
@@ -183,7 +184,7 @@ write_case "$tmp_dir/invalid-one-section.typ" "$common_prefix
   sections: (
     (
       figure: [Only figure],
-      caption: [Only caption],
+      note: [Only note],
     ),
   ),
   conclusion-takeaway: [Conclusion],
@@ -198,11 +199,11 @@ write_case "$tmp_dir/invalid-figure-heights-length.typ" "$common_prefix
   sections: (
     (
       figure: [Upper figure],
-      caption: [Upper caption],
+      note: [Upper note],
     ),
     (
       figure: [Lower figure],
-      caption: [Lower caption],
+      note: [Lower note],
     ),
   ),
   figure-heights: (1fr, 1fr, 1fr),
@@ -217,11 +218,11 @@ write_case "$tmp_dir/invalid-missing-figure.typ" "$common_prefix
   headline-detail: [Detail],
   sections: (
     (
-      caption: [Upper caption],
+      note: [Upper note],
     ),
     (
       figure: [Lower figure],
-      caption: [Lower caption],
+      note: [Lower note],
     ),
   ),
   conclusion-takeaway: [Conclusion],
@@ -236,12 +237,12 @@ write_case "$tmp_dir/invalid-figure-side.typ" "$common_prefix
   sections: (
     (
       figure: [Upper figure],
-      caption: [Upper caption],
+      note: [Upper note],
       figure-side: top,
     ),
     (
       figure: [Lower figure],
-      caption: [Lower caption],
+      note: [Lower note],
     ),
   ),
   conclusion-takeaway: [Conclusion],
@@ -256,24 +257,50 @@ write_case "$tmp_dir/invalid-title-style-key.typ" "$common_prefix
 )
 "
 
-write_case "$tmp_dir/invalid-section-caption-style-key.typ" "$common_prefix
+write_case "$tmp_dir/invalid-section-note-style-key.typ" "$common_prefix
 #poster-portrait-takeaway(
   headline-takeaway: [Headline],
   headline-detail: [Detail],
   sections: (
     (
       figure: [Upper figure],
-      caption: [Upper caption],
-      caption-style: (padding: 1cm),
+      note: [Upper note],
+      note-style: (padding: 1cm),
     ),
     (
       figure: [Lower figure],
-      caption: [Lower caption],
+      note: [Lower note],
     ),
   ),
   conclusion-takeaway: [Conclusion],
   conclusion-detail: [Detail],
 )
+"
+
+# Exercise the required note contract through the public layout.
+for value in missing auto none empty; do
+  case "$value" in
+    missing) note_arg='' ;;
+    auto) note_arg='note: auto,' ;;
+    none) note_arg='note: none,' ;;
+    empty) note_arg='note: [],' ;;
+  esac
+  write_case "$tmp_dir/invalid-note-$value.typ" "$common_prefix
+#poster-portrait-takeaway(
+  headline-takeaway: [Headline], headline-detail: [Detail],
+  sections: ((figure: [Figure], $note_arg), (figure: [Figure], note: [Note])),
+  conclusion-takeaway: [Conclusion], conclusion-detail: [Detail],
+)
+"
+done
+write_case "$tmp_dir/invalid-note-style-key.typ" "$common_prefix
+#poster-portrait-takeaway(note-style: (padding: 1cm), $valid_args)
+"
+# Minimal rendered content also distinguishes the figure heading from note text.
+write_case "$tmp_dir/note-content.typ" "
+#import \"$repo_root/lib/presets/poster.typ\": *
+#set page(width: 30cm, height: 12cm, margin: 1cm)
+#poster-portrait-figure-row((title: [FigureHeading], figure: [FigureBody], note: [NoteBody]), poster-portrait-takeaway-palette())
 "
 
 # One citation fixture combines equivalent formatting, multiline values and nesting.
@@ -349,4 +376,18 @@ expect_fail "invalid-figure-heights-length" "$tmp_dir/invalid-figure-heights-len
 expect_fail "invalid-missing-figure" "$tmp_dir/invalid-missing-figure.typ" "sections.*figure is required"
 expect_fail "invalid-figure-side" "$tmp_dir/invalid-figure-side.typ" 'figure-side must be `left` or `right`'
 expect_fail "invalid-title-style-key" "$tmp_dir/invalid-title-style-key.typ" "unknown title-style key"
-expect_fail "invalid-section-caption-style-key" "$tmp_dir/invalid-section-caption-style-key.typ" "unknown sections.*caption-style key"
+expect_fail "invalid-section-note-style-key" "$tmp_dir/invalid-section-note-style-key.typ" "unknown sections.*note-style key"
+
+for value in missing auto none empty; do
+  expect_fail "invalid-note-$value" "$tmp_dir/invalid-note-$value.typ" 'sections.at\(0\).note is required'
+done
+expect_fail "invalid-note-style-key" "$tmp_dir/invalid-note-style-key.typ" 'unknown note-style key'
+compile_tmp_case "$tmp_dir/note-content.typ" "$tmp_dir/note-content.pdf"
+pdftotext -layout "$tmp_dir/note-content.pdf" "$tmp_dir/note-content.txt"
+for word in FigureHeading FigureBody NoteBody; do
+  [[ $(grep -o "$word" "$tmp_dir/note-content.txt" | wc -l) -eq 1 ]]
+done
+if rg -q 'Guide' "$tmp_dir/note-content.txt"; then
+  printf 'unexpected generated note heading\n' >&2
+  exit 1
+fi

@@ -207,11 +207,11 @@ PDF/UA では document title，semantic heading，math/image の `alt:` text が
 `poster-portrait-takeaway` は縦長A0向けに，複数の大きな図を上下に置くポスター用レイアウトです．
 `headline-takeaway` / `headline-detail` と `conclusion-takeaway` / `conclusion-detail` は必須で，
 冒頭と結論の band に take-home message と本文サイズの補足説明を2行で表示します．
-`sections` は2個以上の辞書を持つ配列で渡し，各 section には `figure` と `caption` が必須です．
-`title` は図側の見出し，`caption-title` はガイド側の見出しです．`caption-title` の既定値は `[Guide]` で，`caption-title: none` にするとガイド側の見出しを非表示にできます．
-`figure-side` は `left` または `right` で，未指定時は上から `left` / `right` 交互に配置されます．`figure-width` と `caption-width` は物理的な左右ではなく図列と caption 列の幅として指定します．未指定時は図列が広くなります．
-`headline-height` と `conclusion-height` で band の高さを変えられ，残りの高さは `figure-heights` の各 section 比率に従って図・caption row に配分されます．`figure-heights` を省略すると全 section が同じ高さになります．
-タイトルや footer は `title-style` と `footer-style` の部分 override で調整できます．caption 本文は `caption-style` で `text-size`，`leading`，`list-spacing`，`title-gutter` を調整できます．section 辞書内の `caption-style` はその section だけに効きます．`metadata.logo` と `metadata.logo-relative-width` を設定すると，タイトル・著者の右列に `poster-logo-strip` などのロゴを配置できます．`footer:` は既定で `metadata.venue` を最下部に置き，`footer: none` で非表示にできます．
+`sections` は2個以上の辞書を持つ配列で渡し，各 section には `figure` と `note` が必須です．
+`title` は図側の見出し，`note` はガイド欄の本文です．
+`figure-side` は `left` または `right` で，未指定時は上から `left` / `right` 交互に配置されます．`figure-width` と `note-width` は物理的な左右ではなく図列と note 列の幅として指定します．未指定時は図列が広くなります．
+`headline-height` と `conclusion-height` で band の高さを変えられ，残りの高さは `figure-heights` の各 section 比率に従って図・note row に配分されます．`figure-heights` を省略すると全 section が同じ高さになります．
+タイトルや footer は `title-style` と `footer-style` の部分 override で調整できます．note 本文は `note-style` で `text-size`，`leading`，`list-spacing` を調整できます．section 辞書内の `note-style` はその section だけに効きます．`metadata.logo` と `metadata.logo-relative-width` を設定すると，タイトル・著者の右列に `poster-logo-strip` などのロゴを配置できます．`footer:` は既定で `metadata.venue` を最下部に置き，`footer: none` で非表示にできます．
 `theme:` には `"default"`，`"solarized-magenta"`，`"wine"`，`"brewer-dark2-magenta"` の名前を渡します．図と layout で同じ色を共有したい場合は `poster-portrait-takeaway-palette(theme: ..., overrides: ...)` の戻り値を `palette:` に渡します．`theme:` と `palette:` は同時指定できません．
 
 - Main + Support: メイン図 / サポート図または数式
@@ -238,7 +238,7 @@ PDF/UA では document title，semantic heading，math/image の `alt:` text が
     author-offset: -2.0cm,
     logo-gutter: 1cm,
   ),
-  caption-style: (text-size: 38pt, leading: 0.72em, list-spacing: 0.60em, title-gutter: 0.8cm),
+  note-style: (text-size: 38pt, leading: 0.72em, list-spacing: 0.60em),
   footer-style: (height: 1.6%, text-size: 30pt, gutter: 1cm),
   headline-takeaway: [Main result in one sentence.],
   headline-detail: [One detail line explains the scope, condition, or evidence behind it.],
@@ -246,24 +246,21 @@ PDF/UA では document title，semantic heading，math/image の `alt:` text が
     (
       title: [Main figure],
       figure: [#cetz.canvas({ import cetz.draw: * })],
-      caption: [What the viewer should read first.],
-      caption-title: [Guide],
+      note: [What the viewer should read first.],
       figure-side: left,
     ),
     (
       title: [Support figure or equation],
       figure: [#cetz.canvas({ import cetz.draw: * })],
-      caption: [How this supports the claim.],
-      caption-title: [Support guide],
+      note: [How this supports the claim.],
       figure-side: right,
       figure-width: 1.3fr,
-      caption-width: 0.7fr,
+      note-width: 0.7fr,
     ),
     (
       title: [Additional check],
       figure: [#cetz.canvas({ import cetz.draw: * })],
-      caption: [Use extra rows for compact checks or comparisons.],
-      caption-title: [Check],
+      note: [Use extra rows for compact checks or comparisons.],
     ),
   ),
   conclusion-takeaway: [One concise conclusion.],
@@ -285,7 +282,7 @@ figure: scale(70%, reflow: true)[
 ],
 ```
 
-`figure-heights`，section 数，見出しや band の高さ，図・caption 列の幅を変更したら，図の寸法を再確認する．
+`figure-heights`，section 数，見出しや band の高さ，図・note 列の幅を変更したら，図の寸法を再確認する．
 コンパイル成功だけでは図の収まりを保証しない．PDF の全ページを表示し，図全体が見えること，headline band・図見出し・隣接パネルに重ならないこと，図中の文字が読めることを確認する．
 既存 example を修正するときは，全3ページと starter を確認し，変更前後の該当ページを比較する．
 検証用 PDF は一時領域へ出力できる．

@@ -80,35 +80,32 @@
     (
       title: [Topic 1],
       figure: example1-figure,
-      caption-title: [Caption 1],
-      caption: [
+      note: [
         *Guide*: Guide sentences.
       ],
       figure-side: left,
       figure-width: 1.1fr,
-      caption-width: 0.9fr,
+      note-width: 0.9fr,
     ),
     (
       title: [Topic 2],
       figure: example2-figure,
-      caption-title: [Caption 2],
-      caption: [
+      note: [
         *Guide*: Guide sentences.
       ],
       figure-side: right,
       figure-width: 1.1fr,
-      caption-width: 0.9fr,
+      note-width: 0.9fr,
     ),
     (
       title: [Topic 3],
       figure: example3-figure,
-      caption-title: [Caption 3],
-      caption: [
+      note: [
         *Guide*: Guide sentences.
       ],
       figure-side: left,
       figure-width: 1.1fr,
-      caption-width: 0.9fr,
+      note-width: 0.9fr,
     ),
   ),
   conclusion-takeaway: [Concluding message.],

@@ -463,6 +463,37 @@ wrapper の `style: auto` / `full: auto` は config の解決を意味する．
 `document / slide / poster` の各 preset からは `aligned-items` と `aligned-enum` をそのまま使える．
 追加の direct import は不要で，具体例は `examples/slide.typ` と `examples/poster-column.typ` にある．
 
+### CeTZ axis-label overlays
+
+`cetz-axis-label(image-name, offset, body)` は，名前付き画像のアンカーを基準に元の軸ラベルを塗りつぶして新しいラベルを重ねる．
+`document / slide / poster` の各 preset から使え，部品だけなら `lib/components/figure-overlays.typ` を直接 import できる．
+画像を移動するとラベルとマスクも追従する．
+
+```typ
+// cetz-axis-label example
+#import "typst-templates/lib/presets/poster.typ": cetz, cetz-axis-label
+#set text(font: "Noto Sans CJK JP", size: 14pt)
+#cetz.canvas({
+  import cetz.draw: *
+  // この矩形を image("figure.pdf", width: 8cm) などに置き換える．
+  content((0, 0), std.rect(width: 8cm, height: 5cm, fill: luma(95%)),
+    name: "plot", anchor: "north-west")
+  cetz-axis-label("plot", (4, -4.6), [時刻])
+  cetz-axis-label("plot", (0.5, -2.5), [誤差エネルギ],
+    angle: 90deg,
+    erase: (((0.2, -1), (0.8, -4)),),
+  )
+})
+```
+
+`offset` は画像の `anchor`（既定値 `"north-west"`）からラベル中心までの `(x, y)` で，右・上が正方向になる．
+`erase` は同じアンカーからの相対座標による矩形の対の配列で，元のラベルと新しいラベルの位置が異なる場合に使う．
+矩形を描いてからラベルを重ねるため，重なる画像があるときは元画像の直後に呼び出す．
+`background`（既定値 `white`）はラベル背景とマスクの塗り色で，`padding`（既定値 `0.08`）はラベル周囲の余白になる．
+座標と `padding` は CeTZ の canvas 単位に従う．
+画像の表示幅を変更した場合は，相対座標も調整する．
+`size`（既定値 `1em`）・`font`（既定値 `auto`）は呼び出し元の文字設定を引き継ぎ，`text-fill`（既定値 `black`）で文字色を変えられる．
+
 ### Slide template references
 
 Touying slide template の改善候補を検討するときに，以下のリポジトリを参照した．

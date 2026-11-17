@@ -5,6 +5,7 @@
 #import "@preview/roremu:0.1.0": roremu
 #import "../core/config.typ": document-config
 #import "../adapters/js.typ": *
+#import "../components/figure-overlays.typ": cetz-axis-label
 #import "../components/aligned-list.typ": aligned-items, aligned-enum
 
 #let setup-document(body, config: none) = {

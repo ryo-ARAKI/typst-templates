@@ -109,6 +109,51 @@ else
   compile_case 'README annotation excerpt' "$tmp_dir/readme-annotation.typ" "$tmp_dir/readme-annotation.pdf" /
 fi
 
+# Exercise the public helper against image movement, including preset exports.
+cat > "$tmp_dir/axis-label-tracking.typ" <<EOF
+#import "$repo_root/lib/presets/poster.typ" as poster
+#import "$repo_root/lib/presets/slide.typ" as slide
+#import "$repo_root/lib/presets/document.typ" as document
+#for preset in (poster, slide, document) {
+  assert("cetz-axis-label" in preset, message: "cetz-axis-label must be exported by every preset")
+}
+#set page(width: 18cm, height: 12cm, margin: 1cm)
+#set text(font: "Noto Sans CJK JP", size: 14pt)
+#let panel(position) = poster.cetz.canvas({
+  import poster.cetz.draw: *
+  rect((-1, -5), (11, 3), stroke: none)
+  content(position, std.rect(width: 5cm, height: 3cm, fill: luma(95%)), name: "plot", anchor: "north-west")
+  poster.cetz-axis-label(
+    "plot", (1, -3.5),
+    [時刻#metadata("axis")<tracked-axis-label>],
+    erase: (((0.2, -1), (0.8, -2)),),
+  )
+})
+#panel((0, 1))
+#pagebreak()
+#panel((2, 0))
+#context {
+  let positions = query(<tracked-axis-label>).map(it => it.location().position())
+  assert.eq(positions.len(), 2)
+  assert(calc.abs(positions.at(1).x - positions.at(0).x - 2cm) < 0.01pt, message: "label follows image horizontally")
+  assert(calc.abs(positions.at(1).y - positions.at(0).y - 1cm) < 0.01pt, message: "label follows image vertically")
+}
+EOF
+compile_case 'axis labels follow a named image / preset exports' "$tmp_dir/axis-label-tracking.typ" "$tmp_dir/axis-label-tracking.pdf" / semantic
+
+# Keep the documented usage executable without adding fixture files to the repo.
+awk '
+  /^\/\/ cetz-axis-label example$/ { capture = 1 }
+  /^```$/ && capture { exit }
+  capture { print }
+' "$repo_root/README.md" > "$tmp_dir/readme-axis-label.typ"
+if rg -q '^#cetz.canvas' "$tmp_dir/readme-axis-label.typ"; then
+  compile_case 'README axis-label overlay excerpt' "$tmp_dir/readme-axis-label.typ" "$tmp_dir/readme-axis-label.pdf" /
+else
+  printf 'FAIL [semantic] README axis-label example was not found\n' >&2
+  failures=$((failures + 1))
+fi
+
 # Existing titles cover ordinary structured authors. This grouped source adds
 # the omitted/empty/one/many and string/content normalization boundaries.
 cat > "$tmp_dir/authors-normalization.typ" <<EOF

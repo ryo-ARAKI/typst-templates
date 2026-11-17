@@ -5,5 +5,6 @@
 #import "@preview/physica:0.9.8": *
 #import "@preview/cetz:0.5.2"
 #import "@preview/fletcher:0.5.8": diagram, edge, node
+#import "../components/figure-overlays.typ": cetz-axis-label
 #import "../components/boxes.typ": *
 #import "../components/math.typ": pinit-highlight-equation-from

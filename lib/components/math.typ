@@ -127,10 +127,15 @@
   )
 
   let config = pos-configs.at(pos)
-  context {
-    let out-height = measure(out-contents).height
-    pinit-place(config.pin, out-contents, dx: config.place-dx, dy: (config.place-dy)(out-height))
-  }
+  // Keep pin placement independent of content measurement inside CeTZ.
+  pinit-place(
+    config.pin,
+    dx: config.place-dx,
+    context {
+      let out-height = measure(out-contents).height
+      move(dy: (config.place-dy)(out-height), out-contents)
+    },
+  )
   pinit-arrow(
     config.arrow-pin,
     config.arrow-pin,

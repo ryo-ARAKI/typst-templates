@@ -7,4 +7,4 @@
 #import "@preview/fletcher:0.5.8": diagram, edge, node
 #import "../components/figure-overlays.typ": cetz-axis-label
 #import "../components/boxes.typ": *
-#import "../components/math.typ": pinit-highlight-equation-from
+#import "../components/math.typ": pinit-highlight-equation-from, colormath

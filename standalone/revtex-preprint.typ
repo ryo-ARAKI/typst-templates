@@ -280,9 +280,6 @@
   body
 }
 
-/// Short alias for `revtex-preprint`, with the same parameters and defaults.
-#let draft = revtex-preprint
-
 // A common frame keeps both authoring notes distinct from manuscript prose.
 #let _authoring-note(label, fill: luma(245), rule: luma(170), body) = block(
   width: 100%,

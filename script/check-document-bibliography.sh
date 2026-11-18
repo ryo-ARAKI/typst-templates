@@ -37,8 +37,6 @@ bib = '''@article{A, author={Alpha, Alice}, title={Cited Alpha Study},
   journal={Beta Journal}, year={2021}, volume={2}, pages={10--19}}
 '''
 (refs / "biblio.bib").write_text(bib)
-# The unchanged default string is resolved at the adapter's standard call site.
-(parent / "typst-templates/lib/adapters/biblio.bib").write_text(bib)
 (refs / "invalid.bib").write_text("@article{ broken")
 styles = caller / "styles"
 styles.mkdir()
@@ -92,12 +90,12 @@ def source(args, *, style=None, full=None, cite=True, before="", citation=None):
     return '''#import "../../typst-templates/lib/presets/document.typ": *
 #set page(width: 420pt, height: 360pt, margin: 35pt)
 #set text(font: "Libertinus Serif", lang: "en", size: 11pt)
-''' + before + "\n" + (citation or '''FIRST #citep(<A>) END
+''' + before + "\n" + (citation or '''FIRST #cite(<A>) END
 
-AGAIN #citep(<A>) END
+AGAIN #cite(<A>) END
 ''') * cite + f'''
 #pagebreak()
-#bibliography-list-from({args})
+#bibliography({args})
 #context {{
   let b = query(bibliography).first()
   {assertions}
@@ -159,36 +157,24 @@ if version.returncode or not match or tuple(map(int, match.groups())) < (0, 15):
     sys.exit("FAIL [environment] Typst 0.15.0 or later is required")
 print(version.stdout.strip(), flush=True)
 harvard = "harvard-cite-them-right"
-path_arg = 'path: "/refs/biblio.bib"'
-success("legacy", path_arg, harvard, True)
-success("default-path", "", harvard, True)
-success("empty-config", path_arg + ", config: (:)", harvard, True)
-success("config-file-ignored", path_arg + ', config: (bibliography: "/absent.bib",)', harvard, True)
+path_arg = '"/refs/biblio.bib"'
+harvard_args = path_arg + f', style: "{harvard}", full: true'
+success("relative-bibliography", f'"../../refs/biblio.bib", style: "{harvard}", full: true',
+        harvard, True)
 for style in (harvard, "ieee"):
     for full in (True, False):
-        args = path_arg + f', config: (bibliography-style: "{style}", bibliography-full: {str(full).lower()})'
-        success(f"config-{style}-{full}", args, style, full)
+        args = path_arg + f', style: "{style}", full: {str(full).lower()}'
+        success(f"native-{style}-{full}", args, style, full)
         success(f"no-cite-{style}-{full}", args, style, full, cite=False)
-success("style-only", path_arg + ', config: (bibliography-full: false,), style: "ieee"', "ieee", False)
-success("full-only", path_arg + ', config: (bibliography-style: "ieee",), full: false', "ieee", False)
-success("full-only-true", path_arg + ', config: (bibliography-style: "ieee", bibliography-full: false), full: true', "ieee", True)
-success("override-both", path_arg + ', config: (bibliography-style: "ieee", bibliography-full: false), '
-        f'style: "{harvard}", full: true', harvard, True)
-success("explicit-auto", path_arg + ', config: (bibliography-style: "ieee", bibliography-full: false), '
-        'style: auto, full: auto', "ieee", False)
-success("overridden-invalid-config", path_arg + ', config: (bibliography-style: auto, bibliography-full: "bad"), '
-        'style: "ieee", full: false', "ieee", False)
-success("overridden-unknown-style", path_arg + ', config: (bibliography-style: "missing-style",), '
-        'style: "ieee"', "ieee", True)
-success("set-rules", path_arg, harvard, True,
-        before='#set bibliography(style: "ieee", full: false, title: [Sources marker])\n#set cite(style: "ieee")')
-success("no-implicit-config", path_arg, harvard, True,
-        before='#show: setup-document.with(config: (bibliography-style: "ieee", bibliography-full: false))')
-success("legacy-supplement", path_arg, harvard, True,
-        citation='FIRST #citep(<A>, supplement: [p. 7]) END', supplement=True)
+success("set-rules", path_arg, "ieee", False,
+        before='#show: setup-document\n#set bibliography(style: "ieee", full: false, title: [Sources marker])')
+success("direct-overrides", harvard_args, harvard, True,
+        before='#set bibliography(style: "ieee", full: false)')
+success("supplement", harvard_args, harvard, True,
+        citation='FIRST #cite(<A>, supplement: [p. 7]) END', supplement=True)
 try:
-    text = compile_case("explicit-cite-style", source(path_arg, citation=
-                        'FIRST #citep(<A>, style: "ieee", supplement: [p. 7]) END'))
+    text = compile_case("explicit-cite-style", source(harvard_args, citation=
+                        'FIRST #cite(<A>, style: "ieee", supplement: [p. 7]) END'))
     first = text.split("FIRST", 1)[1].split("END", 1)[0]
     check("[1" in first and "7" in first and "Alpha" not in first, first)
     check("Sources marker" in (artifacts / "set-rules.txt").read_text(), "set title lost")
@@ -196,19 +182,12 @@ try:
 except (AssertionError, FileNotFoundError) as exc:
     fail("explicit-cite-style", "semantic", exc)
 
-# Each invalid value must reach Typst, rather than silently falling back.
 invalid = [
-    ("config-style-auto", ', config: (bibliography-style: auto,)', r"style|auto"),
-    ("config-style-type", ', config: (bibliography-style: 42,)', r"expected.*(string|str|bytes|path)"),
-    ("config-full-type", ', config: (bibliography-full: "bad",)', r"expected bool"),
-    ("config-full-auto", ', config: (bibliography-full: auto,)', r"expected bool"),
-    ("direct-style-type", ', style: false', r"expected.*(string|str|bytes|path)"),
-    ("direct-full-type", ', full: 1', r"expected bool"),
+    ("style-type", ', style: false', r"expected.*(string|str|bytes|path)"),
+    ("full-type", ', full: 1', r"expected bool"),
     ("unknown-style", ', style: "missing-style"', r"unknown.*style"),
     ("missing-csl", ', style: "/styles/missing.csl"', r"file not found"),
     ("invalid-csl", ', style: path("styles/invalid.csl")', r"CSL|style|XML"),
-    # A plain relative string must not be silently rebased to the caller.
-    ("relative-csl", ', style: "styles/journal.csl"', r"file not found"),
     ("outside-root-csl", ', style: path("../../../outside.csl")', r"access denied|outside.*root"),
 ]
 for name, suffix, error in invalid:
@@ -217,37 +196,34 @@ for name, suffix, error in invalid:
     except AssertionError as exc:
         fail(name, "semantic", exc)
 for name, args, citation, error in [
-    ("missing-bib", 'path: "/refs/missing.bib"', None, r"file not found"),
-    ("invalid-bib", 'path: "/refs/invalid.bib"', None, r"parse|bibliography"),
-    ("missing-key", path_arg, 'FIRST #citep(<MISSING>) END', r"key.*not present"),
+    ("missing-bib", '"/refs/missing.bib"', None, r"file not found"),
+    ("invalid-bib", '"/refs/invalid.bib"', None, r"parse|bibliography"),
+    ("missing-key", path_arg, 'FIRST #cite(<MISSING>) END', r"key.*not present"),
 ]:
     try:
         compile_case(name, source(args, citation=citation), error=error)
     except AssertionError as exc:
         fail(name, "semantic", exc)
 
-# Values must survive forwarding without coercion. The caller is deliberately
-# deeper than the adapter, with no CSL under the adapter's relative path.
+# Check both relative path forms and the other documented CSL inputs.
 custom_cases = []
 for kind, value in [
     ("path", 'path("styles/journal.csl")'),
+    ("relative", '"styles/journal.csl"'),
     ("root", '"/papers/deep/styles/journal.csl"'),
     ("bytes", 'read("styles/journal.csl", encoding: none)'),
 ]:
-    for via in ("config", "direct"):
-        name = f"custom-{kind}-{via}"
-        arg = (f'config: (bibliography-style: {value},)' if via == "config"
-               else f'style: {value}')
-        text = source(path_arg + ", " + arg, full=True)
-        custom_cases.append((name, text))
-        try:
-            output = compile_case(name, text)
-            check(output.count("CUSTOM-1") == 2, "custom citation style lost")
-            check("CUSTOM Cited Alpha Study" in output and
-                  "CUSTOM Uncited Beta Study" in output, "custom bibliography style lost")
-            print(f"PASS [semantic] {name} marker / membership", flush=True)
-        except AssertionError as exc:
-            fail(name, "semantic", exc)
+    name = f"custom-{kind}"
+    text = source(path_arg + f", style: {value}, full: true", full=True)
+    custom_cases.append((name, text))
+    try:
+        output = compile_case(name, text)
+        check(output.count("CUSTOM-1") == 2, "custom citation style lost")
+        check("CUSTOM Cited Alpha Study" in output and
+              "CUSTOM Uncited Beta Study" in output, "custom bibliography style lost")
+        print(f"PASS [semantic] {name} marker / membership", flush=True)
+    except AssertionError as exc:
+        fail(name, "semantic", exc)
 
 
 def verify_links(name):
@@ -326,7 +302,7 @@ def verify_links(name):
     print(f"PASS [link] {name}: FIRST / AGAIN words -> A entry page and coordinates", flush=True)
 
 
-for name in ("legacy", "config-ieee-True", "custom-path-config"):
+for name in (f"native-{harvard}-True", "native-ieee-True", "custom-path"):
     try:
         verify_links(name)
     except (AssertionError, FileNotFoundError, KeyError, StopIteration) as exc:

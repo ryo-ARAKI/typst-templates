@@ -24,19 +24,6 @@
   body
 }
 
-#let js-document(body, config: none) = _js-document-layout(document-config(overrides: config), body)
-
-#let citep(
-  key,
-  supplement: none,
-  style: auto,
-) = cite(
-  key,
-  supplement: supplement,
-  form: "normal",
-  style: style,
-)
-
 #let _document-author-name-text(value) = {
   if type(value) == str {
     value
@@ -112,16 +99,4 @@
       v(1.5em)
     }
   ]
-}
-
-#let bibliography-list-from(
-  path: "biblio.bib",
-  config: none,
-  style: auto,
-  full: auto,
-) = {
-  let resolved = document-config(overrides: config)
-  let effective-style = if style == auto { resolved.at("bibliography-style") } else { style }
-  let effective-full = if full == auto { resolved.at("bibliography-full") } else { full }
-  bibliography(path, style: effective-style, full: effective-full)
 }

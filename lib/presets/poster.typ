@@ -500,15 +500,6 @@
   value
 }
 
-#let _check-poster-portrait-section(section, name) = {
-  if type(section) != dictionary {
-    poster-portrait-takeaway-theme-error(name + " must be a dictionary")
-  }
-  if section.keys().contains("widths") {
-    poster-portrait-takeaway-theme-error(name + ".widths is no longer supported; use figure-width and note-width")
-  }
-}
-
 #let poster-portrait-required-section-content(section, key, section-name) = {
   poster-portrait-required-content(section.at(key, default: auto), section-name + "." + key)
 }
@@ -712,7 +703,9 @@
     poster-portrait-takeaway-theme-error("sections must contain at least two items")
   }
   for (index, section) in sections.enumerate() {
-    _check-poster-portrait-section(section, "sections.at(" + str(index) + ")")
+    if type(section) != dictionary {
+      poster-portrait-takeaway-theme-error("sections.at(" + str(index) + ") must be a dictionary")
+    }
   }
   sections
 }

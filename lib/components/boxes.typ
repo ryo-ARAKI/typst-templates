@@ -32,10 +32,6 @@
   radius: 10pt,
 )
 
-// Backward-compatible aliases for the old slide template API.
-#let showybox_focus = showybox-focus
-#let showybox_advanced = showybox-advanced
-
 #let labeled-box(
   body,
   label: none,
@@ -93,24 +89,6 @@
 #let structure-colorbox = body => semantic-colorbox(body, colors.at("structure"))
 #let alert-colorbox = body => semantic-colorbox(body, colors.at("alert"))
 #let example-colorbox = body => semantic-colorbox(body, colors.at("example"))
-
-// Legacy state objects kept for compatibility with older slide preambles.
-#let summary-state = state("summary-state", ())
-#let question-state = state("question-state", ())
-#let answer-state = state("answer-state", ())
-
-#let create-box-environment(name, title-text, color, state-obj, numbering: true) = {
-  body => {
-    let key = if numbering { name + "-box-legacy" } else { none }
-    labeled-box(
-      body,
-      label: if title-text == "" { none } else { [#title-text] },
-      color: color,
-      numbering: numbering,
-      key: key,
-    )
-  }
-}
 
 #let question = body => labeled-box(body, label: [Q.], color: colors.at("question"), numbering: true, key: "question-box")
 #let answer = body => labeled-box(body, label: [A.], color: colors.at("answer"), numbering: true, key: "answer-box")

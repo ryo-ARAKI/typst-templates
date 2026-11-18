@@ -293,7 +293,6 @@
   body
 }
 
-#let setup-slide(config: none) = [#show: slide-theme.with(config: config)]
 #let slide-title-slide(
   config: (:),
   extra: none,

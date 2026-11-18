@@ -213,6 +213,7 @@
   let resolved = slide-config(overrides: config)
   let metadata = resolved.at("metadata")
   let datetime-format = resolve-slide-datetime-format(resolved)
+  let footer-a = resolved.at("footer-a")
   show: cjk-spacer
   set text(font: resolved.at("text-font"))
   show raw: set text(font: resolved.at("code-font"))
@@ -231,11 +232,13 @@
   show: university-theme.with(
     header-right: "",
     footer-columns: resolved.at("footer-columns"),
-    footer-a: self => {
-      sym.section + " " + utils.display-current-heading(
+    footer-a: if footer-a == auto {
+      self => sym.section + " " + utils.display-current-heading(
         level: 1,
         setting: _slide-footer-heading-body,
       )
+    } else {
+      footer-a
     },
     footer-b: self => {
       h(1fr)

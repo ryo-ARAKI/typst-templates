@@ -70,6 +70,7 @@ runner がスクリプト開始前に失敗した場合は，テンプレート�
 | 構造化 authors（#35） | 既存の title，省略・空・1人・複数人・content／文字列・メール省略の grouped assertion，空／content 著者の title 接続，旧 `author`・scalar／positional `authors` の診断 | slide の著者列が揃い，空のメールセルと著者なしの title，document の content 著者が正しく表示される |
 | slide の式と参照（#36） | 1つの集約入力で未ラベル・未参照ラベル・前方／後方／繰り返し参照・pause／repeat を確認．番号付きの式の内容・表示順・連番・numbering pattern を Typst の公開 query／counter／numbering API で assert | 参照された表示式だけに番号が付き，表示順の番号と式参照が一致する．未参照ラベル・未ラベル式は番号なし，通常の番号設定・通常ラベル・引用の表示とリンク先が正しい |
 | document の文献設定（#50） | 二文献の著者年／番号方式・full・直接引数／config／既定値，独自 CSL，持ち出し後の入力依存，本文引用の文字位置とリンク先のページ・座標を A の文献位置と照合 | `legacy-*.png`，`config-ieee-True-*.png`，`custom-path-config-*.png` の各2ページで本文と一覧の対応・折返し・欠落・重なりを確認 |
+| slide の左フッター（#68） | `slide-footer-*.pdf` の本文スライドから，左欄の既定・非表示・差し替えと，中央・右欄の文字列を確認 | 非表示時は中央の帯が左端から始まり，summary・日付・スライド番号が見切れない |
 
 コンパイル成功はレイアウトや番号・引用の正しさを保証しない．
 共通実行のログ，semantic 確認の結果，PDF の目視結果をそれぞれ記録し，未実施の項目を成功扱いにしない．
@@ -153,6 +154,20 @@ authors: (
 `slide` は `#show: slide-theme.with(config: metadata + (date-locale: "ja",))` のように
 `date-locale` を追加すると，日付表示を日本語に切り替えられる．
 既定値は `"en"` で，`datetime-format` を明示した場合はその指定が優先される．
+
+`footer-a` の既定値は `auto` で，フッター左欄に `§` とレベル1の見出しを表示する．
+内容を差し替えるには `footer-a: [発表名]` のように設定する．
+左欄を非表示にするには，次のように `footer-a: []` で内容を空にし，`footer-columns` で左列を `0%` にする．
+
+```typ
+#show: slide-theme.with(config: metadata + (
+  footer-a: [],
+  footer-columns: (0%, 90%, 10%),
+))
+```
+
+中央に `summary` と日付，右端にスライド番号が表示される．
+
 title slide では複数著者の `metadata.authors` が氏名・所属・メールアドレスの3列形式で表示され，列の先頭が著者間で揃う．`authors[].email` が空ならメールアドレス列のそのセルは空になる．
 数式番号を参照された表示式だけに付けたい場合は，slide metadata に
 `equation-numbering: "referenced-only"` と `equation-numbering-pattern: "(1)"` を追加する．

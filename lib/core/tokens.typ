@@ -81,6 +81,7 @@
   venue: [],
   bibliography: none,
   datetime-format: auto,
+  footer-a: auto,
   footer-columns: (45%, 45%, 10%),
   handout: false,
   equation-numbering: none,

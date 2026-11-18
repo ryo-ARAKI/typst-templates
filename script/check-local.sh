@@ -4,7 +4,7 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 failures=0
 
-for tool in typst rg awk mktemp; do
+for tool in typst rg awk mktemp pdftotext; do
   if ! command -v "$tool" > /dev/null; then
     printf 'FAIL [environment] required command: %s\n' "$tool" >&2
     exit 1
@@ -89,6 +89,46 @@ for source in starters/document-jp.typ starters/slide.typ starters/poster-column
   examples/document-jp.typ examples/slide.typ examples/slide-speaker-notes.typ examples/poster-column.typ; do
   output="$tmp_dir/${source//\//-}"
   compile_case "$source" "$repo_root/$source" "${output%.typ}.pdf" "$repo_root"
+done
+
+# Check the public slide config against the footer of the body slide (page 2).
+cat > "$tmp_dir/slide-footer.typ" <<EOF
+#import "$repo_root/lib/presets/slide.typ": *
+#let override = (
+  default: (:),
+  hidden: (footer-a: [], footer-columns: (0%, 90%, 10%)),
+  custom: (footer-a: [Custom footer],),
+).at(sys.inputs.at("footer"))
+#show: slide-theme.with(config: (
+  summary: [Footer summary],
+  date: datetime(year: 2026, month: 11, day: 18),
+) + override)
+= Footer section
+== Example slide
+#slide[Slide body.]
+EOF
+slide_footer_matches() {
+  local mode="$1" extracted="$2"
+  case "$mode" in
+    default) rg -q '§\s+Footer section' "$extracted" ;;
+    hidden) ! rg -q '§|Footer section' "$extracted" ;;
+    custom) rg -q 'Custom footer' "$extracted" && ! rg -q '§|Footer section' "$extracted" ;;
+  esac
+}
+for mode in default hidden custom; do
+  output="$tmp_dir/slide-footer-$mode"
+  if ! typst compile --root / --input "footer=$mode" "$tmp_dir/slide-footer.typ" \
+    "$output.pdf" > "$output.log" 2>&1; then
+    report_failure "slide footer ($mode)" "$output.log"
+    continue
+  fi
+  if pdftotext -f 2 -l 2 -layout "$output.pdf" "$output.txt" &&
+    slide_footer_matches "$mode" "$output.txt" &&
+    rg -q 'Footer summary\s+Nov\. 18, 2026\s+2\s*/\s*2' "$output.txt"; then
+    printf 'PASS [semantic] slide footer (%s)\n' "$mode"
+  else
+    report_failure "slide footer ($mode)" "$output.txt" semantic
+  fi
 done
 
 # Compile the published README block itself, so a broken example cannot drift

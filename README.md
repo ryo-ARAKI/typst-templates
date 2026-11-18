@@ -11,7 +11,7 @@
 - `lib/adapters`: `js` `touying` `peace-of-posters` への依存点
 - `lib/presets`: `document / slide / poster` ごとの既定値
 - `starters`: 新しい文書を始める最小テンプレート
-- `examples`: starter を参照する簡単な例
+- `examples`: preset の機能を示すコンパイル可能な例
 - `standalone`: 他のライブラリやスクリプトから独立した単一ファイルのスタイル
 
 ## Standalone RevTeX preprint

@@ -207,8 +207,8 @@ cat > "$tmp_dir/authors-normalization.typ" <<EOF
 #assert.eq(many.len(), 2)
 #assert.eq(many.at(1), (name: [Bob], affiliation: "Lab", email: []))
 #for preset in (document-config, slide-config, poster-config) {
-  assert(preset().metadata.authors.len() > 0)
-  assert.eq(preset(overrides: (authors: (),)).metadata.authors, ())
+  assert(preset().authors.len() > 0)
+  assert.eq(preset(overrides: (authors: (),)).authors, ())
 }
 EOF
 compile_case 'authors normalization assertions' "$tmp_dir/authors-normalization.typ" "$tmp_dir/authors-normalization.pdf" / semantic

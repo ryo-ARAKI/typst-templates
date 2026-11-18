@@ -1,6 +1,5 @@
 #import "@preview/cjk-spacer:0.2.1": cjk-spacer
 #import "../core/config.typ": poster-config
-#import "../core/metadata.typ": render-poster-authors-inline
 #import "../core/journal-abbrev.typ": abbreviate-journal
 #import "../core/locale.typ": apply-japanese-text
 #import "../components/aligned-list.typ": aligned-enum, aligned-items
@@ -9,6 +8,10 @@
 #import "../core/tokens.typ": colors
 
 #let poster-runtime-config = state("poster-runtime-config", poster-config())
+#let _current-poster-config(config) = {
+  if config == none { poster-runtime-config.get() } else { poster-config(overrides: config) }
+}
+
 #let poster-column-title-spacing = 5%
 #let poster-portrait-spacing = 1.0cm
 #let poster-portrait-ink = rgb("#172033")
@@ -124,7 +127,7 @@
 }
 
 #let poster-bibliography-path(resolved) = {
-  let path = resolved.at("metadata").at("bibliography", default: none)
+  let path = resolved.bibliography
   if path == none {
     poster-cite-error("metadata.bibliography is not set")
   }
@@ -350,7 +353,6 @@
 
 #let poster-column-theme(body, config: none) = {
   let resolved = poster-config(overrides: config)
-  let metadata = resolved.at("metadata")
   show: cjk-spacer
   set page("a0", margin: 1cm)
   pop.set-poster-layout(pop.layout-a0)
@@ -377,13 +379,12 @@
   set math.accent(dotless: false)
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
-  poster-runtime-config.update(_ => resolved + (metadata: metadata))
+  poster-runtime-config.update(resolved)
   body
 }
 
 #let poster-portrait-takeaway-theme(body, config: none) = {
   let resolved = poster-config(overrides: config)
-  let metadata = resolved.at("metadata")
   show: cjk-spacer
   set page("a0", margin: 1.2cm)
   set text(size: 40pt, font: resolved.at("text-font"), fill: poster-portrait-ink)
@@ -392,21 +393,44 @@
   set math.accent(dotless: false)
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
-  poster-runtime-config.update(_ => resolved + (metadata: metadata))
+  poster-runtime-config.update(resolved)
   body
 }
 
 #let setup-poster(config: none) = {
   let resolved = poster-config(overrides: config)
-  let bibliography-path = resolved.at("metadata").at("bibliography", default: none)
+  let bibliography-path = resolved.bibliography
   if bibliography-path != none {
     hide(bibliography(bibliography-path, title: none))
   }
 }
+
+#let render-poster-authors-inline(authors, author-size: 44pt, email-size: 34pt) = {
+  let rendered = authors.map(author => {
+    let parts = (
+      author.at("name", default: []),
+      author.at("affiliation", default: []),
+    ).filter(value => value != [])
+    let base = if parts.len() == 0 {
+      []
+    } else {
+      text(size: author-size)[#parts.join($at$)]
+    }
+    let email = author.at("email", default: [])
+    if email == [] {
+      base
+    } else if base == [] {
+      text(size: email-size)[#email]
+    } else {
+      [#base #text(size: email-size)[#email]]
+    }
+  }).filter(value => value != [])
+  if rendered.len() == 0 { [] } else { rendered.join(" / ") }
+}
+
 #let resolve-poster-column-title-box-args(resolved, logo-relative-width: auto) = {
-  let metadata = resolved.at("metadata")
   let resolved-logo-relative-width = if logo-relative-width == auto {
-    metadata.at("logo-relative-width", default: none)
+    resolved.at("logo-relative-width")
   } else {
     logo-relative-width
   }
@@ -422,19 +446,15 @@
 
 #let poster-column-title(config: none, logo: auto, logo-relative-width: auto) = {
   context {
-    let resolved = if config == none {
-      poster-runtime-config.get()
-    } else {
-      poster-config(overrides: config)
-    }
+    let resolved = _current-poster-config(config)
     let logo-content = if logo == auto {
-      resolved.at("metadata").at("logo")
+      resolved.logo
     } else {
       logo
     }
     pop.title-box(
-      resolved.at("metadata").at("title"),
-      authors: resolved.at("metadata").at("poster-authors-inline"),
+      resolved.title,
+      authors: render-poster-authors-inline(resolved.authors),
       logo: logo-content,
       ..resolve-poster-column-title-box-args(resolved, logo-relative-width: logo-relative-width),
     )
@@ -443,13 +463,9 @@
 
 #let poster-column-bottom-box(config: none) = {
   context {
-    let resolved = if config == none {
-      poster-runtime-config.get()
-    } else {
-      poster-config(overrides: config)
-    }
+    let resolved = _current-poster-config(config)
     pop.bottom-box()[
-      #h(1fr)#text(32pt)[#resolved.at("metadata").at("venue")]
+      #h(1fr)#text(32pt)[#resolved.venue]
     ]
   }
 }
@@ -458,9 +474,9 @@
   panic("poster-portrait-takeaway: figure-side must be `left` or `right`")
 }
 
-#let poster-portrait-resolve-logo-width(metadata, logo-relative-width) = {
+#let poster-portrait-resolve-logo-width(resolved, logo-relative-width) = {
   let resolved-logo-relative-width = if logo-relative-width == auto {
-    metadata.at("logo-relative-width", default: none)
+    resolved.at("logo-relative-width")
   } else {
     logo-relative-width
   }
@@ -472,14 +488,13 @@
 }
 
 #let poster-portrait-compact-title(resolved, palette, logo: auto, logo-relative-width: auto, style: poster-portrait-title-style-defaults) = {
-  let metadata = resolved.at("metadata")
   let logo-content = if logo == auto {
-    metadata.at("logo", default: [])
+    resolved.logo
   } else {
     logo
   }
   let has-logo = logo-content != [] and logo-content != none
-  let logo-width = poster-portrait-resolve-logo-width(metadata, logo-relative-width)
+  let logo-width = poster-portrait-resolve-logo-width(resolved, logo-relative-width)
   let logo-gutter = style.at("logo-gutter")
   let text-width = 100% - logo-gutter - logo-width
   grid(
@@ -487,11 +502,11 @@
     gutter: logo-gutter,
     align: horizon,
     [
-      #text(size: style.at("title-size"), fill: palette.at("heading"), weight: "bold")[#metadata.at("title")]
+      #text(size: style.at("title-size"), fill: palette.at("heading"), weight: "bold")[#resolved.title]
       #v(style.at("author-offset"))
       #text(fill: palette.at("ink"), weight: "regular")[
         #render-poster-authors-inline(
-          metadata.at("authors"),
+          resolved.authors,
           author-size: style.at("author-size"),
           email-size: style.at("author-email-size"),
         )
@@ -681,14 +696,13 @@
 }
 
 #let poster-portrait-footer(resolved, palette, footer: auto, acknowledgements: auto, style: poster-portrait-footer-style-defaults) = {
-  let metadata = resolved.at("metadata")
   let footer-content = if footer == auto {
-    metadata.at("venue")
+    resolved.venue
   } else {
     footer
   }
   let acknowledgements-content = if acknowledgements == auto {
-    metadata.at("acknowledgements", default: [])
+    resolved.at("acknowledgements", default: [])
   } else {
     acknowledgements
   }
@@ -785,11 +799,7 @@
   footer-style: (:),
 ) = {
   context {
-    let resolved = if config == none {
-      poster-runtime-config.get()
-    } else {
-      poster-config(overrides: config)
-    }
+    let resolved = _current-poster-config(config)
     let resolved-palette = poster-portrait-resolve-palette(theme, palette)
     let resolved-title-style = poster-portrait-resolve-style(title-style, poster-portrait-title-style-defaults, "title-style")
     let resolved-note-style = poster-portrait-resolve-style(note-style, poster-portrait-note-style-defaults, "note-style")
@@ -840,11 +850,7 @@
 
 #let poster-cite(key, config: none) = {
   context {
-    let resolved = if config == none {
-      poster-runtime-config.get()
-    } else {
-      poster-config(overrides: config)
-    }
+    let resolved = _current-poster-config(config)
     let path = poster-bibliography-path(resolved)
     let entry = poster-citation-entry(key, path)
     let kind = if entry.kind == none { none } else { entry.kind.trim() }
@@ -888,7 +894,7 @@
 
 #let poster-citation-ref(it, config: none) = {
   let resolved = poster-config(overrides: config)
-  let bibliography-path = resolved.at("metadata").at("bibliography", default: none)
+  let bibliography-path = resolved.bibliography
   if bibliography-path == none {
     it
   } else {

@@ -36,6 +36,21 @@
   }
 }
 
+#let _slide-author-column(authors, key, empty: []) = {
+  let values = authors.map(author => author.at(key)).filter(value => value != [])
+  if values.len() == 0 { empty } else { values.join(linebreak()) }
+}
+
+#let _slide-title-author-line(author) = {
+  let email = author.email
+  if email != [] and email != "" {
+    email = slide-title-author-email(email)
+  }
+  (author.name, email, author.affiliation)
+    .filter(value => value != [] and value != "")
+    .join(h(0.6em))
+}
+
 #let slide-title-author-table(authors, fill) = {
   let rows = authors.filter(slide-title-author-has-content)
   let cells = ()
@@ -211,7 +226,6 @@
 
 #let slide-theme(body, config: none) = {
   let resolved = slide-config(overrides: config)
-  let metadata = resolved.at("metadata")
   let datetime-format = resolve-slide-datetime-format(resolved)
   let footer-a = resolved.at("footer-a")
   show: cjk-spacer
@@ -249,20 +263,23 @@
     },
     footer-c: context utils.slide-counter.display() + " / " + utils.last-slide-number,
     config-info(
-      title: metadata.at("title"),
-      subtitle: metadata.at("subtitle"),
-      author: if metadata.at("author-names") == [] { "" } else { metadata.at("author-names") },
-      authors: metadata.at("slide-title-authors"),
-      title-author-entries: metadata.at("authors"),
-      date: metadata.at("date"),
+      title: resolved.title,
+      subtitle: resolved.subtitle,
+      author: _slide-author-column(resolved.authors, "name", empty: ""),
+      authors: resolved.authors
+        .filter(slide-title-author-has-content)
+        .map(_slide-title-author-line)
+        .filter(value => value != []),
+      title-author-entries: resolved.authors,
+      date: resolved.date,
       institution: if resolved.at("institution") != [] {
         resolved.at("institution")
       } else {
-        metadata.at("affiliations-inline")
+        _slide-author-column(resolved.authors, "affiliation")
       },
-      logo: metadata.at("logo"),
-      logo-position: metadata.at("logo-position"),
-      summary: metadata.at("summary"),
+      logo: resolved.logo,
+      logo-position: resolved.at("logo-position"),
+      summary: resolved.summary,
     ),
     config-common(
       datetime-format: datetime-format,

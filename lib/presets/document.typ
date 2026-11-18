@@ -11,7 +11,7 @@
 #let setup-document(body, config: none) = {
   let resolved = document-config(overrides: config)
   show: cjk-spacer
-  show: js-document.with(config: resolved)
+  show: _js-document-layout.with(resolved)
   set math.equation(numbering: resolved.at("equation-numbering"))
   set math.accent(dotless: false)
   body

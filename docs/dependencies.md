@@ -59,5 +59,5 @@ These tools are not Typst package imports, and they are not required for normal 
 
 - Check `lib/adapters` first when a package update breaks compilation.
 - Keep `lib/core` free from package-specific APIs where possible.
-- If a package becomes unstable, replace its adapter before touching starters.
-- When metadata behavior changes, update `lib/core/metadata.typ` before changing any target preset.
+- Verify the consuming presets and their re-exports when an adapter changes.
+- Keep author input validation in `lib/core/metadata.typ` and author display in the relevant preset or adapter.

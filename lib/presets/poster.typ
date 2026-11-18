@@ -88,18 +88,15 @@
   if type(overrides) != dictionary {
     poster-portrait-takeaway-theme-error("overrides must be a dictionary")
   }
-  let named-palette = if theme == auto {
-    poster-portrait-named-palettes.at(poster-portrait-default-theme)
-  } else if type(theme) == str {
-    if poster-portrait-named-palettes.keys().contains(theme) {
-      poster-portrait-named-palettes.at(theme)
-    } else {
-      poster-portrait-takeaway-theme-error("unknown theme `" + theme + "`")
-    }
-  } else {
+  let name = if theme == auto { poster-portrait-default-theme } else { theme }
+  if type(name) != str {
     poster-portrait-takeaway-theme-error("theme must be auto or a string")
   }
-  poster-portrait-base-palette + named-palette + overrides
+  let palette = poster-portrait-named-palettes.at(name, default: none)
+  if palette == none {
+    poster-portrait-takeaway-theme-error("unknown theme `" + name + "`")
+  }
+  palette + overrides
 }
 
 #let poster-portrait-resolve-palette(theme, palette) = {
@@ -450,10 +447,6 @@
   }
 }
 
-#let poster-portrait-figure-side-error(side) = {
-  panic("poster-portrait-takeaway: figure-side must be `left` or `right`")
-}
-
 #let poster-portrait-resolve-logo-width(resolved, logo-relative-width) = {
   let resolved-logo-relative-width = if logo-relative-width == auto {
     resolved.at("logo-relative-width")
@@ -507,14 +500,13 @@
   value
 }
 
-#let poster-portrait-required-section(section, name) = {
+#let _check-poster-portrait-section(section, name) = {
   if type(section) != dictionary {
     poster-portrait-takeaway-theme-error(name + " must be a dictionary")
   }
   if section.keys().contains("widths") {
     poster-portrait-takeaway-theme-error(name + ".widths is no longer supported; use figure-width and note-width")
   }
-  section
 }
 
 #let poster-portrait-required-section-content(section, key, section-name) = {
@@ -639,21 +631,20 @@
   name: "section",
   note-style: poster-portrait-note-style-defaults,
 ) = {
-  let resolved-section = poster-portrait-required-section(section, name)
   let resolved-note-style = poster-portrait-resolve-style(
-    resolved-section.at("note-style", default: (:)),
+    section.at("note-style", default: (:)),
     note-style,
     name + ".note-style",
   )
-  let side = resolved-section.at("figure-side", default: default-side)
+  let side = section.at("figure-side", default: default-side)
   if side != left and side != right {
-    poster-portrait-figure-side-error(side)
+    poster-portrait-takeaway-theme-error("figure-side must be `left` or `right`")
   }
-  let title = resolved-section.at("title", default: none)
-  let figure = poster-portrait-required-section-content(resolved-section, "figure", name)
-  let note = poster-portrait-required-section-content(resolved-section, "note", name)
-  let figure-width = resolved-section.at("figure-width", default: 1.18fr)
-  let note-width = resolved-section.at("note-width", default: 0.82fr)
+  let title = section.at("title", default: none)
+  let figure = poster-portrait-required-section-content(section, "figure", name)
+  let note = poster-portrait-required-section-content(section, "note", name)
+  let figure-width = section.at("figure-width", default: 1.18fr)
+  let note-width = section.at("note-width", default: 0.82fr)
   let figure-cell = poster-portrait-figure-box(figure, palette, title: title)
   let note-cell = poster-portrait-note-panel(note, palette, style: resolved-note-style)
   let columns = if side == left {
@@ -720,11 +711,10 @@
   if sections.len() < 2 {
     poster-portrait-takeaway-theme-error("sections must contain at least two items")
   }
-  let resolved-sections = ()
   for (index, section) in sections.enumerate() {
-    resolved-sections.push(poster-portrait-required-section(section, "sections.at(" + str(index) + ")"))
+    _check-poster-portrait-section(section, "sections.at(" + str(index) + ")")
   }
-  resolved-sections
+  sections
 }
 
 #let poster-portrait-resolve-figure-heights(figure-heights, section-count) = {

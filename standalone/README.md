@@ -30,8 +30,6 @@ Typst 0.15.0以降に対応し，本文は英語でNew Computer Modern，日本�
 typst compile revtex-preprint-template.typ
 ```
 
-`draft` は `revtex-preprint` の別名で，同じ既定値を使います．
-
 ### ひな形の構成と書き換え
 
 ひな形は機能紹介と論文の書き始めを兼ね，速度の測定値・標本平均・標本標準偏差を共通の題材にします．

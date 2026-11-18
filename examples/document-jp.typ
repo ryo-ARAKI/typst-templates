@@ -20,8 +20,6 @@
   venue: [],
   logo: [],
   bibliography: "/starters/biblio.bib",
-  bibliography-style: "harvard-cite-them-right",
-  bibliography-full: true,
 )
 
 #show: setup-document.with(config: metadata)
@@ -70,6 +68,6 @@ $
 
 == 参考文献
 
-参考文献の引用~#citep(<Tanogami2024_information>)．
+参考文献の引用~#cite(<Tanogami2024_information>)．
 
-#bibliography-list-from(path: metadata.at("bibliography"), config: metadata)
+#bibliography(metadata.bibliography, style: "harvard-cite-them-right", full: true)

@@ -54,9 +54,6 @@
   abstract: [文書の要旨．],
   venue: [],
   logo: [],
-  bibliography: "/starters/biblio.bib",
-  bibliography-style: "harvard-cite-them-right",
-  bibliography-full: true,
   date: datetime.today().display(),
 )
 

@@ -6,8 +6,6 @@
   base + patch
 }
 
-#let finalize-config(config) = config + (metadata: normalize-metadata(config),)
-
-#let document-config(overrides: none) = finalize-config(merge-config(document-defaults, overrides: overrides))
-#let slide-config(overrides: none) = finalize-config(merge-config(slide-defaults, overrides: overrides))
-#let poster-config(overrides: none) = finalize-config(merge-config(poster-defaults, overrides: overrides))
+#let document-config(overrides: none) = normalize-metadata(merge-config(document-defaults, overrides: overrides))
+#let slide-config(overrides: none) = normalize-metadata(merge-config(slide-defaults, overrides: overrides))
+#let poster-config(overrides: none) = normalize-metadata(merge-config(poster-defaults, overrides: overrides))

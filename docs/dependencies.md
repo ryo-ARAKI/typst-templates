@@ -35,14 +35,8 @@
 
 ## Built-in Bibliography
 
-- `document` uses Typst's built-in `cite` and `bibliography`; the defaults remain `harvard-cite-them-right` and `full: true`.
-- `citep(key, supplement:, style:)` and `bibliography-list-from(path:)` remain available as compatibility wrappers.
-- Pass document config explicitly with `bibliography-list-from(path:, config: metadata)` to use `bibliography-style` and `bibliography-full`.
-  Direct `style:` / `full:` arguments other than `auto` override config independently; config overrides the document defaults.
-  `citep(style: auto)` follows the corresponding bibliography's final style.
-- Custom CSL strings, caller-created `path` values, and `bytes` pass through to Typst without path rebasing or fallback.
-  See the [document bibliography examples](../README.md#document-の参考文献) for compile-root rules and diagnostics.
-- APIs exported only by the former `enja-bib` dependency are no longer available.
+- Document sources use Typst's built-in `cite` and `bibliography`. The document starter and example specify `style: "harvard-cite-them-right"` and `full: true` at the call site.
+- See the [document bibliography examples](../README.md#document-の参考文献) for citation styles and path resolution.
 
 ## Optional Command-Line Tools
 
@@ -59,5 +53,5 @@ These tools are not Typst package imports, and they are not required for normal 
 
 - Check `lib/adapters` first when a package update breaks compilation.
 - Keep `lib/core` free from package-specific APIs where possible.
-- If a package becomes unstable, replace its adapter before touching starters.
-- When metadata behavior changes, update `lib/core/metadata.typ` before changing any target preset.
+- Verify the consuming presets and their re-exports when an adapter changes.
+- Keep author input validation in `lib/core/metadata.typ` and author display in the relevant preset or adapter.

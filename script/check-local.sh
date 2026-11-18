@@ -77,7 +77,7 @@ fi
 if TMPDIR="$tmp_dir" bash "$repo_root/script/check-document-bibliography.sh" \
   > "$tmp_dir/document-bibliography.log" 2>&1; then
   printf 'PASS [compile] document bibliography / README examples (bibliography checker)\n'
-  printf 'PASS [semantic] document bibliography config / styles / selection / relocation / diagnostics\n'
+  printf 'PASS [semantic] document bibliography styles / selection / relocation / diagnostics\n'
   printf 'PASS [link] document body citations point to the cited bibliography entry\n'
 else
   # Keep the focused checker's compile / semantic / link / environment labels.
@@ -207,8 +207,8 @@ cat > "$tmp_dir/authors-normalization.typ" <<EOF
 #assert.eq(many.len(), 2)
 #assert.eq(many.at(1), (name: [Bob], affiliation: "Lab", email: []))
 #for preset in (document-config, slide-config, poster-config) {
-  assert(preset().metadata.authors.len() > 0)
-  assert.eq(preset(overrides: (authors: (),)).metadata.authors, ())
+  assert(preset().authors.len() > 0)
+  assert.eq(preset(overrides: (authors: (),)).authors, ())
 }
 EOF
 compile_case 'authors normalization assertions' "$tmp_dir/authors-normalization.typ" "$tmp_dir/authors-normalization.pdf" / semantic
@@ -236,7 +236,7 @@ EOF
 compile_case 'empty authors slide title' "$tmp_dir/authors-slide.typ" "$tmp_dir/authors-slide.pdf" /
 
 check_authors_diagnostic() {
-  local name="$1" config="$2" scope="$3" reason="$4"
+  local name="$1" config="$2"
   local input="$tmp_dir/$name.typ" log="$tmp_dir/$name.log"
   printf '#import "%s/lib/core/config.typ": slide-config\n#slide-config(overrides: %s)\n' \
     "$repo_root" "$config" > "$input"
@@ -245,20 +245,14 @@ check_authors_diagnostic() {
     failures=$((failures + 1))
     return
   fi
-  # Check only actual error lines for the public scope, reason and migration.
-  # Do not match source excerpts, stack frames, line numbers or full messages.
-  local diagnostic
-  diagnostic="$(rg '^error:' "$log" || true)"
-  if [[ "$diagnostic" == *"$scope"* && "$diagnostic" == *"$reason"* &&
-        "$diagnostic" == *'authors:'* && "$diagnostic" == *'name:'* ]]; then
+  if rg -q '^error:.*metadata\.authors must be an array of author dictionaries' "$log"; then
     printf 'PASS [semantic] %s diagnostic\n' "$name"
   else
     report_failure "$name diagnostic" "$log" semantic
   fi
 }
-check_authors_diagnostic legacy-author '(author: [Alice], authors: (),)' metadata.author 'no longer supported'
-check_authors_diagnostic scalar-authors '(authors: [Alice],)' metadata.authors 'array of author dictionaries'
-check_authors_diagnostic positional-authors '(authors: ([Alice], [Institute], [alice@example.com]),)' metadata.authors 'array of author dictionaries'
+check_authors_diagnostic scalar-authors '(authors: [Alice],)'
+check_authors_diagnostic positional-authors '(authors: ([Alice], [Institute], [alice@example.com]),)'
 
 # One representative input protects referenced-only selection, display order,
 # forward/back/repeated references and Touying pause/repeat. Inspect rendered

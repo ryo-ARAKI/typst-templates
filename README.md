@@ -11,7 +11,7 @@
 - `lib/adapters`: `js` `touying` `peace-of-posters` への依存点
 - `lib/presets`: `document / slide / poster` ごとの既定値
 - `starters`: 新しい文書を始める最小テンプレート
-- `examples`: starter を参照する簡単な例
+- `examples`: preset の機能を示すコンパイル可能な例
 - `standalone`: 他のライブラリやスクリプトから独立した単一ファイルのスタイル
 
 ## Standalone RevTeX preprint
@@ -67,9 +67,9 @@ runner がスクリプト開始前に失敗した場合は，テンプレート�
 | README の数式注釈（#32） | 掲載コードを抽出してコンパイル | 注釈，矢印，数式が重ならず，対応する項を指す |
 | poster 引用（#33） | 既存 poster API チェックで複数行・1行・入れ子・コメント付き BibTeX の値と通常ラベルの参照を確認 | 短い引用の著者・雑誌略称・巻・年が読み取れる |
 | portrait の図寸法（#34） | starter・example のコンパイル | example **全3ページ**と starter で図全体が見え，headline band・見出し・隣接パネルに重ならず，図中の文字が読める |
-| 構造化 authors（#35） | 既存の title，省略・空・1人・複数人・content／文字列・メール省略の grouped assertion，空／content 著者の title 接続，旧 `author`・scalar／positional `authors` の診断 | slide の著者列が揃い，空のメールセルと著者なしの title，document の content 著者が正しく表示される |
+| 構造化 authors（#35） | 既存の title，省略・空・1人・複数人・content／文字列・メール省略の grouped assertion，空／content 著者の title 接続，辞書の配列でない `authors` の診断 | slide の著者列が揃い，空のメールセルと著者なしの title，document の content 著者が正しく表示される |
 | slide の式と参照（#36） | 1つの集約入力で未ラベル・未参照ラベル・前方／後方／繰り返し参照・pause／repeat を確認．番号付きの式の内容・表示順・連番・numbering pattern を Typst の公開 query／counter／numbering API で assert | 参照された表示式だけに番号が付き，表示順の番号と式参照が一致する．未参照ラベル・未ラベル式は番号なし，通常の番号設定・通常ラベル・引用の表示とリンク先が正しい |
-| document の文献設定（#50） | 二文献の著者年／番号方式・full・直接引数／config／既定値，独自 CSL，持ち出し後の入力依存，本文引用の文字位置とリンク先のページ・座標を A の文献位置と照合 | `legacy-*.png`，`config-ieee-True-*.png`，`custom-path-config-*.png` の各2ページで本文と一覧の対応・折返し・欠落・重なりを確認 |
+| document の文献設定（#50） | 二文献の著者年／番号方式・full・直接引数と set rule の優先順位，独自 CSL，持ち出し後の入力依存，本文引用の文字位置とリンク先のページ・座標を A の文献位置と照合 | `native-harvard-cite-them-right-True-*.png`，`native-ieee-True-*.png`，`custom-path-*.png` の各2ページで本文と一覧の対応・折返し・欠落・重なりを確認 |
 | slide の左フッター（#68） | `slide-footer-*.pdf` の本文スライドから，左欄の既定・非表示・差し替えと，中央・右欄の文字列を確認 | 非表示時は中央の帯が左端から始まり，summary・日付・スライド番号が見切れない |
 
 コンパイル成功はレイアウトや番号・引用の正しさを保証しない．
@@ -123,22 +123,7 @@ README だけの説明変更や検証手順への接続だけを理由に，同�
 | `slide` | Presenter name と Co-author name の2人，所属はどちらも Institution，メールなし |
 | `poster` | Presenter name，Institution，`email@address` の1人 |
 
-旧 `author` と非構造化 `authors` は受け付けない破壊的変更で，指定すると移行案内の診断を出す．
-旧 `author: [Alice]` は次のように書き換える．
-
-```typ
-authors: ((name: [Alice],),),
-```
-
-旧 `authors: [Alice]`，`authors: ([Alice], [Institute], [alice@example.com])`，単一の著者辞書も，次の正式形式に書き換える．
-
-```typ
-authors: (
-  (name: [Alice], affiliation: [Institute], email: "alice@example.com"),
-),
-```
-
-- `document`: 主に `title`, `authors`, `date`, `abstract`, `bibliography`
+- `document`: 主に `title`, `authors`, `date`, `abstract`
 - `slide`: 主に `title`, `subtitle`, `authors`, `date`, `summary`, `logo`
 - `poster`: 主に `title`, `authors`, `venue`, `logo`
 
@@ -366,8 +351,8 @@ typst compile --root . starters/document-jp.typ /tmp/document-jp.pdf
 #show: setup-document.with(config: metadata)
 #document-title(config: metadata)
 
-引用~#citep(<Tanogami2024_information>)．
-#bibliography-list-from(path: metadata.at("bibliography"), config: metadata)
+引用~#cite(<Tanogami2024_information>)．
+#bibliography(metadata.bibliography, style: "harvard-cite-them-right", full: true)
 ```
 
 この例では文献ファイルを親リポジトリの `refs/biblio.bib` に置き，`bibliography` をその絶対パスに合わせている．サブモジュールを親側へ追加しただけでは，starter の `"/starters/biblio.bib"` は親側にある文献ファイルを指さない．自分の文書へ starter の設定を移すときは，`bibliography` を親リポジトリ root 基準のパス（例えば `"/refs/biblio.bib"`）に書き換える．`sample.typ` が親リポジトリ直下にある場合のコンパイル例は次の通り．
@@ -380,70 +365,44 @@ typst compile --root . sample.typ /tmp/sample.pdf
 
 ### document の参考文献
 
-共通 document の一覧には，`setup-document` と同じ辞書を `config: metadata` で明示的に渡す．
-`setup-document(config: metadata)` から一覧への暗黙の設定伝播は行わない．
+本文引用には Typst 標準の `cite`，文献一覧には `bibliography` を使う．
+文献ファイルを `bibliography` の位置引数に渡し，書式と収録範囲は `style:` と `full:` で指定する．
 次の完全な例を親リポジトリ直下の `sample.typ` として保存すると，番号方式で引用文献だけを表示できる．
 文献ファイルは `refs/biblio.bib` に置き，例の引用キーを含める．
 
 <!-- document-bibliography-example: numeric -->
 ```typ
 #import "typst-templates/lib/presets/document.typ": *
-#let metadata = (
-  bibliography: "/refs/biblio.bib",
-  bibliography-style: "ieee",
-  bibliography-full: false,
-)
-#show: setup-document.with(config: metadata)
-引用~#citep(<Tanogami2024_information>)．
-#bibliography-list-from(path: metadata.at("bibliography"), config: metadata)
+#show: setup-document
+引用~#cite(<Tanogami2024_information>)．
+#bibliography("/refs/biblio.bib", style: "ieee", full: false)
 ```
 
-wrapper の signature は `bibliography-list-from(path: "biblio.bib", config: none, style: auto, full: auto)`．
-style と full はそれぞれ独立に「直接引数（`auto` 以外） > config > document の既定値」で解決する．
-既定値は `bibliography-style: "harvard-cite-them-right"`，`bibliography-full: true` で，旧 `bibliography-list-from(path:)` も同じ表示を維持する．
-`full: false` は引用された文献だけ，`true` は未引用の文献も収録する．
-無引用なら `false` ではゼロ件，`true` では全件になる．
-`config.bibliography` からファイルを暗黙に選ばないため，`path:` は従来どおり渡す．
-
-次は直接引数で著者年方式・全件表示に上書きする完全な例．
-`style:` だけ，または `full:` だけを指定しても，他方は config に従う．
-明示した `false` も直接引数として優先する．
+`full: false` は引用された文献だけ，`true` は全件を収録する．
+文書内の設定には `#set bibliography(...)` を使える．
+次の例では呼び出し時の引数が set rule より優先され，著者年方式で全件を表示する．
 
 <!-- document-bibliography-example: override -->
 ```typ
 #import "typst-templates/lib/presets/document.typ": *
-#let metadata = (
-  bibliography: "/refs/biblio.bib",
-  bibliography-style: "ieee",
-  bibliography-full: false,
-)
-#show: setup-document.with(config: metadata)
-引用~#citep(<Tanogami2024_information>)．
-#bibliography-list-from(
-  path: metadata.at("bibliography"), config: metadata,
-  style: "harvard-cite-them-right", full: true,
-)
+#show: setup-document
+#set bibliography(style: "ieee", full: false)
+引用~#cite(<Tanogami2024_information>)．
+#bibliography("/refs/biblio.bib", style: "harvard-cite-them-right", full: true)
 ```
 
-`citep(key, supplement: none, style: auto)` は `form: "normal"` を維持し，`auto` では Typst が対応付けた bibliography の最終 style に追従する．
-`citep` の直接 `style:` はその引用だけを変更し，一覧との一致を強制しない．
-wrapper が明示する style/full は外側の `set bibliography(style:, full:)` より優先し，`title` など wrapper が指定しない標準設定や show rule はそのまま使える．
+`cite(style: auto)` は対応する一覧の書式に従う．
+`cite` に個別の `style:` や `supplement:` を指定すると，その引用に適用される．
 
-独自 CSL は組込み名と同じく `bibliography-style` または直接 `style:` に指定できる．
-型は標準 Typst の `str` / `path` / `bytes` をそのまま受け渡す．
-次の例では caller の `sample.typ` と同じ階層の `styles/journal.csl` に有効な CSL を置き，caller で作った `path(...)` に基準位置を保持させる．
+独自 CSL は `bibliography` の `style:` に指定する．
+次の例では `sample.typ` と同じ階層に `styles/journal.csl` を置く．
 
 <!-- document-bibliography-example: csl-path -->
 ```typ
 #import "typst-templates/lib/presets/document.typ": *
-#let metadata = (
-  bibliography: "/refs/biblio.bib",
-  bibliography-style: path("styles/journal.csl"),
-  bibliography-full: false,
-)
-#show: setup-document.with(config: metadata)
-引用~#citep(<Tanogami2024_information>)．
-#bibliography-list-from(path: metadata.at("bibliography"), config: metadata)
+#show: setup-document
+引用~#cite(<Tanogami2024_information>)．
+#bibliography("/refs/biblio.bib", style: path("styles/journal.csl"), full: false)
 ```
 
 次の root 基準文字列も同じ配置で使える．
@@ -452,26 +411,14 @@ wrapper が明示する style/full は外側の `set bibliography(style:, full:)
 <!-- document-bibliography-example: csl-root -->
 ```typ
 #import "typst-templates/lib/presets/document.typ": *
-#let metadata = (
-  bibliography: "/refs/biblio.bib",
-  bibliography-style: "/styles/journal.csl",
-  bibliography-full: false,
-)
-#show: setup-document.with(config: metadata)
-引用~#citep(<Tanogami2024_information>)．
-#bibliography-list-from(path: metadata.at("bibliography"), config: metadata)
+#show: setup-document
+引用~#cite(<Tanogami2024_information>)．
+#bibliography("/refs/biblio.bib", style: "/styles/journal.csl", full: false)
 ```
 
-これらの例は親リポジトリ直下から `typst compile --root . sample.typ /tmp/sample.pdf` でコンパイルする．
-親配置ごと持ち出す場合も `typst-templates/`，`refs/`，`styles/` を含め，移動先の親リポジトリを compile root にする．
-bytes を渡す場合は caller で `read("styles/journal.csl", encoding: none)` を作って指定する．
-相対文字列 `"styles/journal.csl"` は adapter 内の標準 bibliography 呼出位置が基準になり，caller 基準への補正や独自 CSL の探索は行わない．
-caller のファイルには `path(...)` または root 基準文字列を使う．
-
-config の `bibliography-style` に `auto` は指定できない．
-wrapper の `style: auto` / `full: auto` は config の解決を意味する．
-不正な有効値・未知 style・CSL/Bib の欠落や不正・未定義引用キーは Typst の診断を伝播してコンパイル失敗になり，既定スタイルへの fallback は行わない．
-直接引数で置換した config の style/full は先行検証しない．
+原稿内で `bibliography` を呼び出す場合，相対文字列 `"styles/journal.csl"` はその原稿を基準に解決される．
+`read("styles/journal.csl", encoding: none)` で読んだ bytes も指定できる．
+持ち出す場合は `typst-templates/`，`refs/`，`styles/` を含め，移動先の親ディレクトリを compile root に指定する．
 
 ### Aligned list helpers
 

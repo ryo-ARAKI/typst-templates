@@ -1,6 +1,5 @@
 #import "@preview/cjk-spacer:0.2.1": cjk-spacer
 #import "../core/config.typ": poster-config
-#import "../core/metadata.typ": render-poster-authors-inline
 #import "../core/journal-abbrev.typ": abbreviate-journal
 #import "../core/locale.typ": apply-japanese-text
 #import "../components/aligned-list.typ": aligned-enum, aligned-items
@@ -9,6 +8,10 @@
 #import "../core/tokens.typ": colors
 
 #let poster-runtime-config = state("poster-runtime-config", poster-config())
+#let _current-poster-config(config) = {
+  if config == none { poster-runtime-config.get() } else { poster-config(overrides: config) }
+}
+
 #let poster-column-title-spacing = 5%
 #let poster-portrait-spacing = 1.0cm
 #let poster-portrait-ink = rgb("#172033")
@@ -85,18 +88,15 @@
   if type(overrides) != dictionary {
     poster-portrait-takeaway-theme-error("overrides must be a dictionary")
   }
-  let named-palette = if theme == auto {
-    poster-portrait-named-palettes.at(poster-portrait-default-theme)
-  } else if type(theme) == str {
-    if poster-portrait-named-palettes.keys().contains(theme) {
-      poster-portrait-named-palettes.at(theme)
-    } else {
-      poster-portrait-takeaway-theme-error("unknown theme `" + theme + "`")
-    }
-  } else {
+  let name = if theme == auto { poster-portrait-default-theme } else { theme }
+  if type(name) != str {
     poster-portrait-takeaway-theme-error("theme must be auto or a string")
   }
-  poster-portrait-base-palette + named-palette + overrides
+  let palette = poster-portrait-named-palettes.at(name, default: none)
+  if palette == none {
+    poster-portrait-takeaway-theme-error("unknown theme `" + name + "`")
+  }
+  palette + overrides
 }
 
 #let poster-portrait-resolve-palette(theme, palette) = {
@@ -121,14 +121,6 @@
     poster-portrait-takeaway-theme-error("unknown " + name + " key `" + unknown.at(0) + "`")
   }
   defaults + style
-}
-
-#let poster-bibliography-path(resolved) = {
-  let path = resolved.at("metadata").at("bibliography", default: none)
-  if path == none {
-    poster-cite-error("metadata.bibliography is not set")
-  }
-  path
 }
 
 #let poster-capture-first(text, pattern) = {
@@ -159,8 +151,7 @@
 
 // Locate entry boundaries without treating nested field braces as entry endings.
 // This reads literal BibTeX fields for short citations, not macros or crossrefs.
-#let poster-entry-blocks(text) = {
-  let blocks = ()
+#let _find-poster-bibtex-entry(text, key) = {
   let start = none
   let offset = 0
   let depth = 0
@@ -189,13 +180,14 @@
     } else if char == "}" {
       if depth > 1 or not quoted { depth -= 1 }
       if depth == 0 {
-        blocks.push(text.slice(start, offset + char.len()))
+        let entry = text.slice(start, offset + char.len())
+        if poster-entry-key(entry) == key { return entry }
         start = none
       }
     }
     offset += char.len()
   }
-  blocks
+  none
 }
 
 // Only commas outside braced or quoted values separate fields.
@@ -241,8 +233,6 @@
   }
   fields
 }
-
-#let poster-field(block, name) = poster-entry-fields(block).at(lower(name), default: none)
 
 #let poster-entry-kind(block) = {
   let kind = poster-capture-first(block, regex("(?im)^\\s*@([A-Za-z]+)\\s*\\{"))
@@ -297,12 +287,8 @@
 }
 
 #let poster-citation-entry(key, path) = {
-  let bibliography = read(path)
-  let blocks = poster-entry-blocks(bibliography)
-  let target = blocks.find(block => poster-entry-key(block) == key)
-  if target == none {
-    poster-cite-error("entry not found for key `" + key + "` in `" + path + "`")
-  }
+  let target = _find-poster-bibtex-entry(read(path), key)
+  if target == none { return none }
   let fields = poster-entry-fields(target)
   (
     kind: poster-entry-kind(target),
@@ -312,12 +298,6 @@
     volume: fields.at("volume", default: none),
     year: fields.at("year", default: none),
   )
-}
-
-#let poster-has-citation-entry(key, path) = {
-  let bibliography = read(path)
-  let blocks = poster-entry-blocks(bibliography)
-  blocks.find(block => poster-entry-key(block) == key) != none
 }
 
 #let poster-logo-strip(..logos, gap: 0.4em, widths: none) = {
@@ -350,7 +330,6 @@
 
 #let poster-column-theme(body, config: none) = {
   let resolved = poster-config(overrides: config)
-  let metadata = resolved.at("metadata")
   show: cjk-spacer
   set page("a0", margin: 1cm)
   pop.set-poster-layout(pop.layout-a0)
@@ -377,13 +356,12 @@
   set math.accent(dotless: false)
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
-  poster-runtime-config.update(_ => resolved + (metadata: metadata))
+  poster-runtime-config.update(resolved)
   body
 }
 
 #let poster-portrait-takeaway-theme(body, config: none) = {
   let resolved = poster-config(overrides: config)
-  let metadata = resolved.at("metadata")
   show: cjk-spacer
   set page("a0", margin: 1.2cm)
   set text(size: 40pt, font: resolved.at("text-font"), fill: poster-portrait-ink)
@@ -392,21 +370,44 @@
   set math.accent(dotless: false)
   apply-japanese-text(cjk-font: resolved.at("cjk-font"))
   apply-inline-japanese-math-spacing()
-  poster-runtime-config.update(_ => resolved + (metadata: metadata))
+  poster-runtime-config.update(resolved)
   body
 }
 
 #let setup-poster(config: none) = {
   let resolved = poster-config(overrides: config)
-  let bibliography-path = resolved.at("metadata").at("bibliography", default: none)
+  let bibliography-path = resolved.bibliography
   if bibliography-path != none {
     hide(bibliography(bibliography-path, title: none))
   }
 }
+
+#let render-poster-authors-inline(authors, author-size: 44pt, email-size: 34pt) = {
+  let rendered = authors.map(author => {
+    let parts = (
+      author.at("name", default: []),
+      author.at("affiliation", default: []),
+    ).filter(value => value != [])
+    let base = if parts.len() == 0 {
+      []
+    } else {
+      text(size: author-size)[#parts.join($at$)]
+    }
+    let email = author.at("email", default: [])
+    if email == [] {
+      base
+    } else if base == [] {
+      text(size: email-size)[#email]
+    } else {
+      [#base #text(size: email-size)[#email]]
+    }
+  }).filter(value => value != [])
+  if rendered.len() == 0 { [] } else { rendered.join(" / ") }
+}
+
 #let resolve-poster-column-title-box-args(resolved, logo-relative-width: auto) = {
-  let metadata = resolved.at("metadata")
   let resolved-logo-relative-width = if logo-relative-width == auto {
-    metadata.at("logo-relative-width", default: none)
+    resolved.at("logo-relative-width")
   } else {
     logo-relative-width
   }
@@ -422,19 +423,15 @@
 
 #let poster-column-title(config: none, logo: auto, logo-relative-width: auto) = {
   context {
-    let resolved = if config == none {
-      poster-runtime-config.get()
-    } else {
-      poster-config(overrides: config)
-    }
+    let resolved = _current-poster-config(config)
     let logo-content = if logo == auto {
-      resolved.at("metadata").at("logo")
+      resolved.logo
     } else {
       logo
     }
     pop.title-box(
-      resolved.at("metadata").at("title"),
-      authors: resolved.at("metadata").at("poster-authors-inline"),
+      resolved.title,
+      authors: render-poster-authors-inline(resolved.authors),
       logo: logo-content,
       ..resolve-poster-column-title-box-args(resolved, logo-relative-width: logo-relative-width),
     )
@@ -443,24 +440,16 @@
 
 #let poster-column-bottom-box(config: none) = {
   context {
-    let resolved = if config == none {
-      poster-runtime-config.get()
-    } else {
-      poster-config(overrides: config)
-    }
+    let resolved = _current-poster-config(config)
     pop.bottom-box()[
-      #h(1fr)#text(32pt)[#resolved.at("metadata").at("venue")]
+      #h(1fr)#text(32pt)[#resolved.venue]
     ]
   }
 }
 
-#let poster-portrait-figure-side-error(side) = {
-  panic("poster-portrait-takeaway: figure-side must be `left` or `right`")
-}
-
-#let poster-portrait-resolve-logo-width(metadata, logo-relative-width) = {
+#let poster-portrait-resolve-logo-width(resolved, logo-relative-width) = {
   let resolved-logo-relative-width = if logo-relative-width == auto {
-    metadata.at("logo-relative-width", default: none)
+    resolved.at("logo-relative-width")
   } else {
     logo-relative-width
   }
@@ -472,14 +461,13 @@
 }
 
 #let poster-portrait-compact-title(resolved, palette, logo: auto, logo-relative-width: auto, style: poster-portrait-title-style-defaults) = {
-  let metadata = resolved.at("metadata")
   let logo-content = if logo == auto {
-    metadata.at("logo", default: [])
+    resolved.logo
   } else {
     logo
   }
   let has-logo = logo-content != [] and logo-content != none
-  let logo-width = poster-portrait-resolve-logo-width(metadata, logo-relative-width)
+  let logo-width = poster-portrait-resolve-logo-width(resolved, logo-relative-width)
   let logo-gutter = style.at("logo-gutter")
   let text-width = 100% - logo-gutter - logo-width
   grid(
@@ -487,11 +475,11 @@
     gutter: logo-gutter,
     align: horizon,
     [
-      #text(size: style.at("title-size"), fill: palette.at("heading"), weight: "bold")[#metadata.at("title")]
+      #text(size: style.at("title-size"), fill: palette.at("heading"), weight: "bold")[#resolved.title]
       #v(style.at("author-offset"))
       #text(fill: palette.at("ink"), weight: "regular")[
         #render-poster-authors-inline(
-          metadata.at("authors"),
+          resolved.authors,
           author-size: style.at("author-size"),
           email-size: style.at("author-email-size"),
         )
@@ -510,16 +498,6 @@
     poster-portrait-takeaway-theme-error(name + " is required")
   }
   value
-}
-
-#let poster-portrait-required-section(section, name) = {
-  if type(section) != dictionary {
-    poster-portrait-takeaway-theme-error(name + " must be a dictionary")
-  }
-  if section.keys().contains("widths") {
-    poster-portrait-takeaway-theme-error(name + ".widths is no longer supported; use figure-width and note-width")
-  }
-  section
 }
 
 #let poster-portrait-required-section-content(section, key, section-name) = {
@@ -644,21 +622,20 @@
   name: "section",
   note-style: poster-portrait-note-style-defaults,
 ) = {
-  let resolved-section = poster-portrait-required-section(section, name)
   let resolved-note-style = poster-portrait-resolve-style(
-    resolved-section.at("note-style", default: (:)),
+    section.at("note-style", default: (:)),
     note-style,
     name + ".note-style",
   )
-  let side = resolved-section.at("figure-side", default: default-side)
+  let side = section.at("figure-side", default: default-side)
   if side != left and side != right {
-    poster-portrait-figure-side-error(side)
+    poster-portrait-takeaway-theme-error("figure-side must be `left` or `right`")
   }
-  let title = resolved-section.at("title", default: none)
-  let figure = poster-portrait-required-section-content(resolved-section, "figure", name)
-  let note = poster-portrait-required-section-content(resolved-section, "note", name)
-  let figure-width = resolved-section.at("figure-width", default: 1.18fr)
-  let note-width = resolved-section.at("note-width", default: 0.82fr)
+  let title = section.at("title", default: none)
+  let figure = poster-portrait-required-section-content(section, "figure", name)
+  let note = poster-portrait-required-section-content(section, "note", name)
+  let figure-width = section.at("figure-width", default: 1.18fr)
+  let note-width = section.at("note-width", default: 0.82fr)
   let figure-cell = poster-portrait-figure-box(figure, palette, title: title)
   let note-cell = poster-portrait-note-panel(note, palette, style: resolved-note-style)
   let columns = if side == left {
@@ -681,14 +658,13 @@
 }
 
 #let poster-portrait-footer(resolved, palette, footer: auto, acknowledgements: auto, style: poster-portrait-footer-style-defaults) = {
-  let metadata = resolved.at("metadata")
   let footer-content = if footer == auto {
-    metadata.at("venue")
+    resolved.venue
   } else {
     footer
   }
   let acknowledgements-content = if acknowledgements == auto {
-    metadata.at("acknowledgements", default: [])
+    resolved.at("acknowledgements", default: [])
   } else {
     acknowledgements
   }
@@ -726,11 +702,12 @@
   if sections.len() < 2 {
     poster-portrait-takeaway-theme-error("sections must contain at least two items")
   }
-  let resolved-sections = ()
   for (index, section) in sections.enumerate() {
-    resolved-sections.push(poster-portrait-required-section(section, "sections.at(" + str(index) + ")"))
+    if type(section) != dictionary {
+      poster-portrait-takeaway-theme-error("sections.at(" + str(index) + ") must be a dictionary")
+    }
   }
-  resolved-sections
+  sections
 }
 
 #let poster-portrait-resolve-figure-heights(figure-heights, section-count) = {
@@ -785,11 +762,7 @@
   footer-style: (:),
 ) = {
   context {
-    let resolved = if config == none {
-      poster-runtime-config.get()
-    } else {
-      poster-config(overrides: config)
-    }
+    let resolved = _current-poster-config(config)
     let resolved-palette = poster-portrait-resolve-palette(theme, palette)
     let resolved-title-style = poster-portrait-resolve-style(title-style, poster-portrait-title-style-defaults, "title-style")
     let resolved-note-style = poster-portrait-resolve-style(note-style, poster-portrait-note-style-defaults, "note-style")
@@ -838,65 +811,68 @@
   }
 }
 
-#let poster-cite(key, config: none) = {
-  context {
-    let resolved = if config == none {
-      poster-runtime-config.get()
-    } else {
-      poster-config(overrides: config)
+#let _format-poster-citation(key, entry, text-font) = {
+  let kind = if entry.kind == none { none } else { entry.kind.trim() }
+  let author = if entry.author == none { none } else { entry.author.trim() }
+  let title = if entry.title == none { none } else { poster-normalize-title(entry.title) }
+  let journal-name = if entry.journal == none { none } else { entry.journal.trim() }
+  let volume = if entry.volume == none { none } else { entry.volume.trim() }
+  let year = if entry.year == none { none } else { entry.year.trim() }
+  let authors = if author == none or author == "" {
+    ()
+  } else {
+    author.split(" and ").map(part => part.trim()).filter(part => part != "")
+  }
+  if authors.len() == 0 {
+    poster-cite-error("entry `" + key + "` is missing one of: author, year")
+  }
+  let author-label = poster-author-label(authors)
+  let is-article = kind != none and kind.match(regex("(?i)^article$")) != none
+  let is-book = kind != none and kind.match(regex("(?i)^book$")) != none
+  if is-article {
+    if journal-name == none or journal-name == "" or year == none or year == "" {
+      poster-cite-error("entry `" + key + "` is missing one of: author, journal, year")
     }
-    let path = poster-bibliography-path(resolved)
-    let entry = poster-citation-entry(key, path)
-    let kind = if entry.kind == none { none } else { entry.kind.trim() }
-    let author = if entry.author == none { none } else { entry.author.trim() }
-    let title = if entry.title == none { none } else { poster-normalize-title(entry.title) }
-    let journal-name = if entry.journal == none { none } else { entry.journal.trim() }
-    let volume = if entry.volume == none { none } else { entry.volume.trim() }
-    let year = if entry.year == none { none } else { entry.year.trim() }
-    let authors = if author == none or author == "" {
-      ()
+    let journal = poster-italicized-citation-text(poster-display-journal(journal-name), text-font)
+    if volume == none or volume == "" {
+      [#author-label, #journal (#year)]
     } else {
-      author.split(" and ").map(part => part.trim()).filter(part => part != "")
+      [#author-label, #journal, #strong[#volume] (#year)]
     }
-    if authors.len() == 0 {
-      poster-cite-error("entry `" + key + "` is missing one of: author, year")
+  } else {
+    if title == none or title == "" or year == none or year == "" {
+      poster-cite-error("entry `" + key + "` is missing one of: author, title, year")
     }
-    let is-article = kind != none and kind.match(regex("(?i)^article$")) != none
-    let is-book = kind != none and kind.match(regex("(?i)^book$")) != none
-    if is-article {
-      if author == none or author == "" or journal-name == none or journal-name == "" or year == none or year == "" {
-        poster-cite-error("entry `" + key + "` is missing one of: author, journal, year")
-      }
-      let journal = poster-display-journal(journal-name)
-      if volume == none or volume == "" {
-        [#poster-author-label(authors), #poster-italicized-citation-text(journal, resolved.at("text-font")) (#year)]
-      } else {
-        [#poster-author-label(authors), #poster-italicized-citation-text(journal, resolved.at("text-font")), #strong[#volume] (#year)]
-      }
+    if is-book {
+      [#author-label, #poster-italicized-citation-text(title, text-font) (#year)]
     } else {
-      if author == none or author == "" or title == none or title == "" or year == none or year == "" {
-        poster-cite-error("entry `" + key + "` is missing one of: author, title, year")
-      }
-      if is-book {
-        [#poster-author-label(authors), #poster-italicized-citation-text(title, resolved.at("text-font")) (#year)]
-      } else {
-        [#poster-author-label(authors), #title (#year)]
-      }
+      [#author-label, #title (#year)]
     }
   }
 }
 
+#let poster-cite(key, config: none) = context {
+  let resolved = _current-poster-config(config)
+  let path = resolved.bibliography
+  if path == none {
+    poster-cite-error("metadata.bibliography is not set")
+  }
+  let entry = poster-citation-entry(key, path)
+  if entry == none {
+    poster-cite-error("entry not found for key `" + key + "` in `" + path + "`")
+  }
+  _format-poster-citation(key, entry, resolved.at("text-font"))
+}
+
 #let poster-citation-ref(it, config: none) = {
   let resolved = poster-config(overrides: config)
-  let bibliography-path = resolved.at("metadata").at("bibliography", default: none)
-  if bibliography-path == none {
+  let path = resolved.bibliography
+  if path == none { return it }
+  let key = str(it.target)
+  let entry = poster-citation-entry(key, path)
+  if entry == none {
     it
   } else {
-    let key = str(it.target)
-    if poster-has-citation-entry(key, bibliography-path) {
-      poster-cite(key, config: resolved)
-    } else {
-      it
-    }
+    _format-poster-citation(key, entry, resolved.at("text-font"))
   }
 }

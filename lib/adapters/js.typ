@@ -1,11 +1,9 @@
 #import "@preview/js:0.1.3": *
 #import "../core/config.typ": document-config
-#import "../core/metadata.typ": authors-for-js
 #import "../core/locale.typ": wrap-block-equation
 #import "../components/math.typ": apply-inline-japanese-math-spacing
 
-#let js-document(body, config: none) = {
-  let resolved = document-config(overrides: config)
+#let _js-document-layout(resolved, body) = {
   show: js.with(
     lang: resolved.at("lang"),
     seriffont: resolved.at("seriffont"),
@@ -25,17 +23,6 @@
   apply-inline-japanese-math-spacing()
   body
 }
-
-#let citep(
-  key,
-  supplement: none,
-  style: auto,
-) = cite(
-  key,
-  supplement: supplement,
-  form: "normal",
-  style: style,
-)
 
 #let _document-author-name-text(value) = {
   if type(value) == str {
@@ -59,15 +46,30 @@
   }
 }
 
+#let authors-for-js(authors) = {
+  let mapped = authors.map(author => (
+    author.at("name", default: []),
+    author.at("affiliation", default: []),
+    author.at("email", default: []),
+  ))
+  // js uses an inline tuple for one author and a table for each of several.
+  if mapped.len() == 0 {
+    ""
+  } else if mapped.len() == 1 {
+    mapped.first()
+  } else {
+    mapped
+  }
+}
+
 #let document-title(config: none) = {
   let resolved = document-config(overrides: config)
-  let metadata = resolved.at("metadata")
-  let authors = metadata.at("authors-js")
+  let authors = authors-for-js(resolved.authors)
   // js.maketitle couples visible author content to the string-only PDF field.
   // Keep its title layout and boxtable while passing plain names to the PDF.
   set document(
-    title: metadata.at("title"),
-    author: metadata.at("authors")
+    title: resolved.title,
+    author: resolved.authors
       .map(author => _document-author-name-text(author.name))
       .filter(name => name != ""),
     keywords: (),
@@ -75,7 +77,7 @@
   place(top + center, scope: "parent", float: true)[
     #set align(center)
     #v(2em)
-    #text(1.7em, metadata.at("title"))
+    #text(1.7em, resolved.title)
     #v(1.5em)
     #pad(
       x: 2em,
@@ -86,27 +88,15 @@
       },
     )
     #v(1em)
-    #metadata.at("date")
+    #resolved.date
     #v(1.5em)
-    #if metadata.at("abstract") != [] {
+    #if resolved.abstract != [] {
       block(width: 90%)[
         #set text(0.9em)
         _概要_
-        #align(left)[#metadata.at("abstract")]
+        #align(left)[#resolved.abstract]
       ]
       v(1.5em)
     }
   ]
-}
-
-#let bibliography-list-from(
-  path: "biblio.bib",
-  config: none,
-  style: auto,
-  full: auto,
-) = {
-  let resolved = document-config(overrides: config)
-  let effective-style = if style == auto { resolved.at("bibliography-style") } else { style }
-  let effective-full = if full == auto { resolved.at("bibliography-full") } else { full }
-  bibliography(path, style: effective-style, full: effective-full)
 }

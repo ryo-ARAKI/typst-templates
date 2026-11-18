@@ -80,7 +80,7 @@ for name, enabled in (('revtex-preprint-template', False),
     assert numbers == list(range(1, len(numbers)+1)), (name, numbers)
 print('PASS: copied manuscript examples, references, review switch and note visibility')
 
-prefix = '#import "revtex-preprint.typ": revtex-preprint, appendices, draft\n'
+prefix = '#import "revtex-preprint.typ": revtex-preprint, appendices\n'
 (root/'refs.bib').write_text('''@article{sample, author={Jane Example}, title={Transport and information},
  journal={Physical Review E}, year={2025}, volume={111}, pages={012345}}''')
 front = '''
@@ -473,7 +473,7 @@ Explicit body font.
 print('PASS: language-based body fonts, inherited/local/shared note language and explicit font overrides')
 
 # Shared affiliation numbers disappear; multiple affiliations resolve to 1,2.
-shared = prefix+'''#show: draft.with(title: "Plain title", authors: (
+shared = prefix+'''#show: revtex-preprint.with(title: "Plain title", authors: (
 (name: "Alice", affiliations: ("uni",)), (name: "Bob", affiliations: ("uni",))),
 affiliations: ((id: "uni", text: [Shared University]),))
 Text.
@@ -490,7 +490,7 @@ A different font. $ x = 1 $
 ''')
 assert '2026-10-16' in text
 assert '20261016' in run('qpdf','--json',str(root/'dated-font.pdf'))
-print('PASS: shared/multiple/no affiliations, alias, date, alternative font')
+print('PASS: shared/multiple/no affiliations, date, alternative font')
 
 # Failures must be actionable diagnostics, not downstream crashes or swallowed errors.
 invalid = [

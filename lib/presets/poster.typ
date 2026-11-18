@@ -126,14 +126,6 @@
   defaults + style
 }
 
-#let poster-bibliography-path(resolved) = {
-  let path = resolved.bibliography
-  if path == none {
-    poster-cite-error("metadata.bibliography is not set")
-  }
-  path
-}
-
 #let poster-capture-first(text, pattern) = {
   let matched = text.match(pattern)
   if matched == none { none } else { matched.captures.at(0) }
@@ -162,8 +154,7 @@
 
 // Locate entry boundaries without treating nested field braces as entry endings.
 // This reads literal BibTeX fields for short citations, not macros or crossrefs.
-#let poster-entry-blocks(text) = {
-  let blocks = ()
+#let _find-poster-bibtex-entry(text, key) = {
   let start = none
   let offset = 0
   let depth = 0
@@ -192,13 +183,14 @@
     } else if char == "}" {
       if depth > 1 or not quoted { depth -= 1 }
       if depth == 0 {
-        blocks.push(text.slice(start, offset + char.len()))
+        let entry = text.slice(start, offset + char.len())
+        if poster-entry-key(entry) == key { return entry }
         start = none
       }
     }
     offset += char.len()
   }
-  blocks
+  none
 }
 
 // Only commas outside braced or quoted values separate fields.
@@ -244,8 +236,6 @@
   }
   fields
 }
-
-#let poster-field(block, name) = poster-entry-fields(block).at(lower(name), default: none)
 
 #let poster-entry-kind(block) = {
   let kind = poster-capture-first(block, regex("(?im)^\\s*@([A-Za-z]+)\\s*\\{"))
@@ -300,12 +290,8 @@
 }
 
 #let poster-citation-entry(key, path) = {
-  let bibliography = read(path)
-  let blocks = poster-entry-blocks(bibliography)
-  let target = blocks.find(block => poster-entry-key(block) == key)
-  if target == none {
-    poster-cite-error("entry not found for key `" + key + "` in `" + path + "`")
-  }
+  let target = _find-poster-bibtex-entry(read(path), key)
+  if target == none { return none }
   let fields = poster-entry-fields(target)
   (
     kind: poster-entry-kind(target),
@@ -315,12 +301,6 @@
     volume: fields.at("volume", default: none),
     year: fields.at("year", default: none),
   )
-}
-
-#let poster-has-citation-entry(key, path) = {
-  let bibliography = read(path)
-  let blocks = poster-entry-blocks(bibliography)
-  blocks.find(block => poster-entry-key(block) == key) != none
 }
 
 #let poster-logo-strip(..logos, gap: 0.4em, widths: none) = {
@@ -848,61 +828,68 @@
   }
 }
 
-#let poster-cite(key, config: none) = {
-  context {
-    let resolved = _current-poster-config(config)
-    let path = poster-bibliography-path(resolved)
-    let entry = poster-citation-entry(key, path)
-    let kind = if entry.kind == none { none } else { entry.kind.trim() }
-    let author = if entry.author == none { none } else { entry.author.trim() }
-    let title = if entry.title == none { none } else { poster-normalize-title(entry.title) }
-    let journal-name = if entry.journal == none { none } else { entry.journal.trim() }
-    let volume = if entry.volume == none { none } else { entry.volume.trim() }
-    let year = if entry.year == none { none } else { entry.year.trim() }
-    let authors = if author == none or author == "" {
-      ()
-    } else {
-      author.split(" and ").map(part => part.trim()).filter(part => part != "")
+#let _format-poster-citation(key, entry, text-font) = {
+  let kind = if entry.kind == none { none } else { entry.kind.trim() }
+  let author = if entry.author == none { none } else { entry.author.trim() }
+  let title = if entry.title == none { none } else { poster-normalize-title(entry.title) }
+  let journal-name = if entry.journal == none { none } else { entry.journal.trim() }
+  let volume = if entry.volume == none { none } else { entry.volume.trim() }
+  let year = if entry.year == none { none } else { entry.year.trim() }
+  let authors = if author == none or author == "" {
+    ()
+  } else {
+    author.split(" and ").map(part => part.trim()).filter(part => part != "")
+  }
+  if authors.len() == 0 {
+    poster-cite-error("entry `" + key + "` is missing one of: author, year")
+  }
+  let author-label = poster-author-label(authors)
+  let is-article = kind != none and kind.match(regex("(?i)^article$")) != none
+  let is-book = kind != none and kind.match(regex("(?i)^book$")) != none
+  if is-article {
+    if journal-name == none or journal-name == "" or year == none or year == "" {
+      poster-cite-error("entry `" + key + "` is missing one of: author, journal, year")
     }
-    if authors.len() == 0 {
-      poster-cite-error("entry `" + key + "` is missing one of: author, year")
-    }
-    let is-article = kind != none and kind.match(regex("(?i)^article$")) != none
-    let is-book = kind != none and kind.match(regex("(?i)^book$")) != none
-    if is-article {
-      if author == none or author == "" or journal-name == none or journal-name == "" or year == none or year == "" {
-        poster-cite-error("entry `" + key + "` is missing one of: author, journal, year")
-      }
-      let journal = poster-display-journal(journal-name)
-      if volume == none or volume == "" {
-        [#poster-author-label(authors), #poster-italicized-citation-text(journal, resolved.at("text-font")) (#year)]
-      } else {
-        [#poster-author-label(authors), #poster-italicized-citation-text(journal, resolved.at("text-font")), #strong[#volume] (#year)]
-      }
+    let journal = poster-italicized-citation-text(poster-display-journal(journal-name), text-font)
+    if volume == none or volume == "" {
+      [#author-label, #journal (#year)]
     } else {
-      if author == none or author == "" or title == none or title == "" or year == none or year == "" {
-        poster-cite-error("entry `" + key + "` is missing one of: author, title, year")
-      }
-      if is-book {
-        [#poster-author-label(authors), #poster-italicized-citation-text(title, resolved.at("text-font")) (#year)]
-      } else {
-        [#poster-author-label(authors), #title (#year)]
-      }
+      [#author-label, #journal, #strong[#volume] (#year)]
+    }
+  } else {
+    if title == none or title == "" or year == none or year == "" {
+      poster-cite-error("entry `" + key + "` is missing one of: author, title, year")
+    }
+    if is-book {
+      [#author-label, #poster-italicized-citation-text(title, text-font) (#year)]
+    } else {
+      [#author-label, #title (#year)]
     }
   }
 }
 
+#let poster-cite(key, config: none) = context {
+  let resolved = _current-poster-config(config)
+  let path = resolved.bibliography
+  if path == none {
+    poster-cite-error("metadata.bibliography is not set")
+  }
+  let entry = poster-citation-entry(key, path)
+  if entry == none {
+    poster-cite-error("entry not found for key `" + key + "` in `" + path + "`")
+  }
+  _format-poster-citation(key, entry, resolved.at("text-font"))
+}
+
 #let poster-citation-ref(it, config: none) = {
   let resolved = poster-config(overrides: config)
-  let bibliography-path = resolved.bibliography
-  if bibliography-path == none {
+  let path = resolved.bibliography
+  if path == none { return it }
+  let key = str(it.target)
+  let entry = poster-citation-entry(key, path)
+  if entry == none {
     it
   } else {
-    let key = str(it.target)
-    if poster-has-citation-entry(key, bibliography-path) {
-      poster-cite(key, config: resolved)
-    } else {
-      it
-    }
+    _format-poster-citation(key, entry, resolved.at("text-font"))
   }
 }

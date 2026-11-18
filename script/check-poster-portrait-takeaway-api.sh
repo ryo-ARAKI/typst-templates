@@ -330,22 +330,20 @@ write_case "$tmp_dir/valid-bibliography-comments.typ" "
 #import \"$repo_root/lib/presets/poster.typ\": *
 #let existing = \"$repo_root/examples/biblio.bib\"
 #let formats = \"$tmp_dir/citation-formats.bib\"
-#assert(poster-has-citation-entry(\"Tanogami2024_information\", existing))
-#assert(not poster-has-citation-entry(\"ignored\", formats))
+#assert(poster-citation-entry(\"Tanogami2024_information\", existing) != none)
+#assert.eq(poster-citation-entry(\"ignored\", formats), none)
 #let expected = (
   kind: \"article\", author: \"Jane Smith and John Doe\",
   title: \"A {Nested {Title}}, with punctuation\",
   journal: \"Journal of Fluid Mechanics\", volume: \"42\", year: \"2024\",
 )
 #for key in (\"lines\", \"compact\", \"multiline\") {
-  assert(poster-has-citation-entry(key, formats))
   assert.eq(poster-citation-entry(key, formats), expected)
 }
 #let config = (bibliography: formats,)
 #show ref: poster-citation-ref.with(config: config)
 #set heading(numbering: \"1\")
 = Citation formats <ordinary-label>
-#assert(not poster-has-citation-entry(\"ordinary-label\", formats))
 @ordinary-label
 
 @lines / #poster-cite(\"lines\", config: config)
@@ -367,6 +365,15 @@ write_case "$tmp_dir/valid-bibliography-comments.typ" "
 compile_repo_doc "examples/poster-portrait-takeaway.typ" "$tmp_dir/example.pdf"
 compile_repo_doc "starters/poster-portrait-takeaway.typ" "$tmp_dir/starter.pdf"
 compile_tmp_case "$tmp_dir/valid-bibliography-comments.typ" "$tmp_dir/valid-bibliography-comments.pdf"
+citation_text="$tmp_dir/valid-bibliography-comments.txt"
+pdftotext -layout "$tmp_dir/valid-bibliography-comments.pdf" "$citation_text"
+short_citation='Smith and Doe, J. Fluid Mech., 42 (2024)'
+if [[ $(rg -Fxc "$short_citation / $short_citation" "$citation_text") != 3 ]] ||
+   ! rg -Fxq 'Smith, J. Fluid Mech. (2024)' "$citation_text" ||
+   ! rg -Fxq 'Section 1' "$citation_text"; then
+  printf 'unexpected short citations or section reference: %s\n' "$citation_text" >&2
+  exit 1
+fi
 compile_tmp_case "$tmp_dir/valid-theme.typ" "$tmp_dir/valid-theme.pdf"
 compile_tmp_case "$tmp_dir/valid-palette.typ" "$tmp_dir/valid-palette.pdf"
 
